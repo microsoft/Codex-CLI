@@ -6,19 +6,15 @@ With the added functionality for loading developing 'modes', it makes the experi
 
 ## Installation
 
-MacOS and Linux users can go for the zsh instructions and Windows users for powershell instructions.
+MacOS users can go for the zsh instructions, Linux for bash instructions and Windows users for powershell instructions.
 
-0. Install needed python packages.
+First install needed python packages.
 ```
 pip3 install openai
 pip3 install psutil
 ```
 
 ### Zsh instructions
-
-Bash doesn't have native support for plugins. Zsh is a shell that extends bash with a lot more functionality one of which is plugin support. 
-
-Most macOS versions ship zsh natively. Run `zsh --version` to confirm. In case you don't use zsh, consider [these installation instructions](https://github.com/ohmyzsh/ohmyzsh/wiki/Installing-ZSH).
 
 
 1. Download the ZSH plugin.
@@ -58,5 +54,27 @@ secret_key = ...
 TBD
 
 
+### Bash instructions
+
+TBD
+
+## Commands
+
+- `unlearn`
+Deletes the last exchange with Codex
+
+- `unlearn all` or `clear context`
+Starts the current thread/context with Codex afresh
+
+- `show context`
+Shows what the context for your queries look like currently
+
+- `edit context`
+Allows you to go back and edit the context to 'prime' Codex to better respond for some queries
+
+- `save context`
+Allows you to save your context if you want to load it in later
+
 ## Troubleshooting
 
+TBD
