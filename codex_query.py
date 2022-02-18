@@ -16,9 +16,8 @@ ENGINE = 'davinci-codex-msft'
 TEMPERATURE = 0.5
 MAX_TOKENS = 50
 
-# Get config dir from environment or default to ~/.config
-DIRECTORY_SLASH = '\\'
-CONFIG_DIR = os.getenv('XDG_CONFIG_HOME', os.path.expanduser('~'+DIRECTORY_SLASH+'.config'))
+# Get config dir from environment or default to ~/.config or ~\.config depending on OS
+CONFIG_DIR = os.getenv('XDG_CONFIG_HOME', os.path.expanduser(os.path.join('~','.config')))
 API_KEYS_LOCATION = os.path.join(CONFIG_DIR, 'openaiapirc')
 
 PROMPT_CONTEXT = Path(__file__).with_name('openai_completion_input.txt')
@@ -52,7 +51,6 @@ def initialize():
     """
     Initialize openAI and shell mode
     """
-    global DIRECTORY_SLASH
 
     # Check if file at API_KEYS_LOCATION exists
     create_template_ini_file()
@@ -310,7 +308,6 @@ def get_prompt(config):
 
 def detect_shell():
     global SHELL
-    global DIRECTORY_SLASH
 
     parent_process_name = psutil.Process(os.getppid()).name()
     POWERSHELL_MODE = bool(re.fullmatch('pwsh|pwsh.exe|powershell.exe', parent_process_name))
@@ -319,10 +316,6 @@ def detect_shell():
 
     SHELL = "powershell" if POWERSHELL_MODE else "bash" if BASH_MODE else "zsh" if ZSH_MODE else "unknown"
 
-    if SHELL == "powershell":
-        DIRECTORY_SLASH = '\\'
-    else:
-        DIRECTORY_SLASH = '/'
     print(SHELL)
 
 if __name__ == '__main__':
