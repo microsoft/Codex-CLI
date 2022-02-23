@@ -16,6 +16,8 @@ ENGINE = 'davinci-codex-msft'
 TEMPERATURE = 0.5
 MAX_TOKENS = 50
 
+DEBUG_MODE = True
+
 # Get config dir from environment or default to ~/.config or ~\.config depending on OS
 CONFIG_DIR = os.getenv('XDG_CONFIG_HOME', os.path.expanduser(os.path.join('~','.config')))
 API_KEYS_LOCATION = os.path.join(CONFIG_DIR, 'openaiapirc')
@@ -46,7 +48,6 @@ def create_template_ini_file():
         'https://openai.com/blog/openai-codex/')
         sys.exit(1)
 
-
 def initialize():
     """
     Initialize openAI and shell mode
@@ -59,45 +60,25 @@ def initialize():
 
     openai.organization_id = config['openai']['organization_id'].strip('"').strip("'")
     openai.api_key = config['openai']['secret_key'].strip('"').strip("'")
-
-    if os.path.isfile(PROMPT_CONTEXT) == False:
-        with PROMPT_CONTEXT.open('w') as f:
-            f.write('## engine: {}\n'.format(ENGINE))
-            f.write('## temperature: {}\n'.format(TEMPERATURE))
-            f.write('## max_tokens: {}\n'.format(MAX_TOKENS))
-            f.write('## shell: {}\n'.format(SHELL))
-            f.write('## token_count: {}\n'.format(0))
-            f.write('\n')
-    elif has_prompt_headers(PROMPT_CONTEXT) == False:
-        with PROMPT_CONTEXT.open('r') as f:
-            lines = f.readlines()
-        # count number of tokens
-        token_count = 0
-        for line in lines:
-            token_count += len(line.split())
-        newf = open('temp.txt','w')
-        lines = PROMPT_CONTEXT.open('r').readlines() # read old content
-        # add headers at the beginning
-        newf.write('## engine: {}\n'.format(ENGINE))
-        newf.write('## temperature: {}\n'.format(TEMPERATURE))
-        newf.write('## max_tokens: {}\n'.format(MAX_TOKENS))
-        newf.write('## shell: {}\n'.format(SHELL))
-        newf.write('## token_count: {}\n'.format(token_count))
-        newf.write('\n')
-        for line in lines: # write old content after new
-            newf.write(line)
-        newf.close()
-        newf = open('temp.txt','r')
-        with PROMPT_CONTEXT.open('w') as f:
-            # write everything from newf to f
-            f.write(newf.read())
     
-    return read_prompt_headers(PROMPT_CONTEXT)
+    prompt_config = {
+        'engine': ENGINE,
+        'temperature': TEMPERATURE,
+        'max_tokens': MAX_TOKENS,
+        'shell': SHELL,
+        'token_count': get_token_count(PROMPT_CONTEXT)
+    }
+
+    stamp_prompt_headers(PROMPT_CONTEXT, prompt_config)
+    
+    return prompt_config
 
 def has_prompt_headers(prompt_file):
     """
     Check if the prompt context file has headers
     """
+    if os.path.isfile(prompt_file) == False:
+        return False
     with prompt_file.open('r') as f:
         lines = f.readlines()
         # this is not a strict check, but it should be enough
@@ -116,7 +97,7 @@ def read_prompt_headers(prompt_file):
             'temperature': TEMPERATURE,
             'max_tokens': MAX_TOKENS,
             'shell': SHELL,
-            'token_count': 0
+            'token_count': get_token_count(prompt_file)
         }
     with prompt_file.open('r') as f:
         lines = f.readlines()
@@ -132,6 +113,52 @@ def read_prompt_headers(prompt_file):
         'shell': shell,
         'token_count': int(token_count)
     }
+
+def stamp_prompt_headers(prompt_file, config):
+    """
+    Stamp the prompt headers with the config
+    """
+    lines = []
+    if os.path.isfile(PROMPT_CONTEXT):
+        lines = prompt_file.open('r').readlines() # read old content
+
+    newf = open('temp.txt','w')
+    # add headers at the beginning
+    newf.write('## engine: {}\n'.format(config['engine']))
+    newf.write('## temperature: {}\n'.format(config['temperature']))
+    newf.write('## max_tokens: {}\n'.format(config['max_tokens']))
+    newf.write('## shell: {}\n'.format(config['shell']))
+    newf.write('## token_count: {}\n'.format(config['token_count']))
+
+    if has_prompt_headers(prompt_file):
+        lines = lines[5:] # drop old headers
+    
+    for line in lines: # write old content after new
+        newf.write(line)
+    
+    newf.close()
+    newf = open('temp.txt','r')
+    with prompt_file.open('w') as f:
+        # write everything from newf to f
+        f.write(newf.read())
+    newf.close()
+    os.remove('temp.txt')
+
+def get_token_count(prompt_file):
+    """
+    Get the token count from the prompt context file
+    """
+    token_count = 0
+    if os.path.isfile(prompt_file):
+        with prompt_file.open('r') as f:
+            lines = f.readlines()
+        # count number of tokens
+        token_count = 0
+        if has_prompt_headers(prompt_file):
+            lines = lines[5:] # drop headers
+        for line in lines:
+            token_count += len(line.split())
+    return token_count
 
 def get_updated_prompt_file(input, config):
     """
@@ -176,35 +203,62 @@ def get_command_result(input, config):
     Currently supported commands:
     - unlearn
     - unlearn all
-    - show context
+    - show context <n>
     - edit context
     - save context
     - clear context
+    - load context <filename>
+    - set engine <engine>
+    - set temperature <temperature>
+    - set max_tokens <max_tokens>
+    - set shell <shell>
 
     Returns: command result or "" if no command matched
     """
 
+    # configuration setting commands
     if input.__contains__("set"):
-        # if the input is "set temperature 0.5", update TEMPERATURE
-        # and return the prompt
+        # set temperature <temperature>
         if input.__contains__("temperature"):
             input = input.split()
             if len(input) == 3:
                 config['temperature'] = float(input[2])
-                return "temperature set", config
+                return "config set", config
             else:
                 return "", config
-        # if the input is "set max_tokens 50", update MAX_TOKENS
-        # and return the
+        # set max_tokens <max_tokens>
         elif input.__contains__("max_tokens"):
             input = input.split()
             if len(input) == 3:
                 config['max_tokens'] = int(input[2])
-                return "max_tokens set", config
+                return "config set", config
+            else:
+                return "", config
+        elif input.__contains__("shell"):
+            input = input.split()
+            if len(input) == 3:
+                config['shell'] = input[2]
+                return "config set", config
+            else:
+                return "", config
+        elif input.__contains__("engine"):
+            input = input.split()
+            if len(input) == 3:
+                config['engine'] = input[2]
+                return "config set", config
             else:
                 return "", config
 
-    # if input contains "unlearn", then delete the last exchange in the prompt file
+    if input.__contains__("show config"):
+        print('\n')
+        with open(PROMPT_CONTEXT, 'r') as f:
+            lines = f.readlines()
+            lines = lines[:5] # keep headers
+        # the input looks like "show context <number of lines>"
+        print('\n# '.join(lines))
+        return "config shown", config
+
+    # interaction deletion commands
     if input.__contains__("unlearn"):
         # if input is "unlearn all", then delete all the lines of the prompt file
         if input.__contains__("all"):
@@ -226,10 +280,9 @@ def get_command_result(input, config):
                 print("\n#\tUnlearned interaction")
         return "unlearned interaction", config
 
-    # TODO add an input for how many lines to show after "show context"
     # context commands
     if input.__contains__("context"):
-        # show context
+        # show context <n>
         if input.__contains__("show"):
             # print the prompt file to the command line
             print('\n')
@@ -251,38 +304,76 @@ def get_command_result(input, config):
         # edit context
         if input.__contains__("edit"):
             # open the prompt file in text editor
-            os.system('open {}'.format(PROMPT_CONTEXT))
+            if config['shell'] != 'powershell':
+                os.system('open {}'.format(PROMPT_CONTEXT))
+            else:
+                os.system('start {}'.format(PROMPT_CONTEXT))
             return "context shown", config
 
         # save context <filename>
         if input.__contains__("save"):
             # save the current prompt file to a new file
-            # the input looks like "save context <filename>"
-            # save the prompt file to the filename
-            # set filename to current time and date
+            # if filename not specified use the current time (to avoid name conflicts)
+
             filename = time.strftime("%Y-%m-%d_%H-%M-%S") + ".txt"
-            if len(input.split()) == 3:
+            if len(input.split()) == 4:
                 filename = input.split()[3]
+            
             with open(PROMPT_CONTEXT, 'r') as f:
                 lines = f.readlines()
-                # create a new file name with the current time in this file's directory
                 if not filename.endswith('.txt'):
                     filename = filename + '.txt'
-                if config['shell'] == "powershell":
-                    filename = "saved\\" + filename
-                else:
-                    filename = "saved/" + filename
-                with Path(__file__).with_name(filename).open('w') as f:
+                filename = os.path.join(os.path.dirname(PROMPT_CONTEXT), "saved", filename)
+                with Path(filename).open('w') as f:
                     f.writelines(lines)
+            
             print('\n#\tContext saved to {}'.format(filename))
             return "context saved", config
         
+        # clear context
         if input.__contains__("clear"):
-            # TODO maybe add a confirmation prompt or temporary file save before deleting file
+            # temporary saving deleted prompt file
+            filename = time.strftime("%Y-%m-%d_%H-%M-%S") + ".txt"
+            with open(PROMPT_CONTEXT, 'r') as f:
+                lines = f.readlines()
+                filename = os.path.join(os.path.dirname(PROMPT_CONTEXT), "deleted", filename)
+                with Path(filename).open('w') as f:
+                    f.writelines(lines)
+            
+            # delete the prompt file
             with open(PROMPT_CONTEXT, 'w') as f:
                 f.write('')
-                print("\n#\tContext has been cleared")
+                print("\n#\tContext has been cleared, temporarily saved to {}".format(filename))
             return "unlearned interaction", config
+        
+        # load context <filename>
+        if input.__contains__("load"):
+            # the input looks like # load context <filename>
+            # write everything from the file to the prompt file
+            if len(input.split()) == 4:
+                filename = input.split()[3]
+
+                # read from saved directory
+                if not filename.endswith('.txt'):
+                    filename = filename + '.txt'
+                filename = os.path.join(os.path.dirname(PROMPT_CONTEXT), "saved", filename)
+
+                # check if the file exists
+                if os.path.isfile(filename):
+                    with Path(filename).open('r') as f:
+                        lines = f.readlines()
+                else:
+                    print("\n#\tFile not found")
+                    return "context loaded", config
+                
+                # write to the current prompt file
+                with open(PROMPT_CONTEXT, 'w') as f:
+                    f.writelines(lines)
+                
+                print('\n#\tContext loaded from {}'.format(filename))
+                return "context loaded", config
+            print('\n#\tInvalid command format, did you specify which file to load?')
+            return "context loaded", config
     
     return "", config
 
@@ -294,17 +385,23 @@ def get_prompt(config):
     Returns: command result or context + input from stdin
     """
 
-    # get input from terminal
-    #sys.stdin.read() + '\n'
-    entry = input("prompt: ") + '\n'
+    # get input from terminal or stdin
+    if DEBUG_MODE:
+        entry = input("prompt: ") + '\n'
+    else:
+        entry = sys.stdin.read() + '\n'
     # first we check if the input is a command
     command_result, config = get_command_result(entry, config)
 
     # if input is not a command, then update the prompt file and get the prompt
     if command_result == "":
         return get_updated_prompt_file(entry, config)
+    elif command_result == "config set":
+        # successful command no codex query needed
+        stamp_prompt_headers(PROMPT_CONTEXT, config)
+        sys.exit(0)
     else:
-        return command_result, config
+        sys.exit(0)
 
 def detect_shell():
     global SHELL
@@ -316,19 +413,13 @@ def detect_shell():
 
     SHELL = "powershell" if POWERSHELL_MODE else "bash" if BASH_MODE else "zsh" if ZSH_MODE else "unknown"
 
-    print(SHELL)
-
 if __name__ == '__main__':
     detect_shell()
     config = initialize()
-
     try:
         prompt, config = get_prompt(config)
-
-        # check if the prompt is a command result, otherwise run the query
-        if prompt == "unlearned interaction" or prompt == "context shown" or prompt == "context saved":
-            sys.exit(0)
-
+        
+        # use query prefix to prime Codex for correct scripting language
         prefix = ""
         # prime codex for the corresponding shell type
         if config['shell'] == "zsh":
@@ -337,9 +428,10 @@ if __name__ == '__main__':
             prefix = '#!/bin/bash\n\n'
         elif config['shell'] == "powershell":
             prefix = '<# powershell #>'
+        elif config['shell'] == "unknown":
+            print("\n#\tUnsupported shell type, please use # set shell <shell>")
         else:
             prefix = '#' + config['shell'] + '\n\n'
-            print("\n#\tUnsupported shell type, please use # set shell <shell type>")
 
         codex_query = prefix + prompt
 
@@ -368,5 +460,8 @@ if __name__ == '__main__':
         with PROMPT_CONTEXT.open('a') as f:
             f.write(output + '\n')
             f.close()
+        
+        config['token_count'] = get_token_count(PROMPT_CONTEXT)
+        stamp_prompt_headers(PROMPT_CONTEXT, config)
     except FileNotFoundError:
         print('\n\n# Codex CLI error: Prompt file not found')
