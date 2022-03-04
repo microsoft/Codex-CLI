@@ -3,7 +3,7 @@
 # it will look like - C:\Users\<username>\your\custom\path\NL-CLI\codex-query.py
 $nl_cli_script = ""
 
-# this function takes the input from the buffer and prints it to the screen
+# this function takes the input from the buffer and passes it to codex_query.py
 function create_completion() {
     param (
         [Parameter (Mandatory = $true)] [string] $buffer
@@ -21,7 +21,7 @@ function create_completion() {
 
 Set-PSReadLineKeyHandler -Key Ctrl+x `
                          -BriefDescription NLCLI `
-                         -LongDescription "Calls NL-CLI tool for given input" `
+                         -LongDescription "Calls NL-CLI tool on the current buffer" `
                          -ScriptBlock {
     param($key, $arg)
     
