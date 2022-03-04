@@ -57,12 +57,12 @@ secret_key = ...
 2. Open powershell and run the following command.
 
 ```
-$profile
+notepad $profile
 ```
 
-3. Paste the code from `powershell_plugin.ps1` to the end of your `$profile` file. 
+3. Paste the code from `powershell_plugin.ps1` to the end of that file. 
 
-4. Update the `$nl_cli_script` variable inside `$profile` to point to the python script in this project. 
+4. Update the `$nl_cli_script` variable inside `$profile` to point to the python script in the NL-CLI project. 
 
 5. Open another powershell session as admin and run the following command.
 
