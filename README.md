@@ -4,6 +4,8 @@ Type in a natural language command, hit Ctrl+X and watch Codex turn it into scri
 
 With the added functionality for loading developing 'modes', it makes the experience of working in the terminal seamless.
 
+Inspired by the [zsh_codex](https://github.com/tom-doerr/zsh_codex) project, it expands the functionality to multiple shells and adds the ability to load modes.
+
 ## Installation
 
 MacOS users can go for the zsh instructions, Linux for bash instructions and Windows for powershell instructions.
@@ -18,7 +20,7 @@ pip3 install psutil
 ### Zsh instructions
 
 
-1. Download the ZSH plugin.
+1. Download this project to `~/your/custom/path/plugins`.
 
 ```
     $ git clone https://github.com/microsoft/NL-CLI.git ~/your/custom/path/plugins/ 
@@ -27,9 +29,9 @@ pip3 install psutil
 2. Add the following to your `~/.zshrc` file.
 
 ```
-    # in your/custom/path you need to have a "plugins" folder and in there you clone the repository as zsh_codex
+    # in your/custom/path you need to have a "plugins" folder and in there you clone the repository as nl_cli
     export ZSH_CUSTOM="your/custom/path"
-    source "$ZSH_CUSTOM/plugins/NL-CLI/zsh_codex.plugin.zsh"
+    source "$ZSH_CUSTOM/plugins/NL-CLI/nl_cli.plugin.zsh"
     bindkey '^X' create_completion
 ```
 
@@ -46,8 +48,37 @@ secret_key = ...
 
 ### Powershell instructions
 
-TBD
+1. Download this project to wherever you want `C:\Users\<username>\your\custom\path\`.
 
+```
+    $ git clone https://github.com/microsoft/NL-CLI.git C:\Users\<username>\your\custom\path\
+```
+
+2. Open powershell and run the following command.
+
+```
+$profile
+```
+
+3. Paste the code from `powershell_plugin.ps1` to the end of your `$profile` file. 
+
+4. Update the `$nl_cli_script` variable inside `$profile` to point to the python script in this project. 
+
+5. Open another powershell session as admin and run the following command.
+
+```
+Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
+```
+
+6. Create a file called `openaiapirc` in `C:\Users\<username>\.config` with your ORGANIZATION_ID and SECRET_KEY.
+
+```
+[openai]
+organization_id = ...
+secret_key = ...
+```
+
+7. Open a new powershell session, type in `#` followed by your natural language command and hit Ctrl+X!
 
 ### Bash instructions
 

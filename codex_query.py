@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 
 import openai
 import sys
@@ -13,10 +14,10 @@ from pathlib import Path
 SHELL = ""
 
 ENGINE = 'davinci-codex-msft'
-TEMPERATURE = 0.5
-MAX_TOKENS = 50
+TEMPERATURE = 0.1
+MAX_TOKENS = 100
 
-DEBUG_MODE = True
+DEBUG_MODE = False
 
 # Get config dir from environment or default to ~/.config or ~\.config depending on OS
 CONFIG_DIR = os.getenv('XDG_CONFIG_HOME', os.path.expanduser(os.path.join('~','.config')))
@@ -61,15 +62,19 @@ def initialize():
     openai.organization_id = config['openai']['organization_id'].strip('"').strip("'")
     openai.api_key = config['openai']['secret_key'].strip('"').strip("'")
     
-    prompt_config = {
-        'engine': ENGINE,
-        'temperature': TEMPERATURE,
-        'max_tokens': MAX_TOKENS,
-        'shell': SHELL,
-        'token_count': get_token_count(PROMPT_CONTEXT)
-    }
+    prompt_config = {}
 
-    stamp_prompt_headers(PROMPT_CONTEXT, prompt_config)
+    if has_prompt_headers(PROMPT_CONTEXT) == False:
+        prompt_config = {
+            'engine': ENGINE,
+            'temperature': TEMPERATURE,
+            'max_tokens': MAX_TOKENS,
+            'shell': SHELL,
+            'token_count': get_token_count(PROMPT_CONTEXT)
+        }
+        stamp_prompt_headers(PROMPT_CONTEXT, prompt_config)
+    else:
+        prompt_config = read_prompt_headers(PROMPT_CONTEXT)
     
     return prompt_config
 
@@ -389,7 +394,7 @@ def get_prompt(config):
     if DEBUG_MODE:
         entry = input("prompt: ") + '\n'
     else:
-        entry = sys.stdin.read() + '\n'
+        entry = sys.stdin.read()
     # first we check if the input is a command
     command_result, config = get_command_result(entry, config)
 
@@ -427,7 +432,7 @@ if __name__ == '__main__':
         elif config['shell'] == "bash":
             prefix = '#!/bin/bash\n\n'
         elif config['shell'] == "powershell":
-            prefix = '<# powershell #>'
+            prefix = '<# powershell #>\n\n'
         elif config['shell'] == "unknown":
             print("\n#\tUnsupported shell type, please use # set shell <shell>")
         else:
@@ -435,9 +440,11 @@ if __name__ == '__main__':
 
         codex_query = prefix + prompt
 
+        # write codex_query to a temporary file
+        with open("codex_query.txt", 'w') as f:
+            f.write(codex_query)
+
         # get the response from codex
-        # keeping max_tokens at 50 to avoid multi-line responses
-        # keeping temperature high
         response = openai.Completion.create(engine=config['engine'], prompt=codex_query, temperature=config['temperature'], max_tokens=config['max_tokens'])
 
         completion_all = response['choices'][0]['text']
