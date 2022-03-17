@@ -8,7 +8,6 @@ Inspired by the [zsh_codex](https://github.com/tom-doerr/zsh_codex) project, it 
 
 ## Installation
 
-MacOS users can go for the zsh instructions, Linux for bash instructions and Windows for powershell instructions.
 
 Make sure you have python installed. Then install needed python packages.
 
@@ -17,21 +16,23 @@ pip3 install openai
 pip3 install psutil
 ```
 
+Follow the steps for which shell you are using. Generally, Mac OS has zsh, Linux has bash, Windows has powershell.
+
 ### Zsh instructions
 
 
-1. Download this project to `~/your/custom/path/plugins`.
+1. Download this project to `~/your/custom/path/`.
 
 ```
-    $ git clone https://github.com/microsoft/NL-CLI.git ~/your/custom/path/plugins/ 
+    $ git clone https://github.com/microsoft/NL-CLI.git ~/your/custom/path/
 ```
 
 2. Add the following to your `~/.zshrc` file.
 
 ```
-    # in your/custom/path you need to have a "plugins" folder and in there you clone the repository as nl_cli
+    # in your/custom/path you need to clone the repository
     export ZSH_CUSTOM="your/custom/path"
-    source "$ZSH_CUSTOM/plugins/NL-CLI/nl_cli.plugin.zsh"
+    source "$ZSH_CUSTOM/NL-CLI/nl_cli.plugin.zsh"
     bindkey '^X' create_completion
 ```
 
@@ -48,10 +49,10 @@ secret_key = ...
 
 ### Powershell instructions
 
-1. Download this project to wherever you want `C:\Users\<username>\your\custom\path\`.
+1. Download this project to wherever you want `C:\your\custom\path\`.
 
 ```
-    $ git clone https://github.com/microsoft/NL-CLI.git C:\Users\<username>\your\custom\path\
+    $ git clone https://github.com/microsoft/NL-CLI.git C:\your\custom\path\
 ```
 
 2. Open powershell and run the following command.
@@ -82,7 +83,32 @@ secret_key = ...
 
 ### Bash instructions
 
-TBD
+
+1. Download this project to `~/your/custom/path/`.
+
+```
+    $ git clone https://github.com/microsoft/NL-CLI.git ~/your/custom/path/
+```
+
+2. Add the following to your `~/.bashrc` file.
+
+```
+    # in your/custom/path you need to clone the repository
+    export NL_CLI_PATH="your/custom/path/NL-CLI"
+    source "$NL_CLI_PATH/nl_cli.plugin.sh"
+    bind -x '"\C-x":"create_completion"'
+```
+
+3. Create a file called `openaiapirc` in `~/.config` with your ORGANIZATION_ID and SECRET_KEY.
+
+```
+[openai]
+organization_id = ...
+secret_key = ...
+```
+
+4. Run `bash`, start typing and complete it using `^X`!
+
 
 
 ## Context file format
@@ -104,7 +130,7 @@ The lines starting with `##` are the configuration options and are ignored by Co
 
 ## Usage
 
-When an input is provided to the CLI, we first check if it is a config/context command. If it is, we execute the command and exit. If it is not, we prefix the input with the shell name and context history and pass it to Codex (which is configured according to the configurations at the beginning of the context file). Codex then returns the script that should be executed which is printed to the CLI. We add the input-output to the context file and save it.
+When an input is provided to the CLI, we first check if it is a command. If it is, we execute the command and exit. If it is not, we prefix the input with the shell name and context history and pass it to Codex (which is configured according to the configurations at the beginning of the context file). Codex then returns the script that should be executed which is printed to the CLI. In the background, we add the input-output to the context file and save it to allow multi-turn scenarios.
 
 Feel free to use `edit context` to edit the context file via a text editor instead of the CLI.
 ## Commands
@@ -139,8 +165,6 @@ Allows you to save your context if you want to load it in later, saves it to `sa
 
 Loads a previously saved context from the `saved` directory. 
 
-
-
 ### Configuration commands
 
 If any configuration values are out of range, we revert to the defaults (see below).
@@ -168,3 +192,5 @@ Sets the shell for the current context. There is no default here since we need t
 ## Troubleshooting
 
 Use `DEBUG_MODE` to use a terminal input instead of the stdin and debug the code. This is useful when adding new commands.
+
+Sometimes `openai` will throws errors that aren't caught by the tool, you can add a catch block at the end of `codex_query.py` for that exception and print a custom error message.

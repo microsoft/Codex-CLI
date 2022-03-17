@@ -1,6 +1,6 @@
 
 # fill in the path here
-# it will look like - C:\Users\<username>\your\custom\path\NL-CLI\codex-query.py
+# it will look like - C:\Users\<username>\your\custom\path\NL-CLI\codex_query.py
 $nl_cli_script = ""
 
 # this function takes the input from the buffer and passes it to codex_query.py
@@ -31,9 +31,13 @@ Set-PSReadLineKeyHandler -Key Ctrl+x `
     [Microsoft.PowerShell.PSConsoleReadLine]::GetBufferState([ref]$line, [ref]$cursor)
 
     # get response from create_completion function
-    $outpt = create_completion($line)
+    $output = create_completion($line)
 
     # move to the next line
     [Microsoft.PowerShell.PSConsoleReadLine]::AddLine()
-    [Microsoft.PowerShell.PSConsoleReadLine]::Insert($outpt)
+    
+    # check if output is not null
+    if ($output -ne $null) {
+        [Microsoft.PowerShell.PSConsoleReadLine]::Insert($output)
+    }
 }

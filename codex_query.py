@@ -14,7 +14,7 @@ from pathlib import Path
 SHELL = ""
 
 ENGINE = 'davinci-codex-msft'
-TEMPERATURE = 0.1
+TEMPERATURE = 0
 MAX_TOKENS = 100
 
 DEBUG_MODE = False
@@ -282,7 +282,7 @@ def get_command_result(input, config):
                     lines.pop()
                     with open(PROMPT_CONTEXT, 'w') as f:
                         f.writelines(lines)
-                print("\n#\tUnlearned interaction")
+                print("\n#   Unlearned interaction")
         return "unlearned interaction", config
 
     # context commands
@@ -445,30 +445,23 @@ if __name__ == '__main__':
             f.write(codex_query)
 
         # get the response from codex
-        response = openai.Completion.create(engine=config['engine'], prompt=codex_query, temperature=config['temperature'], max_tokens=config['max_tokens'])
+        response = openai.Completion.create(engine=config['engine'], prompt=codex_query, temperature=config['temperature'], max_tokens=config['max_tokens'], stop="#")
 
         completion_all = response['choices'][0]['text']
-        completion_list = completion_all.split('\n')
-        output = ""
-        if completion_all[:2] == '\n\n':
-            output = completion_all
-        elif completion_list[0]:
-            output = completion_list[0]
-        elif len(completion_list) == 1:
-            output = ""
-        else:
-            output = '\n' + completion_list[1]
 
-        # print output to CLI
         print('\n')
-        print(output)
+        print(completion_all)
 
         # append output to prompt context file
         with PROMPT_CONTEXT.open('a') as f:
-            f.write(output + '\n')
+            f.write(completion_all)
             f.close()
         
         config['token_count'] = get_token_count(PROMPT_CONTEXT)
         stamp_prompt_headers(PROMPT_CONTEXT, config)
     except FileNotFoundError:
         print('\n\n# Codex CLI error: Prompt file not found')
+    except openai.error.RateLimitError:
+        print('\n\n# Codex CLI error: Rate limit exceeded')
+    except openai.error.APIConnectionError:
+        print('\n\n# Codex CLI error: API connection error, are you connected to the internet?')
