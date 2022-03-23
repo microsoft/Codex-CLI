@@ -130,7 +130,7 @@ The lines starting with `##` are the configuration options and are ignored by Co
 
 ## Usage
 
-When an input is provided to the CLI, we first check if it is a command. If it is, we execute the command and exit. If it is not, we prefix the input with the shell name and context history and pass it to Codex (which is configured according to the configurations at the beginning of the context file). Codex then returns the script that should be executed which is printed to the CLI. In the background, we add the input-output to the context file and save it to allow multi-turn scenarios.
+When an input is provided to the CLI, we first check if it is a command. If it is, we execute the command and exit. If it is not, we prefix the input with the shell name and context history and pass it to Codex (which is configured according to the configurations at the beginning of the context file). Codex then returns the script that should be executed. That script is printed to the CLI. In the background, we add the input-output to the context file and save it to allow multi-turn scenarios.
 
 Feel free to use `edit context` to edit the context file via a text editor instead of the CLI.
 ## Commands
