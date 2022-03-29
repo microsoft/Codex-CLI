@@ -180,3 +180,9 @@ def get_command_result(input, prompt_file):
             return "context loaded", prompt_file
     
     return "", prompt_file
+
+def dangerous_command_validation(command):
+    if command.__contains__('rm') or command.__contains__('Remove-Item') or command.__contains__('sudo'):
+            return True
+    
+    return False

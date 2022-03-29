@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from cmd import PROMPT
 import openai
 import sys
 import os
@@ -12,7 +11,7 @@ import psutil
 
 from pathlib import Path
 from prompt_file import PromptFile
-from commands import get_command_result
+from commands import get_command_result, dangerous_command_validation
 
 SHELL = ""
 
@@ -153,6 +152,10 @@ if __name__ == '__main__':
         completion_all = response['choices'][0]['text']
 
         print(completion_all)
+
+        if dangerous_command_validation(completion_all):
+            print("\n# ****Dangerous command detected*****")
+            print("\n# Hit Ctrl+C or Ctrl+Z to exit if you don't want to execute (and run unlearn command if needed)")
 
         # if the response is not empty, then update the prompt file
         if CONTEXT_MODE and (completion_all != "" or len(completion_all) > 0):
