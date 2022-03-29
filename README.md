@@ -34,14 +34,15 @@ Follow the steps for which shell you are using. Generally, Mac OS has zsh, Linux
     export ZSH_CUSTOM="your/custom/path"
     source "$ZSH_CUSTOM/NL-CLI/nl_cli.plugin.zsh"
     bindkey '^X' create_completion
+    bindkey '^G' create_completion_without_context
 ```
 
 3. Create a file called `openaiapirc` in `~/.config` with your ORGANIZATION_ID and SECRET_KEY.
 
 ```
 [openai]
-organization_id = ...
-secret_key = ...
+organization_id=...
+secret_key=...
 ```
 
 4. Run `zsh`, start typing and complete it using `^X`!
@@ -75,8 +76,8 @@ Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
 
 ```
 [openai]
-organization_id = ...
-secret_key = ...
+organization_id=...
+secret_key=...
 ```
 
 7. Open a new powershell session, type in `#` followed by your natural language command and hit Ctrl+X!
@@ -97,14 +98,15 @@ secret_key = ...
     export NL_CLI_PATH="your/custom/path/NL-CLI"
     source "$NL_CLI_PATH/nl_cli.plugin.sh"
     bind -x '"\C-x":"create_completion"'
+    bind -x '"\C-g":"create_completion_without_context"'
 ```
 
 3. Create a file called `openaiapirc` in `~/.config` with your ORGANIZATION_ID and SECRET_KEY.
 
 ```
 [openai]
-organization_id = ...
-secret_key = ...
+organization_id=...
+secret_key=...
 ```
 
 4. Run `bash`, start typing and complete it using `^X`!
