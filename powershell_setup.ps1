@@ -3,7 +3,6 @@
 ###
 param
 (
-    # TODO: Add a swtich for init/clean-up
     [Parameter(Mandatory = $true)]
     [System.IO.FileInfo]
     [ValidateScript( {
@@ -30,28 +29,6 @@ param
 $plugInScriptPath = Join-Path $RepoRoot -ChildPath "powershell_plugin.ps1"
 $codexQueryPath = Join-Path $RepoRoot -ChildPath "codex_query.py"
 $openAIConfigPath = Join-Path $env:USERPROFILE -ChildPath ".config\openaiapirc"
-
-function CleanUpProfile() {
-    if (Test-Path -Path $PROFILE)
-    {
-        CleanUpProfileContent
-        New-Item -Type File -Path $PROFILE -Force 
-    }
-}
-
-function CleanUpProfileContent() {
-# RegEx match start and end pattern, replace with empty string.
-# if the file length is 0. delete the file
-# if the folder childItem count is 0, delete the folder
-}
-
-function CleanUpOpenAiConfig() {
-    if (Test-Path -Path $openAIConfigPath)
-    {
-        Remove-Item $openAIConfigPath
-        Write-Host "Removed $openAIConfigPath"
-    }
-}
 
 # Create new PowerShell profile if doesn't exist. The profile type is for current user and current host.
 # To learn more about PowerShell profile, please refer to 
