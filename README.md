@@ -61,11 +61,12 @@ Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
 ```
 
 
-3. In the same Powershell window, go to `C:\your\custom\path\` (the folder contains NL-CLI code), then run the following command to setup your PowerShell environment.
+3. In the same Powershell window, go to `C:\your\custom\path\` (the folder contains NL-CLI code), then run the following command to setup your PowerShell environment. It will prompt you for OpenAI access key.
 
 ```
 .\powershell_setup.ps1
 ```
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;See [About powershell_setup.ps1](#about-powershellsetupps1) section to learn script parameters.
 
 4. Open a new powershell session, type in `#` followed by your natural language command and hit Ctrl+X!
 
@@ -79,6 +80,13 @@ If you want to revert the execution policy, run this command
 ```
 Set-ExecutionPolicy Undefined -Scope CurrentUser
 ```
+
+#### About powershell_setup.ps1
+`powershell_setup.ps1` supports the following parameters:
+| Parameter | Type | Description | Example |
+|--|--|--|--|
+| `-RepoRoot` | [FileInfo](https://docs.microsoft.com/en-us/dotnet/api/system.io.fileinfo) | Optional. Default to the current folder.<br>The value should be the path of NL-CLI folder|`.\powershell_setup.ps1 -RepoRoot 'C:\your\custom\path'`|
+| `-OpenAIApiKey` | [SecureString](https://docs.microsoft.com/en-us/dotnet/api/system.security.securestring) | Required. If is not supplied, the script will prompt you to input the value. If you would like to provide the value via PowerShell parameter, please refer to the example. | `.\powershell_setup.ps1 -OpenAIApiKey (ConvertTo-SecureString "YOUR_OPENAI_API_KEY" -AsPlainText -Force)` |
 
 ### Bash instructions
 
