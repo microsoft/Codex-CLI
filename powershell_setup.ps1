@@ -14,6 +14,7 @@ param
     [string]$RepoRoot,
 
     [Parameter(Mandatory = $true)]
+    [ValidateNotNullOrEmpty()]
     [SecureString]
     $OpenAIApiKey,
 
@@ -33,7 +34,9 @@ if (!(Test-Path -Path $PROFILE))
 {
     New-Item -Type File -Path $PROFILE -Force 
 } else {
-    # TODO: Clean up the content before append new one
+    # Clean up the content before append new one. This allow users to setup multiple times without running cleanup script
+    (Get-Content -Path $PROFILE -Raw) -replace "(?ms)### NL-CLI setup - start.*?### NL-CLI setup - end", "" | Set-Content -Path $PROFILE
+    Write-Host "Removed previous setup script from $PROFILE."
 }
 
 # Add our plugin script into PowerShell profile. It involves three steps:
@@ -49,6 +52,8 @@ if (!(Test-Path -Path $openAIConfigPath))
     New-Item -Type File -Path $openAIConfigPath -Force 
 }
 
+$openAIApiKeyPlainText = ConvertFrom-SecureString -SecureString $OpenAIApiKey -AsPlainText
+
 Set-Content -Path $openAIConfigPath "[openai]
-secret_key=$OpenAIApiKey"
+secret_key=$openAIApiKeyPlainText"
 Write-Host "Updated OpenAI configuration file with secrets"
