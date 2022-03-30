@@ -54,30 +54,31 @@ secret_key = ...
     $ git clone https://github.com/microsoft/NL-CLI.git C:\your\custom\path\
 ```
 
-2. Open powershell and run the following command.
-
-```
-notepad $profile
-```
-
-3. Paste the code from `powershell_plugin.ps1` to the end of that file. 
-
-4. Update the `$nl_cli_script` variable inside `$profile` to point to the python script in the NL-CLI project. 
-
-5. Open another powershell session as admin and run the following command.
+2. Open PowerShell as Administrator and run the following command.
 
 ```
 Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
 ```
 
-6. Create a file called `openaiapirc` in `C:\Users\<username>\.config` with your SECRET_KEY.
+
+3. In the same Powershell window, go to `C:\your\custom\path\` (the folder contains NL-CLI code), then run the following command to setup your PowerShell environment.
 
 ```
-[openai]
-secret_key = ...
+.\powershell_setup.ps1
 ```
 
-7. Open a new powershell session, type in `#` followed by your natural language command and hit Ctrl+X!
+4. Open a new powershell session, type in `#` followed by your natural language command and hit Ctrl+X!
+
+#### Clean up
+Once you are done, go to `C:\your\custom\path\` (the folder contains NL-CLI code), then run the following command to clean up.
+```
+.\powershell_cleanup.ps1
+```
+
+If you want to revert the execution policy, run this command
+```
+Set-ExecutionPolicy Undefined -Scope CurrentUser
+```
 
 ### Bash instructions
 
