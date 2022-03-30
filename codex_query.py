@@ -16,12 +16,11 @@ from commands import get_command_result
 
 SHELL = ""
 
-ENGINE = 'davinci-codex-msft'
+ENGINE = 'cushman-codex-msft'
 TEMPERATURE = 0
 MAX_TOKENS = 300
 
 DEBUG_MODE = False
-CONTEXT_MODE = False
 
 # Get config dir from environment or default to ~/.config or ~\.config depending on OS
 CONFIG_DIR = os.getenv('XDG_CONFIG_HOME', os.path.expanduser(os.path.join('~','.config')))
@@ -57,19 +56,16 @@ def initialize():
 
     openai.organization_id = config['openai']['organization_id'].strip('"').strip("'")
     openai.api_key = config['openai']['secret_key'].strip('"').strip("'")
+
+    prompt_config = {
+        'engine': ENGINE,
+        'temperature': TEMPERATURE,
+        'max_tokens': MAX_TOKENS,
+        'shell': SHELL,
+        'token_count': 0
+    }
     
-    if CONTEXT_MODE:
-        prompt_config = {
-            'engine': ENGINE,
-            'temperature': TEMPERATURE,
-            'max_tokens': MAX_TOKENS,
-            'shell': SHELL,
-            'token_count': 0
-        }
-        
-        return PromptFile(PROMPT_CONTEXT.name, prompt_config)
-    
-    return None
+    return PromptFile(PROMPT_CONTEXT.name, prompt_config)
 
 def get_query(prompt_file):
     """
@@ -104,13 +100,6 @@ def detect_shell():
     SHELL = "powershell" if POWERSHELL_MODE else "bash" if BASH_MODE else "zsh" if ZSH_MODE else "unknown"
 
 if __name__ == '__main__':
-    # detect the -c flag and set CONTEXT_MODE to True
-    if '-c' in sys.argv:
-        CONTEXT_MODE = True
-        # write to codex_query.txt
-        with open('codex_query.txt', 'a') as f:
-            f.write("CONTEXT ON?\n")
-
     detect_shell()
     prompt_file = initialize()
     try:
@@ -138,15 +127,8 @@ if __name__ == '__main__':
         else:
             prefix = '#' + config['shell'] + '\n\n'
 
-        if CONTEXT_MODE:
-            codex_query = prefix + prompt_file.read_prompt_file(user_query) + user_query
-        else:
-            codex_query = prefix + '# what\'s the time?\nGet-Date\n\n' + user_query
+        codex_query = prefix + prompt_file.read_prompt_file(user_query) + user_query
 
-        # write codex_query to a file
-        with open('codex_query.txt', 'a') as f:
-            f.write(codex_query)
-        
         # get the response from codex
         response = openai.Completion.create(engine=config['engine'], prompt=codex_query, temperature=config['temperature'], max_tokens=config['max_tokens'], stop="#")
 
@@ -155,7 +137,7 @@ if __name__ == '__main__':
         print(completion_all)
 
         # if the response is not empty, then update the prompt file
-        if CONTEXT_MODE and (completion_all != "" or len(completion_all) > 0):
+        if completion_all != "" or len(completion_all) > 0:
             prompt_file.add_input_output_pair(user_query, completion_all)
         
     except FileNotFoundError:
