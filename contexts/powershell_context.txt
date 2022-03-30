@@ -24,10 +24,6 @@ Stop-Process -Id 1584
 # what other devices are on my network?
 Get-NetIPAddress | Format-Table
 
-# Say "hello world"
-$Voice = new-object -ComObject SAPI.SPVoice
-[void]$Voice.Speak("Hello World")
-
 # how much storage is left on my pc?
 Get-WmiObject -Class Win32_LogicalDisk | Select-Object -Property DeviceID,FreeSpace,Size,DriveType | Format-Table -AutoSize
 
