@@ -15,7 +15,6 @@ def get_command_result(input, prompt_file):
     - save context
     - clear context
     - load context <filename>
-    - disable context
     - set engine <engine>
     - set temperature <temperature>
     - set max_tokens <max_tokens>
@@ -33,30 +32,20 @@ def get_command_result(input, prompt_file):
         if input.__contains__("temperature"):
             input = input.split()
             if len(input) == 3:
-                new_temp = float(input[2])
-                if new_temp >= 0 and new_temp <= 1:
-                    config['temperature'] = new_temp
-                    prompt_file.set_headers(config)
-                else:
-                    print("\n# ERROR: temperature must be between 0 and 1")
+                config['temperature'] = float(input[2])
+                prompt_file.set_headers(config)
                 return "config set", prompt_file
             else:
                 return "", prompt_file
-        
         # set max_tokens <max_tokens>
         elif input.__contains__("max_tokens"):
             input = input.split()
             if len(input) == 3:
-                new_token_count = int(input[2])
-                if new_token_count >= 0 and new_token_count <= 1000:
-                    config['max_tokens'] = int(input[2])
-                    prompt_file.set_headers(config)
-                else:
-                    print("\n# ERROR: max_tokens must be between 0 and 1000")
+                config['max_tokens'] = int(input[2])
+                prompt_file.set_headers(config)
                 return "config set", prompt_file
             else:
                 return "", prompt_file
-        
         elif input.__contains__("shell"):
             input = input.split()
             if len(input) == 3:
@@ -112,11 +101,8 @@ def get_command_result(input, prompt_file):
                 line_numbers = int(input.split()[3])
             # print the last line_numbers lines
             if line_numbers != 0:
-                if line_numbers > len(lines):
-                    print("\n# ERROR: context number must be less than the number of lines in the file")
-                else:
-                    for line in lines[-line_numbers:]:
-                        print('\n# '+line, end='')
+                for line in lines[-line_numbers:]:
+                    print('\n# '+line, end='')
             else:
                 print('\n# '.join(lines))
             return "context shown", prompt_file
@@ -167,7 +153,7 @@ def get_command_result(input, prompt_file):
                     with Path(filename).open('r') as f:
                         lines = f.readlines()
                 else:
-                    print("\n# File not found")
+                    print("\n#\tFile not found")
                     return "context loaded", prompt_file
                 
                 # write to the current prompt file
