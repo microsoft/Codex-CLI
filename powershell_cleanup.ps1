@@ -6,6 +6,8 @@
 # 2. OpenAI configuration file (openaiapirc)
 ###
 
+$openAIConfigPath = Join-Path $env:USERPROFILE -ChildPath ".config\openaiapirc"
+
 function CleanUpOpenAiConfig() 
 {
     if (Test-Path -Path $openAIConfigPath)
@@ -17,30 +19,19 @@ function CleanUpOpenAiConfig()
 
 function CleanUpProfileContent() 
 {
-    # RegEx match start and end pattern, replace with empty string.
-    (Get-Content -Path $PROFILE) -replace "^.*?(?:\b|_)NL-CLI setup - start(?:\b|_).*?(?:\b|_)NL-CLI setup - end", "" | Set-Content $PROFILE
-
-    # if the file length is 0. delete the file
-    if (IsNullOrWhiteSpace((Get-Content -Path $PROFILE)))
+    if (Test-Path -Path $PROFILE) 
     {
-        Remove-Item $PROFILE
-        Write-Host "Removed $PROFILE"
+        # RegEx match setup code, replace with empty string.
+        (Get-Content -Path $PROFILE -Raw) -replace "(?ms)### NL-CLI setup - start.*?### NL-CLI setup - end", "" | Set-Content -Path $PROFILE
 
-        # if the folder childItem count is 1, delete the folder
-        $profileFolderPath = (Get-Item $PROFILE).parent
-        if(Test-Path -Path $profileFolderPath)
+        # Delete the file if its content is empty
+        if ([String]::IsNullOrWhiteSpace((Get-Content -Path $PROFILE)))
         {
-            if ((Get-ChildItem $profileFolderPath).count == 1)
-            {
-                # TODO: actually reove the folder
-                Write-Host "Removed $profileFolderPath"
-            }
+            Remove-Item $PROFILE
+            Write-Host "Removed $PROFILE"
         }
     }
 }
 
-if (Test-Path -Path $PROFILE) 
-{
-    CleanUpProfileContent
-    #Remove-Item -Type File -Path $PROFILE -Force 
-}
+CleanUpProfileContent
+CleanUpOpenAiConfig
