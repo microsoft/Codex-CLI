@@ -15,10 +15,6 @@ param
 
     [Parameter(Mandatory = $true)]
     [SecureString]
-    $OpenAIOrgId,
-
-    [Parameter(Mandatory = $true)]
-    [SecureString]
     $OpenAIApiKey,
 
     [Parameter()]
@@ -54,6 +50,5 @@ if (!(Test-Path -Path $openAIConfigPath))
 }
 
 Set-Content -Path $openAIConfigPath "[openai]
-organization_id=$OpenAIOrgId
 secret_key=$OpenAIApiKey"
 Write-Host "Updated OpenAI configuration file with secrets"
