@@ -1,0 +1,35 @@
+## engine: cushman-codex-msft
+## temperature: 0
+## max_tokens: 300
+## shell: powershell
+## token_count: 618
+
+# what process is using the most memory?
+Get-Process | Sort-Object -Property WorkingSet -Descending | Select-Object -First 10
+
+# stop the chrome processes
+Get-Process chrome | Stop-Process
+
+# make a readme with a project header and two sections
+"# Project Header
+## Section 1
+## Section 2" | Out-File "./readme2.md"
+
+# what's running on port 3000?
+Get-Process -Id (Get-NetTCPConnection -LocalPort 3000).OwningProcess
+
+# kill process 1584
+Stop-Process -Id 1584
+
+# what other devices are on my network?
+Get-NetIPAddress | Format-Table
+
+# Say "hello world"
+$Voice = new-object -ComObject SAPI.SPVoice
+[void]$Voice.Speak("Hello World")
+
+# how much storage is left on my pc?
+Get-WmiObject -Class Win32_LogicalDisk | Select-Object -Property DeviceID,FreeSpace,Size,DriveType | Format-Table -AutoSize
+
+# how many GB is 367247884288 B?
+(367247884288 / 1GB)
