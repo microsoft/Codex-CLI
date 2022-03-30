@@ -25,28 +25,20 @@ API_KEYS_LOCATION = os.path.join(CONFIG_DIR, 'openaiapirc')
 
 PROMPT_CONTEXT = Path(__file__).with_name('openai_completion_input.txt')
 
-# Read the organization_id and secret_key from the ini file ~/.config/openaiapirc
+# Read the secret_key from the ini file ~/.config/openaiapirc
 # The format is:
 # [openai]
-# organization_id=<your organization ID>
 # secret_key=<your secret key>
 
-# If you don't see your organization ID in the file you can get it from the
-# OpenAI web site: https://openai.com/organizations
 def create_template_ini_file():
     """
-    If the ini file does not exist create it and add the organization_id and
-    secret_key
+    If the ini file does not exist create it and add secret_key
     """
     if not os.path.isfile(API_KEYS_LOCATION):
-        print('Please create a file called openaiapirc at {} and add your organization ID and secret key'.format(CONFIG_DIR))
+        print('Please create a file called openaiapirc at {} and add your secret key'.format(CONFIG_DIR))
         print('The format is:\n')
         print('[openai]')
-        print('organization_id=<your organization ID>')
         print('secret_key=<your secret key>\n')
-        print('If you do not yet have an organization ID and secret key, you\n'
-        'need to register for OpenAI Codex: \n'
-        'https://openai.com/blog/openai-codex/')
         sys.exit(1)
 
 def initialize():
@@ -59,7 +51,6 @@ def initialize():
     config = configparser.ConfigParser()
     config.read(API_KEYS_LOCATION)
 
-    openai.organization_id = config['openai']['organization_id'].strip('"').strip("'")
     openai.api_key = config['openai']['secret_key'].strip('"').strip("'")
     
     prompt_config = {}

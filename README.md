@@ -36,11 +36,10 @@ Follow the steps for which shell you are using. Generally, Mac OS has zsh, Linux
     bindkey '^X' create_completion
 ```
 
-3. Create a file called `openaiapirc` in `~/.config` with your ORGANIZATION_ID and SECRET_KEY.
+3. Create a file called `openaiapirc` in `~/.config` with your SECRET_KEY.
 
 ```
 [openai]
-organization_id = ...
 secret_key = ...
 ```
 
@@ -71,11 +70,10 @@ notepad $profile
 Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
 ```
 
-6. Create a file called `openaiapirc` in `C:\Users\<username>\.config` with your ORGANIZATION_ID and SECRET_KEY.
+6. Create a file called `openaiapirc` in `C:\Users\<username>\.config` with your SECRET_KEY.
 
 ```
 [openai]
-organization_id = ...
 secret_key = ...
 ```
 
@@ -99,11 +97,10 @@ secret_key = ...
     bind -x '"\C-x":"create_completion"'
 ```
 
-3. Create a file called `openaiapirc` in `~/.config` with your ORGANIZATION_ID and SECRET_KEY.
+3. Create a file called `openaiapirc` in `~/.config` with your SECRET_KEY.
 
 ```
 [openai]
-organization_id = ...
 secret_key = ...
 ```
 
