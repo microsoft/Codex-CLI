@@ -3,13 +3,10 @@
 # it will look like - C:\Users\<username>\your\custom\path\NL-CLI\codex_query.py
 $nl_cli_script = ""
 
-
 # this function takes the input from the buffer and passes it to codex_query.py
 function create_completion() {
     param (
-        # accept $buffer and $context parameters
-        [string] $buffer,
-        [bool] $context
+        [Parameter (Mandatory = $true)] [string] $buffer
     )
     
     if ($nl_cli_script -eq "") {
@@ -17,20 +14,14 @@ function create_completion() {
         return "`nnotepad $profile"
     }
 
-    if ($context) {
-    	$output = echo -n $buffer | python $nl_cli_script -c
-    }
-    else {
-	    $output = echo -n $buffer | python $nl_cli_script
-    }
-
-
+    $output = echo -n $buffer | python $nl_cli_script 
+    
     return $output
 }
 
 Set-PSReadLineKeyHandler -Key Ctrl+x `
-                         -BriefDescription NLCLI1 `
-                         -LongDescription "Calls NL-CLI tool on the current buffer with context" `
+                         -BriefDescription NLCLI `
+                         -LongDescription "Calls NL-CLI tool on the current buffer" `
                          -ScriptBlock {
     param($key, $arg)
     
@@ -39,38 +30,17 @@ Set-PSReadLineKeyHandler -Key Ctrl+x `
 
     [Microsoft.PowerShell.PSConsoleReadLine]::GetBufferState([ref]$line, [ref]$cursor)
 
-    $output = create_completion($line, $true)
+    # get response from create_completion function
+    $output = create_completion($line)
+
+    # move to the next line
+    [Microsoft.PowerShell.PSConsoleReadLine]::AddLine()
     
+    # check if output is not null
     if ($output -ne $null) {
         foreach ($str in $output) {
-            if ($str -ne $null -and $str -ne "") {
-                [Microsoft.PowerShell.PSConsoleReadLine]::AddLine()
-                [Microsoft.PowerShell.PSConsoleReadLine]::Insert($str)
-            }
-        }
-    }
-}
-
-
-Set-PSReadLineKeyHandler -Key Ctrl+g `
-                         -BriefDescription NLCLI2 `
-                         -LongDescription "Calls NL-CLI tool on the current buffer without context" `
-                         -ScriptBlock {
-    param($key, $arg)
-    
-    $line = $null
-    $cursor = $null
-
-    [Microsoft.PowerShell.PSConsoleReadLine]::GetBufferState([ref]$line, [ref]$cursor)
-
-    $output = create_completion($line, $false)
-    
-    if ($output -ne $null) {
-        foreach ($str in $output) {
-            if ($str -ne $null -and $str -ne "") {
-                [Microsoft.PowerShell.PSConsoleReadLine]::AddLine()
-                [Microsoft.PowerShell.PSConsoleReadLine]::Insert($str)
-            }
+            [Microsoft.PowerShell.PSConsoleReadLine]::Insert($str)
+            [Microsoft.PowerShell.PSConsoleReadLine]::AddLine()
         }
     }
 }
