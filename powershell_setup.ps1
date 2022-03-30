@@ -3,7 +3,7 @@
 ###
 param
 (
-    [Parameter(Mandatory = $true)]
+    [Parameter()]
     [System.IO.FileInfo]
     [ValidateScript( {
             if (-Not ($_ | Test-Path) ) {
@@ -11,16 +11,12 @@ param
             }
             return $true
         })]
-    [string]$RepoRoot,
+    [string]$RepoRoot = (Get-Location),
 
     [Parameter(Mandatory = $true)]
     [ValidateNotNullOrEmpty()]
     [SecureString]
-    $OpenAIApiKey,
-
-    [Parameter()]
-    [bool]
-    $CleanUp = $false
+    $OpenAIApiKey
 )
 
 $plugInScriptPath = Join-Path $RepoRoot -ChildPath "powershell_plugin.ps1"
