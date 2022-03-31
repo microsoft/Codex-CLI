@@ -26,8 +26,7 @@ $openAIConfigPath = Join-Path $env:USERPROFILE -ChildPath ".config\openaiapirc"
 # Create new PowerShell profile if doesn't exist. The profile type is for current user and current host.
 # To learn more about PowerShell profile, please refer to 
 # https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_profiles
-if (!(Test-Path -Path $PROFILE))
-{
+if (!(Test-Path -Path $PROFILE)) {
     New-Item -Type File -Path $PROFILE -Force 
 } else {
     # Clean up the content before append new one. This allow users to setup multiple times without running cleanup script
@@ -43,12 +42,16 @@ if (!(Test-Path -Path $PROFILE))
 Write-Host "Added plugin setup to $PROFILE."
 
 # Create OpenAI configuration file to store secrets
-if (!(Test-Path -Path $openAIConfigPath))
-{
+if (!(Test-Path -Path $openAIConfigPath)) {
     New-Item -Type File -Path $openAIConfigPath -Force 
 }
 
-$openAIApiKeyPlainText = ConvertFrom-SecureString -SecureString $OpenAIApiKey -AsPlainText
+if ($PSVersionTable.PSVersion.Major -lt 7) {
+    $binaryString = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($OpenAIApiKey);
+    $openAIApiKeyPlainText = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto($binaryString);
+} else {
+    $openAIApiKeyPlainText = ConvertFrom-SecureString -SecureString $OpenAIApiKey -AsPlainText
+}
 
 Set-Content -Path $openAIConfigPath "[openai]
 secret_key=$openAIApiKeyPlainText"
