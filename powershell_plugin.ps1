@@ -1,7 +1,5 @@
-
-# fill in the path here
-# it will look like - C:\Users\<username>\your\custom\path\NL-CLI\codex_query.py
-$nl_cli_script = ""
+### NL-CLI setup - start
+$nl_cli_script = "{{codex_query_path}}"
 
 # this function takes the input from the buffer and passes it to codex_query.py
 function create_completion() {
@@ -44,3 +42,4 @@ Set-PSReadLineKeyHandler -Key Ctrl+x `
         }
     }
 }
+### NL-CLI setup - end
