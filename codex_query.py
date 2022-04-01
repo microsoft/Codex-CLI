@@ -14,6 +14,7 @@ from pathlib import Path
 from prompt_file import PromptFile
 from commands import get_command_result
 
+CONTEXT_MODE = "off"
 SHELL = ""
 
 ENGINE = 'cushman-codex-msft'
@@ -61,6 +62,7 @@ def initialize():
         'temperature': TEMPERATURE,
         'max_tokens': MAX_TOKENS,
         'shell': SHELL,
+        'context': CONTEXT_MODE,
         'token_count': 0
     }
     
@@ -90,6 +92,7 @@ def get_query(prompt_file):
 
 def detect_shell():
     global SHELL
+    global PROMPT_CONTEXT
 
     parent_process_name = psutil.Process(os.getppid()).name()
     POWERSHELL_MODE = bool(re.fullmatch('pwsh|pwsh.exe|powershell.exe', parent_process_name))
@@ -97,6 +100,11 @@ def detect_shell():
     ZSH_MODE = bool(re.fullmatch('zsh|zsh.exe', parent_process_name))
 
     SHELL = "powershell" if POWERSHELL_MODE else "bash" if BASH_MODE else "zsh" if ZSH_MODE else "unknown"
+
+    # set the prompt context file to contexts/powershell_context.txt
+    shell_prompt_file = Path(os.path.join(os.path.dirname(__file__), "contexts", "{}_context.txt".format(SHELL))
+    if shell_prompt_file.is_file():
+        PROMPT_CONTEXT = shell_prompt_file
 
 if __name__ == '__main__':
     detect_shell()
@@ -109,6 +117,7 @@ if __name__ == '__main__':
             'temperature': TEMPERATURE,
             'max_tokens': MAX_TOKENS,
             'shell': SHELL,
+            'context': CONTEXT_MODE,
             'token_count': 0
         }
 
@@ -135,10 +144,10 @@ if __name__ == '__main__':
 
         print(completion_all)
 
-        # if the response is not empty, then update the prompt file
-        if completion_all != "" or len(completion_all) > 0:
-            prompt_file.add_input_output_pair(user_query, completion_all)
-        
+        # append output to prompt context file
+        if config['context'] == "on":
+          if completion_all != "" or len(completion_all) > 0:
+              prompt_file.add_input_output_pair(user_query, completion_all)
     except FileNotFoundError:
         print('\n\n# Codex CLI error: Prompt file not found')
     except openai.error.RateLimitError:
