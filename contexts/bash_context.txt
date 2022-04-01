@@ -1,0 +1,45 @@
+## engine: cushman-codex-msft
+## temperature: 0
+## max_tokens: 300
+## shell: bash
+## context_mode: off
+## token_count: 110
+
+# what processes are hogging the most cpu?
+ps aux | sort -nrk 3,3 | head -n 10
+
+# stop the chrome processes
+kill -9 $(ps aux | grep chrome | awk '{print $2}')
+
+# what's my IP?
+curl ifconfig.me
+
+# what's the weather in San Francisco?
+curl wttr.in/SanFrancisco
+
+# make a directory called web-app
+mkdir web-app
+
+# add an html, css, and js file to it
+touch web-app/index.html
+touch web-app/style.css
+touch web-app/script.js
+
+# add a hello world website to the index
+echo '<html><body><h1>Hello World!</h1></body></html>' > web-app/index.html
+
+# open it with vi
+vi web-app/index.html
+
+# what's running on port 1018?
+lsof -i :1018
+
+# kill process 1584
+kill -9 1584
+
+# what other devices are on my network?
+arp -a
+
+# how much storage is left?
+df -h
+
