@@ -12,6 +12,7 @@ def get_command_result(input, prompt_file):
     - unlearn all
     - start context
     - stop context
+    - default context
     - show context <n>
     - edit context
     - save context
@@ -71,7 +72,6 @@ def get_command_result(input, prompt_file):
 
     if input.__contains__("show config"):
         print('\n')
-        config = prompt_file.read_headers()
         # read the dictionary into a list of # lines
         lines = []
         for key, value in config.items():
@@ -81,14 +81,10 @@ def get_command_result(input, prompt_file):
 
     # interaction deletion commands
     if input.__contains__("unlearn"):
-        # if input is "unlearn all", then delete all the lines of the prompt file
         if input.__contains__("all"):
-            # TODO maybe add a confirmation prompt or temporary file save before deleting file
-            prompt_file.clear()
+            prompt_file.default_context()
             return "unlearned interaction", prompt_file
         else:
-        # otherwise remove the last two lines assuming single line prompt and responses
-        # TODO Codex sometimes responds with multiple lines, so some kind of metadata tagging is needed
             prompt_file.clear_last_interaction()
         return "unlearned interaction", prompt_file
 
@@ -97,9 +93,6 @@ def get_command_result(input, prompt_file):
         # start context
         if input.__contains__("start"):
             if config['context'] == 'off':
-                config['context'] = 'on'
-                
-                # we need to have prompt_file now track openai_completion_input.txt
                 prompt_file.turn_on_context()
                 return "started context", prompt_file
             
@@ -107,7 +100,6 @@ def get_command_result(input, prompt_file):
         
         # stop context
         if input.__contains__("stop"):
-            config['context'] = 'off'
             prompt_file.turn_off_context()
             return "stopped context", prompt_file
         
@@ -159,7 +151,7 @@ def get_command_result(input, prompt_file):
         # clear context
         if input.__contains__("clear"):
             # temporary saving deleted prompt file
-            prompt_file.clear()
+            prompt_file.default_context()
             return "unlearned interaction", prompt_file
         
         # load context <filename>
