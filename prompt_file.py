@@ -285,14 +285,6 @@ class PromptFile:
         if os.path.isfile(filename):
             with Path(filename).open('r') as f:
                 lines = f.readlines()
-            
-            # preserve old headers
-            lines[0] = '## engine: {}\n'.format(self.config['engine'])
-            lines[1] = '## temperature: {}\n'.format(self.config['temperature'])
-            lines[2] = '## max_tokens: {}\n'.format(self.config['max_tokens'])
-            lines[3] = '## shell: {}\n'.format(self.config['shell'])
-            lines[4] = '## context_mode: {}\n'.format(self.config['context'])
-
             # write to the current prompt file
             with open(self.file_name, 'w') as f:
                 f.writelines(lines)

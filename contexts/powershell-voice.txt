@@ -1,0 +1,39 @@
+## engine: cushman-codex-msft
+## temperature: 0
+## max_tokens: 300
+## shell: powershell
+## context_mode: on
+## token_count: 110
+
+# what processes are hogging the most cpu?
+Get-Process | Sort-Object -Property CPU -Descending | Select-Object -First 10
+
+# stop the chrome processes
+Get-Process chrome | Stop-Process
+
+# make a readme with a project header and two sections
+"# Project Header
+## Section 1
+## Section 2" | Out-File "./readme2.md"
+
+# what's running on port 3000?
+Get-Process -Id (Get-NetTCPConnection -LocalPort 3000).OwningProcess
+
+# kill process 1584
+Stop-Process -Id 1584
+
+# what other devices are on my network?
+Get-NetIPAddress | Format-Table
+
+# how much storage is left on my pc?
+Get-WmiObject -Class Win32_LogicalDisk | Select-Object -Property DeviceID,FreeSpace,Size,DriveType | Format-Table -AutoSize
+
+# how many GB is 367247884288 B?
+(367247884288 / 1GB)
+
+# what's the meaning of life?
+(new-object -ComObject SAPI.SPVoice).Speak("The meaning of life is 42")
+
+# where are you located
+(new-object -ComObject SAPI.SPVoice).Speak("I live in " + $env:UserProfile)
+
