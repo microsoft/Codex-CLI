@@ -21,7 +21,7 @@ ENGINE = 'cushman-codex-msft'
 TEMPERATURE = 0
 MAX_TOKENS = 300
 
-DEBUG_MODE = False
+DEBUG_MODE = True
 
 # Get config dir from environment or default to ~/.config or ~\.config depending on OS
 CONFIG_DIR = os.getenv('XDG_CONFIG_HOME', os.path.expanduser(os.path.join('~','.config')))
@@ -101,14 +101,15 @@ def detect_shell():
 
     SHELL = "powershell" if POWERSHELL_MODE else "bash" if BASH_MODE else "zsh" if ZSH_MODE else "unknown"
 
-    # set the prompt context file to contexts/powershell_context.txt
-    shell_prompt_file = Path(os.path.join(os.path.dirname(__file__), "contexts", "{}_context.txt".format(SHELL))
+    shell_prompt_file = Path(os.path.join(os.path.dirname(__file__), "contexts", "{}_context.txt".format(SHELL)))
+
     if shell_prompt_file.is_file():
         PROMPT_CONTEXT = shell_prompt_file
 
 if __name__ == '__main__':
     detect_shell()
     prompt_file = initialize()
+
     try:
         user_query, prompt_file = get_query(prompt_file)
         
@@ -146,11 +147,11 @@ if __name__ == '__main__':
 
         # append output to prompt context file
         if config['context'] == "on":
-          if completion_all != "" or len(completion_all) > 0:
-              prompt_file.add_input_output_pair(user_query, completion_all)
+            if completion_all != "" or len(completion_all) > 0:
+                prompt_file.add_input_output_pair(user_query, completion_all)
     except FileNotFoundError:
-        print('\n\n# Codex CLI error: Prompt file not found')
+        print('\n\n# Codex CLI error: Prompt file not found, try again')
     except openai.error.RateLimitError:
-        print('\n\n# Codex CLI error: Rate limit exceeded')
+        print('\n\n# Codex CLI error: Rate limit exceeded, try later')
     except openai.error.APIConnectionError:
         print('\n\n# Codex CLI error: API connection error, are you connected to the internet?')

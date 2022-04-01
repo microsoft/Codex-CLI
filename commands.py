@@ -10,6 +10,8 @@ def get_command_result(input, prompt_file):
     Currently supported commands:
     - unlearn
     - unlearn all
+    - start context
+    - stop context
     - show context <n>
     - edit context
     - save context
@@ -31,34 +33,38 @@ def get_command_result(input, prompt_file):
         # set temperature <temperature>
         if input.__contains__("temperature"):
             input = input.split()
-            if len(input) == 3:
-                config['temperature'] = float(input[2])
+            if len(input) == 4:
+                config['temperature'] = float(input[3])
                 prompt_file.set_headers(config)
+                print("# Temperature set to " + str(config['temperature']))
                 return "config set", prompt_file
             else:
                 return "", prompt_file
         # set max_tokens <max_tokens>
         elif input.__contains__("max_tokens"):
             input = input.split()
-            if len(input) == 3:
-                config['max_tokens'] = int(input[2])
+            if len(input) == 4:
+                config['max_tokens'] = int(input[3])
                 prompt_file.set_headers(config)
+                print("# Max tokens set to " + str(config['max_tokens']))
                 return "config set", prompt_file
             else:
                 return "", prompt_file
         elif input.__contains__("shell"):
             input = input.split()
-            if len(input) == 3:
-                config['shell'] = input[2]
+            if len(input) == 4:
+                config['shell'] = input[3]
                 prompt_file.set_headers(config)
+                print("# Shell set to " + str(config['shell']))
                 return "config set", prompt_file
             else:
                 return "", prompt_file
         elif input.__contains__("engine"):
             input = input.split()
-            if len(input) == 3:
-                config['engine'] = input[2]
+            if len(input) == 4:
+                config['engine'] = input[3]
                 prompt_file.set_headers(config)
+                print("# Engine set to " + str(config['engine']))
                 return "config set", prompt_file
             else:
                 return "", prompt_file
@@ -88,18 +94,38 @@ def get_command_result(input, prompt_file):
 
     # context commands
     if input.__contains__("context"):
+        # start context
+        if input.__contains__("start"):
+            if config['context'] == 'off':
+                config['context'] = 'on'
+                
+                # we need to have prompt_file now track openai_completion_input.txt
+                prompt_file.turn_on_context()
+                return "started context", prompt_file
+            
+            return "started context", prompt_file
+        
+        # stop context
+        if input.__contains__("stop"):
+            config['context'] = 'off'
+            prompt_file.turn_off_context()
+            return "stopped context", prompt_file
+        
+        if input.__contains__("default"):
+            prompt_file.default_context()
+            return "stopped context", prompt_file
+        
         # show context <n>
         if input.__contains__("show"):
-            # print the prompt file to the command line
             print('\n')
             with open(prompt_file.file_name, 'r') as f:
                 lines = f.readlines()
                 lines = lines[5:] # skip headers
-            # the input looks like "show context <number of lines>"
+            
             line_numbers = 0
             if len(input.split()) > 3:
                 line_numbers = int(input.split()[3])
-            # print the last line_numbers lines
+            
             if line_numbers != 0:
                 for line in lines[-line_numbers:]:
                     print('\n# '+line, end='')
@@ -140,27 +166,10 @@ def get_command_result(input, prompt_file):
         if input.__contains__("load"):
             # the input looks like # load context <filename>
             # write everything from the file to the prompt file
-            if len(input.split()) == 4:
-                filename = input.split()[3]
-
-                # read from saved directory
-                if not filename.endswith('.txt'):
-                    filename = filename + '.txt'
-                filename = os.path.join(os.path.dirname(prompt_file.file_name), "saved", filename)
-
-                # check if the file exists
-                if os.path.isfile(filename):
-                    with Path(filename).open('r') as f:
-                        lines = f.readlines()
-                else:
-                    print("\n#\tFile not found")
-                    return "context loaded", prompt_file
-                
-                # write to the current prompt file
-                with open(prompt_file.file_name, 'w') as f:
-                    f.writelines(lines)
-                
-                print('\n#\tContext loaded from {}'.format(filename))
+            input = input.split()
+            if len(input) == 4:
+                filename = input[3]
+                prompt_file.load_context(filename)
                 return "context loaded", prompt_file
             print('\n#\tInvalid command format, did you specify which file to load?')
             return "context loaded", prompt_file
