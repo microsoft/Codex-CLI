@@ -11,6 +11,7 @@ import psutil
 
 from pathlib import Path
 
+CONTEXT_MODE = "off"
 SHELL = ""
 
 ENGINE = 'davinci-codex-msft'
@@ -59,17 +60,17 @@ def initialize():
     config = configparser.ConfigParser()
     config.read(API_KEYS_LOCATION)
 
-    openai.organization_id = config['openai']['organization_id'].strip('"').strip("'")
     openai.api_key = config['openai']['secret_key'].strip('"').strip("'")
     
     prompt_config = {}
-
+    
     if has_prompt_headers(PROMPT_CONTEXT) == False:
         prompt_config = {
             'engine': ENGINE,
             'temperature': TEMPERATURE,
             'max_tokens': MAX_TOKENS,
             'shell': SHELL,
+            'context': CONTEXT_MODE,
             'token_count': get_token_count(PROMPT_CONTEXT)
         }
         stamp_prompt_headers(PROMPT_CONTEXT, prompt_config)
@@ -84,6 +85,7 @@ def has_prompt_headers(prompt_file):
     """
     if os.path.isfile(prompt_file) == False:
         return False
+    
     with prompt_file.open('r') as f:
         lines = f.readlines()
         # this is not a strict check, but it should be enough
@@ -102,6 +104,7 @@ def read_prompt_headers(prompt_file):
             'temperature': TEMPERATURE,
             'max_tokens': MAX_TOKENS,
             'shell': SHELL,
+            'context': CONTEXT_MODE,
             'token_count': get_token_count(prompt_file)
         }
     with prompt_file.open('r') as f:
@@ -110,12 +113,14 @@ def read_prompt_headers(prompt_file):
         temperature = lines[1].split(':')[1].strip()
         max_tokens = lines[2].split(':')[1].strip()
         shell = lines[3].split(':')[1].strip()
-        token_count = lines[4].split(':')[1].strip()
+        context = lines[4].split(':')[1].strip()
+        token_count = lines[5].split(':')[1].strip()
     return {
         'engine': engine,
         'temperature': float(temperature),
         'max_tokens': int(max_tokens),
         'shell': shell,
+        'context': context,
         'token_count': int(token_count)
     }
 
@@ -126,17 +131,18 @@ def stamp_prompt_headers(prompt_file, config):
     lines = []
     if os.path.isfile(PROMPT_CONTEXT):
         lines = prompt_file.open('r').readlines() # read old content
-
+    
     newf = open('temp.txt','w')
     # add headers at the beginning
     newf.write('## engine: {}\n'.format(config['engine']))
     newf.write('## temperature: {}\n'.format(config['temperature']))
     newf.write('## max_tokens: {}\n'.format(config['max_tokens']))
     newf.write('## shell: {}\n'.format(config['shell']))
+    newf.write('## context_mode: {}\n'.format(config['context']))
     newf.write('## token_count: {}\n'.format(config['token_count']))
 
     if has_prompt_headers(prompt_file):
-        lines = lines[5:] # drop old headers
+        lines = lines[6:] # drop old headers
     
     for line in lines: # write old content after new
         newf.write(line)
@@ -160,7 +166,7 @@ def get_token_count(prompt_file):
         # count number of tokens
         token_count = 0
         if has_prompt_headers(prompt_file):
-            lines = lines[5:] # drop headers
+            lines = lines[6:] # drop headers
         for line in lines:
             token_count += len(line.split())
     return token_count
@@ -181,26 +187,27 @@ def get_updated_prompt_file(input, config):
         # delete first 2 lines of prompt context file
         with PROMPT_CONTEXT.open('r') as f:
             lines = f.readlines()
-            headers = lines[:5]
-            prompt = lines[7:] # drop first 2 lines of prompt
+            headers = lines[:6]
+            prompt = lines[8:] # drop first 2 lines of prompt
         with PROMPT_CONTEXT.open('w') as f:
             f.writelines(headers)
             f.writelines(prompt)
 
     # append input to prompt context file
-    with PROMPT_CONTEXT.open('a') as f:
-        f.write(input)
-        f.close()
+    if config['context'] == 'on':
+        with PROMPT_CONTEXT.open('a') as f:
+            f.write(input)
+            f.close()
 
     prompt = ""
     # get input from prompt file
     # skip the header lines
     with PROMPT_CONTEXT.open('r') as f:
         lines = f.readlines()
-        lines = lines[5:] # skip headers
+        lines = lines[6:] # skip headers
         prompt = ''.join(lines)
 
-    return prompt, config
+    return prompt + input, config
 
 def get_command_result(input, config):
     """
@@ -258,7 +265,7 @@ def get_command_result(input, config):
         print('\n')
         with open(PROMPT_CONTEXT, 'r') as f:
             lines = f.readlines()
-            lines = lines[:5] # keep headers
+            lines = lines[:6] # keep headers
         # the input looks like "show context <number of lines>"
         print('\n# '.join(lines))
         return "config shown", config
@@ -293,7 +300,7 @@ def get_command_result(input, config):
             print('\n')
             with open(PROMPT_CONTEXT, 'r') as f:
                 lines = f.readlines()
-                lines = lines[5:] # skip headers
+                lines = lines[6:] # skip headers
             # the input looks like "show context <number of lines>"
             line_numbers = 0
             if len(input.split()) > 3:
@@ -410,6 +417,7 @@ def get_prompt(config):
 
 def detect_shell():
     global SHELL
+    global PROMPT_CONTEXT
 
     parent_process_name = psutil.Process(os.getppid()).name()
     POWERSHELL_MODE = bool(re.fullmatch('pwsh|pwsh.exe|powershell.exe', parent_process_name))
@@ -418,12 +426,16 @@ def detect_shell():
 
     SHELL = "powershell" if POWERSHELL_MODE else "bash" if BASH_MODE else "zsh" if ZSH_MODE else "unknown"
 
+    # set the prompt context file to contexts/powershell_context.txt
+    if SHELL == "powershell":
+        PROMPT_CONTEXT = Path(os.path.join(os.path.dirname(__file__), "contexts", "powershell_context.txt"))
+
 if __name__ == '__main__':
     detect_shell()
     config = initialize()
     try:
         prompt, config = get_prompt(config)
-        
+
         # use query prefix to prime Codex for correct scripting language
         prefix = ""
         # prime codex for the corresponding shell type
@@ -453,12 +465,13 @@ if __name__ == '__main__':
         print(completion_all)
 
         # append output to prompt context file
-        with PROMPT_CONTEXT.open('a') as f:
-            f.write(completion_all)
-            f.close()
-        
-        config['token_count'] = get_token_count(PROMPT_CONTEXT)
-        stamp_prompt_headers(PROMPT_CONTEXT, config)
+        if config['context'] == "on":
+            with PROMPT_CONTEXT.open('a') as f:
+                f.write(completion_all)
+                f.close()
+            
+            config['token_count'] = get_token_count(PROMPT_CONTEXT)
+            stamp_prompt_headers(PROMPT_CONTEXT, config)
     except FileNotFoundError:
         print('\n\n# Codex CLI error: Prompt file not found')
     except openai.error.RateLimitError:
