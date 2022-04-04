@@ -36,12 +36,15 @@ Follow the steps for which shell you are using. Generally, Mac OS has zsh, Linux
     bindkey '^X' create_completion
 ```
 
-3. Create a file called `openaiapirc` in `~/.config` with your SECRET_KEY.
+3. Create a file called `openaiapirc` in `~/.config` with your API key.
 
 ```
 [openai]
 secret_key = ...
 ```
+
+> In order to get your OpenAI API key, go to `https://beta.openai.com/account/api-keys` and copy your key, or create a new one.
+
 
 4. Run `zsh`, start typing and complete it using `^X`!
 
@@ -88,6 +91,8 @@ Set-ExecutionPolicy Undefined -Scope CurrentUser
 | `-RepoRoot` | [FileInfo](https://docs.microsoft.com/en-us/dotnet/api/system.io.fileinfo) | Optional. Default to the current folder.<br>The value should be the path of NL-CLI folder|`.\powershell_setup.ps1 -RepoRoot 'C:\your\custom\path'`|
 | `-OpenAIApiKey` | [SecureString](https://docs.microsoft.com/en-us/dotnet/api/system.security.securestring) | Required. If is not supplied, the script will prompt you to input the value. If you would like to provide the value via PowerShell parameter, please refer to the example. | `.\powershell_setup.ps1 -OpenAIApiKey (ConvertTo-SecureString "YOUR_OPENAI_API_KEY" -AsPlainText -Force)` |
 
+> In order to get your OpenAI API key, go to `https://beta.openai.com/account/api-keys` and copy your key, or create a new one.
+
 ### Bash instructions
 
 
@@ -112,6 +117,8 @@ Set-ExecutionPolicy Undefined -Scope CurrentUser
 [openai]
 secret_key = ...
 ```
+
+> In order to get your OpenAI API key, go to `https://beta.openai.com/account/api-keys` and copy your key, or create a new one.
 
 4. Run `bash`, start typing and complete it using `^X`!
 
