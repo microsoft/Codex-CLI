@@ -30,7 +30,7 @@ Follow the steps for which shell you are using. Generally, Mac OS has zsh, Linux
 2. In zsh, go to `~/your/custom/path/` (the folder contains NL-CLI code), then run the following command to setup your zsh environment. It will prompt you for OpenAI access key.
 
 ```
-sh zsh_setup.sh
+./zsh_setup.sh
 ```
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;See [About zsh_setup.sh](#about-zshsetupsh) section to learn script parameters.
 
@@ -39,14 +39,14 @@ sh zsh_setup.sh
 #### Clean up
 Once you are done, go to `~/your/custom/path/` (the folder contains NL-CLI code), then run the following command to clean up.
 ```
-sh zsh_cleanup.sh
+./zsh_cleanup.sh
 ```
 
 #### About zsh_setup.sh
 `zsh_setup.sh` supports the following parameters:
 | Parameter | Description | Example |
 |--|--|--|
-| `--RepoRoot` | Optional. Default to the current folder.<br>The value should be the path of NL-CLI folder | `sh zsh_setup.sh --RepoRoot /Code/NL-CLI`|
+| `--RepoRoot` | Optional. Default to the current folder.<br>The value should be the path of NL-CLI folder | `./zsh_setup.sh --RepoRoot /Code/NL-CLI`|
 
 ### Powershell instructions
 

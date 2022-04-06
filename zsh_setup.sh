@@ -5,11 +5,13 @@
 # You can pass the following arguments to the script:
 #   --RepoRoot: Optional. Default to the current folder. The value should be the path of NL-CLI folder.
 # For example:
-# sh zsh_setup.sh --RepoRoot /Code/NL-CLI
+# ./zsh_setup.sh --RepoRoot /Code/NL-CLI
 # 
 set -e
 
-# Parse parameters
+
+# Use zparseopts to parse parameters
+zmodload zsh/zutil
 zparseopts -E -D -- \
            -RepoRoot:=o_repoRoot \
 
