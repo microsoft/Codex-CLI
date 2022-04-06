@@ -27,24 +27,26 @@ Follow the steps for which shell you are using. Generally, Mac OS has zsh, Linux
     $ git clone https://github.com/microsoft/NL-CLI.git ~/your/custom/path/
 ```
 
-2. Add the following to your `~/.zshrc` file.
+2. In zsh, go to `~/your/custom/path/` (the folder contains NL-CLI code), then run the following command to setup your zsh environment. It will prompt you for OpenAI access key.
 
 ```
-    # in your/custom/path you need to clone the repository
-    export ZSH_CUSTOM="your/custom/path"
-    source "$ZSH_CUSTOM/NL-CLI/nl_cli.plugin.zsh"
-    bindkey '^X' create_completion
+sh zsh_setup.sh
+```
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;See [About zsh_setup.sh](#about-zshsetupsh) section to learn script parameters.
+
+3. Run `zsh`, start typing and complete it using `^X`!
+
+#### Clean up
+Once you are done, go to `~/your/custom/path/` (the folder contains NL-CLI code), then run the following command to clean up.
+```
+sh zsh_cleanup.sh
 ```
 
-3. Create a file called `openaiapirc` in `~/.config` with your SECRET_KEY.
-
-```
-[openai]
-secret_key = ...
-```
-
-4. Run `zsh`, start typing and complete it using `^X`!
-
+#### About zsh_setup.sh
+`zsh_setup.sh` supports the following parameters:
+| Parameter | Description | Example |
+|--|--|--|
+| `--RepoRoot` | Optional. Default to the current folder.<br>The value should be the path of NL-CLI folder | `sh zsh_setup.sh --RepoRoot /Code/NL-CLI`|
 
 ### Powershell instructions
 
