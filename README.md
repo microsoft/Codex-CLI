@@ -1,5 +1,9 @@
 # NL-CLI - Natural Language Command Line Interface
 
+This project uses Codex to convert natural language commands into commands in PowerShell, Zshell and Bash. 
+
+![Babylex GIF](nl_cli.gif)
+
 Type in a natural language command, hit Ctrl+X and watch Codex turn it into scripting code.
 
 With the added functionality for loading developing 'modes', it makes the experience of working in the terminal seamless.

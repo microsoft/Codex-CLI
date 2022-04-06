@@ -37,8 +37,10 @@ Set-PSReadLineKeyHandler -Key Ctrl+x `
     # check if output is not null
     if ($output -ne $null) {
         foreach ($str in $output) {
-            [Microsoft.PowerShell.PSConsoleReadLine]::Insert($str)
-            [Microsoft.PowerShell.PSConsoleReadLine]::AddLine()
+            if ($str -ne $null -and $str -ne "") {
+                [Microsoft.PowerShell.PSConsoleReadLine]::Insert($str)
+                [Microsoft.PowerShell.PSConsoleReadLine]::AddLine()
+            }
         }
     }
 }
