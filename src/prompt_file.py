@@ -8,9 +8,7 @@ from pathlib import Path
 class PromptFile:
     default_file_name = "current_context.txt"
     default_file_path = os.path.join(os.path.dirname(__file__), "..", "current_context.txt")
-
-    # feel free to set your own default context path here
-    default_context_path = "" # os.path.join(os.path.dirname(__file__), "..", "contexts", "<your-context-name>.txt")
+    default_context_path = "" 
 
     def __init__(self, file_name, config):
         if file_name != self.default_file_name:
@@ -49,7 +47,10 @@ class PromptFile:
         self.file_name = self.default_file_name
         self.file_path = self.default_file_path
         self.config = config
+
+        # feel free to set your own default context path here
         self.default_context_path = os.path.join(os.path.dirname(__file__), "..", "contexts", "{}-context.txt".format(self.config['shell']))
+        # self.default_context_path = os.path.join(os.path.dirname(__file__), "..", "contexts", "<your-context-name>.txt")
         
         if self.has_headers() == False:
             self.set_headers(self.config)
