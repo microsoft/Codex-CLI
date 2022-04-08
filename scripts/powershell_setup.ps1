@@ -20,7 +20,6 @@ param
 
     [Parameter(Mandatory = $true)]
     [ValidateNotNullOrEmpty()]
-    [SecureString]
     $OpenAIOrganizationId,
 
     [Parameter(Mandatory = $true)]
@@ -58,16 +57,12 @@ if (!(Test-Path -Path $openAIConfigPath)) {
 if ($PSVersionTable.PSVersion.Major -lt 7) {
     $binaryString = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($OpenAIApiKey);
     $openAIApiKeyPlainText = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto($binaryString);
-
-    $binaryString = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($OpenAIOrganizationId);
-    $openAIOrganizationIdPlainText = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto($binaryString);
 } else {
     $openAIApiKeyPlainText = ConvertFrom-SecureString -SecureString $OpenAIApiKey -AsPlainText
-    $openAIOrganizationIdPlainText = ConvertFrom-SecureString -SecureString $OpenAIOrganizationId -AsPlainText
 }
 
 Set-Content -Path $openAIConfigPath "[openai]
-organization_id=$openAIOrganizationIdPlainText
+organization_id=$OpenAIOrganizationId
 secret_key=$openAIApiKeyPlainText
 engine=$OpenAIEngine"
 Write-Host "Updated OpenAI configuration file with secrets"

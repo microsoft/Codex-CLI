@@ -36,7 +36,7 @@ Follow the steps for which shell you are using. Generally, Mac OS has zsh, Linux
 ```
     # in your/custom/path you need to clone the repository
     export ZSH_CUSTOM="your/custom/path"
-    source "$ZSH_CUSTOM/NL-CLI/nl_cli.plugin.zsh"
+    source "$ZSH_CUSTOM/NL-CLI/scripts/nl_cli.plugin.zsh"
     bindkey '^X' create_completion
 ```
 
@@ -70,7 +70,7 @@ Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
 3. In the same Powershell window, go to `C:\your\custom\path\` (the folder contains NL-CLI code), then run the following command to setup your PowerShell environment. It will prompt you for OpenAI access key.
 
 ```
-.\powershell_setup.ps1
+.\scripts\powershell_setup.ps1
 ```
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;See [About powershell_setup.ps1](#about-powershellsetupps1) section to learn script parameters.
 
@@ -79,7 +79,7 @@ Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
 #### Clean up
 Once you are done, go to `C:\your\custom\path\` (the folder contains NL-CLI code), then run the following command to clean up.
 ```
-.\powershell_cleanup.ps1
+.\scripts\powershell_cleanup.ps1
 ```
 
 If you want to revert the execution policy, run this command
@@ -93,6 +93,8 @@ Set-ExecutionPolicy Undefined -Scope CurrentUser
 |--|--|--|--|
 | `-RepoRoot` | [FileInfo](https://docs.microsoft.com/en-us/dotnet/api/system.io.fileinfo) | Optional. Default to the current folder.<br>The value should be the path of NL-CLI folder|`.\powershell_setup.ps1 -RepoRoot 'C:\your\custom\path'`|
 | `-OpenAIApiKey` | [SecureString](https://docs.microsoft.com/en-us/dotnet/api/system.security.securestring) | Required. If is not supplied, the script will prompt you to input the value. If you would like to provide the value via PowerShell parameter, please refer to the example. | `.\powershell_setup.ps1 -OpenAIApiKey (ConvertTo-SecureString "YOUR_OPENAI_API_KEY" -AsPlainText -Force)` |
+| `-OpenAIOrganizationId` | String | Required. If is not supplied, the script will prompt you to input the value. If you would like to provide the value via PowerShell parameter, please refer to the example. | `.\powershell_setup.ps1 -OpenAIOrganizationId "YOUR_OPENAI_ORGANIZATION_ID"` |
+| `-OpenAIEngine` | String | Required. If is not supplied, the script will prompt you to input the value. If you would like to provide the value via PowerShell parameter, please refer to the example. | `.\powershell_setup.ps1 -OpenAIEngine "ENGINE_NAME"` |
 
 ### Bash instructions
 
@@ -108,7 +110,7 @@ Set-ExecutionPolicy Undefined -Scope CurrentUser
 ```
     # in your/custom/path you need to clone the repository
     export NL_CLI_PATH="your/custom/path/NL-CLI"
-    source "$NL_CLI_PATH/nl_cli.plugin.sh"
+    source "$NL_CLI_PATH/scripts/nl_cli.plugin.sh"
     bind -x '"\C-x":"create_completion"'
 ```
 
