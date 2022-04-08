@@ -142,7 +142,7 @@ Depending on whether multi-turn mode is on or off and the interaction was succes
 | `stop multi-turn` | Stops a multi-turn experience and loads default context |
 | `load context <filename>` | Loads the context file from `contexts` folder |
 | `default context` | Loads default shell context |
-| `edit context` | Opens the context file in a text editor |
+| `view context` | Opens the context file in a text editor |
 | `save context <filename>` | Saves the context file to `contexts` folder, if name not specified, uses current date-time |
 | `show config` | Shows the current configuration of your interaction with the model |
 | `set <config-key> <config-value>` | Sets the configuration of your interaction with the model |

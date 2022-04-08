@@ -220,7 +220,7 @@ class PromptFile:
         # delete the prompt file
         with open(self.file_path, 'w') as f:
             f.write('')
-            print("\n#\tContext has been cleared, temporarily saved to {}".format(filename))
+            print("\n#   Context has been cleared, temporarily saved to {}".format(filename))
         self.set_headers(config)
     
     def clear_last_interaction(self):
@@ -248,7 +248,7 @@ class PromptFile:
             with Path(save_path).open('w') as f:
                 f.writelines(lines)
         
-        print('\n#\tContext saved to {}'.format(save_name))
+        print('\n#   Context saved to {}'.format(save_name))
     
     def start_multi_turn(self):
         """
@@ -295,7 +295,7 @@ class PromptFile:
             # write to the current prompt file
             with open(self.file_path, 'w') as f:
                 f.writelines(lines)
-            print('\n#\tContext loaded from {}'.format(filename))
+            print('\n#   Context loaded from {}'.format(filename))
         else:
-            print("\n#\tFile not found")
+            print("\n#   File not found")
             return False

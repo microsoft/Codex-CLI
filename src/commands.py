@@ -126,12 +126,12 @@ def get_command_result(input, prompt_file):
             return "context shown", prompt_file
         
         # edit context
-        if input.__contains__("edit"):
+        if input.__contains__("view"):
             # open the prompt file in text editor
             if config['shell'] != 'powershell':
-                os.system('open {}'.format(prompt_file.file_name))
+                os.system('open {}'.format(prompt_file.file_path))
             else:
-                os.system('start {}'.format(prompt_file.file_name))
+                os.system('start {}'.format(prompt_file.file_path))
             return "context shown", prompt_file
 
         # save context <filename>
