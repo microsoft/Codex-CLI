@@ -16,11 +16,20 @@ param
     [Parameter(Mandatory = $true)]
     [ValidateNotNullOrEmpty()]
     [SecureString]
-    $OpenAIApiKey
+    $OpenAIApiKey,
+
+    [Parameter(Mandatory = $true)]
+    [ValidateNotNullOrEmpty()]
+    [SecureString]
+    $OpenAIOrganizationId,
+
+    [Parameter(Mandatory = $true)]
+    [ValidateNotNullOrEmpty()]
+    $OpenAIEngine
 )
 
-$plugInScriptPath = Join-Path $RepoRoot -ChildPath "powershell_plugin.ps1"
-$codexQueryPath = Join-Path $RepoRoot -ChildPath "codex_query.py"
+$plugInScriptPath = Join-Path $RepoRoot -ChildPath "plugins\powershell_plugin.ps1"
+$codexQueryPath = Join-Path $RepoRoot -ChildPath "src\codex_query.py"
 $openAIConfigPath = Join-Path $env:USERPROFILE -ChildPath ".config\openaiapirc"
 
 # Create new PowerShell profile if doesn't exist. The profile type is for current user and current host.
@@ -49,10 +58,16 @@ if (!(Test-Path -Path $openAIConfigPath)) {
 if ($PSVersionTable.PSVersion.Major -lt 7) {
     $binaryString = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($OpenAIApiKey);
     $openAIApiKeyPlainText = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto($binaryString);
+
+    $binaryString = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($OpenAIOrganizationId);
+    $openAIOrganizationIdPlainText = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto($binaryString);
 } else {
     $openAIApiKeyPlainText = ConvertFrom-SecureString -SecureString $OpenAIApiKey -AsPlainText
+    $openAIOrganizationIdPlainText = ConvertFrom-SecureString -SecureString $OpenAIOrganizationId -AsPlainText
 }
 
 Set-Content -Path $openAIConfigPath "[openai]
-secret_key=$openAIApiKeyPlainText"
+organization_id=$openAIOrganizationIdPlainText
+secret_key=$openAIApiKeyPlainText
+engine=$OpenAIEngine"
 Write-Host "Updated OpenAI configuration file with secrets"

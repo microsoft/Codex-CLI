@@ -46,6 +46,7 @@ Follow the steps for which shell you are using. Generally, Mac OS has zsh, Linux
 [openai]
 organization_id=...
 secret_key=...
+engine=...
 ```
 
 4. Run `zsh`, start typing and complete it using `^X`!
@@ -117,6 +118,7 @@ Set-ExecutionPolicy Undefined -Scope CurrentUser
 [openai]
 organization_id=...
 secret_key=...
+engine=...
 ```
 
 4. Run `bash`, start typing and complete it using `^X`!
@@ -145,6 +147,17 @@ Depending on whether multi-turn mode is on or off and the interaction was succes
 | `show config` | Shows the current configuration of your interaction with the model |
 | `set <config-key> <config-value>` | Sets the configuration of your interaction with the model |
 | `unlearn` | Unlearns the last two lines of input-output from the model |
+
+
+## Context file system
+
+All contexts are loaded from the `contexts` folder. There are some shell defaults that we have added to get you started.
+
+You can create your own contexts using the multi-turn feature and the `save context` command. Otherwise, you can simply paste in your favorite prompt files into the `contexts` folder and load them in using the `load context <filename>` command.
+
+One important thing to consider is that if you add a new context, keep the multi-turn mode on to avoid our automatic defaulting (added to keep faulty contexts from breaking your experience).
+
+You can change the default context from our shell defaults to your context file inside `src\prompt_file.py`.
 
 ## Troubleshooting
 

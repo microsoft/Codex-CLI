@@ -17,17 +17,17 @@ from commands import get_command_result
 MULTI_TURN = "off"
 SHELL = ""
 
-ENGINE = 'cushman-codex-msft'
+ENGINE = ''
 TEMPERATURE = 0
 MAX_TOKENS = 300
 
-DEBUG_MODE = False
+DEBUG_MODE = True
 
 # Get config dir from environment or default to ~/.config or ~\.config depending on OS
 CONFIG_DIR = os.getenv('XDG_CONFIG_HOME', os.path.expanduser(os.path.join('~','.config')))
 API_KEYS_LOCATION = os.path.join(CONFIG_DIR, 'openaiapirc')
 
-PROMPT_CONTEXT = Path(__file__).with_name('openai_completion_input.txt')
+PROMPT_CONTEXT = Path(__file__).with_name('current_context.txt')
 
 
 # Read the secret_key from the ini file ~/.config/openaiapirc
@@ -35,6 +35,7 @@ PROMPT_CONTEXT = Path(__file__).with_name('openai_completion_input.txt')
 # [openai]
 # organization=<organization-id>
 # secret_key=<your secret key>
+# engine=<engine-name>
 def create_template_ini_file():
     """
     If the ini file does not exist create it and add secret_key
@@ -45,12 +46,14 @@ def create_template_ini_file():
         print('[openai]')
         print('organization_id=<organization-id>')
         print('secret_key=<your secret key>\n')
+        print('engine=<engine-id>')
         sys.exit(1)
 
 def initialize():
     """
     Initialize openAI and shell mode
     """
+    global ENGINE
 
     # Check if file at API_KEYS_LOCATION exists
     create_template_ini_file()
@@ -59,6 +62,7 @@ def initialize():
 
     openai.api_key = config['openai']['secret_key'].strip('"').strip("'")
     openai.organization = config['openai']['organization_id'].strip('"').strip("'")
+    ENGINE = config['openai']['engine'].strip('"').strip("'")
 
     prompt_config = {
         'engine': ENGINE,
@@ -104,7 +108,7 @@ def detect_shell():
 
     SHELL = "powershell" if POWERSHELL_MODE else "bash" if BASH_MODE else "zsh" if ZSH_MODE else "unknown"
 
-    shell_prompt_file = Path(os.path.join(os.path.dirname(__file__), "contexts", "{}_context.txt".format(SHELL)))
+    shell_prompt_file = Path(os.path.join(os.path.dirname(__file__), "..", "contexts", "{}-context.txt".format(SHELL)))
 
     if shell_prompt_file.is_file():
         PROMPT_CONTEXT = shell_prompt_file
@@ -158,3 +162,5 @@ if __name__ == '__main__':
         print('\n\n# Codex CLI error: Rate limit exceeded, try later')
     except openai.error.APIConnectionError:
         print('\n\n# Codex CLI error: API connection error, are you connected to the internet?')
+    except openai.error.InvalidRequestError:
+        print('\n\n# Codex CLI error: Invalid request, is the engine/temperature valid?')
