@@ -4,11 +4,13 @@ This project uses Codex to convert natural language commands into commands in Po
 
 ![Babylex GIF](nl_cli.gif)
 
-Type in a natural language command, hit Ctrl+X and watch Codex turn it into scripting code.
+The Command Line Interface (CLI) was the first major User Interface we used to interact with machines. It's incredibly powerful, you can do almost anything with a CLI, but it requires the user to express their intent extremely precisely. The user needs to _know the language of the computer_. 
 
-With the added functionality for loading developing 'modes', it makes the experience of working in the terminal seamless.
+With the advent of Large Language Models (LLMs), particularly those that have been trained on code, it's now possible to interact with a CLI using Natural Language (NL). In effect, these models understand natural language _and_ code well enough that they can translate from one to another. 
 
-Inspired by the [zsh_codex](https://github.com/tom-doerr/zsh_codex) project, it expands the functionality to multiple shells and adds the ability to load modes.
+This project aims to offer a cross-shell NL->Code experience to allow users to interact with their favorite CLI using NL. The user enters a command, like "what's my IP address", hits Ctrl + X and gets a suggestion for a command idiomatic to the shell they're using.
+
+This project took technical inspiration from the [zsh_codex](https://github.com/tom-doerr/zsh_codex) project, extending its functionality to span multiple shells and to customize the prompts we pass to the model (see prompt engineering section below).
 
 ## Installation
 
