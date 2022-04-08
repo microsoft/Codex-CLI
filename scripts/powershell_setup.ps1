@@ -27,7 +27,7 @@ param
     $OpenAIEngine
 )
 
-$plugInScriptPath = Join-Path $RepoRoot -ChildPath "plugins\powershell_plugin.ps1"
+$plugInScriptPath = Join-Path $RepoRoot -ChildPath "scripts\powershell_plugin.ps1"
 $codexQueryPath = Join-Path $RepoRoot -ChildPath "src\codex_query.py"
 $openAIConfigPath = Join-Path $env:USERPROFILE -ChildPath ".config\openaiapirc"
 
