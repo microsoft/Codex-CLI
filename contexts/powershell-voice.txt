@@ -2,7 +2,7 @@
 ## temperature: 0
 ## max_tokens: 300
 ## shell: powershell
-## context_mode: on
+## multi_turn: on
 ## token_count: 110
 
 # what processes are hogging the most cpu?

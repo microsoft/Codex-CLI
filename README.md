@@ -2,13 +2,13 @@
 
 This project uses Codex to convert natural language commands into commands in PowerShell, Zshell and Bash. 
 
-![Babylex GIF](nl_cli.gif)
+![nl_cli GIF](nl_cli.gif)
 
-Type in a natural language command, hit Ctrl+X and watch Codex turn it into scripting code.
+Type in `#` followed by your natural language command, hit Ctrl+X and watch Codex turn it into scripting code.
 
 With the added functionality for loading developing 'modes', it makes the experience of working in the terminal seamless.
 
-Inspired by the [zsh_codex](https://github.com/tom-doerr/zsh_codex) project, it expands the functionality to multiple shells and adds the ability to load modes.
+Inspired by the [zsh_codex](https://github.com/tom-doerr/zsh_codex) project, it expands the functionality to multiple shells and adds the ability to load prompts for better model performance.
 
 ## Installation
 
@@ -44,7 +44,8 @@ Follow the steps for which shell you are using. Generally, Mac OS has zsh, Linux
 
 ```
 [openai]
-secret_key = ...
+organization_id=...
+secret_key=...
 ```
 
 4. Run `zsh`, start typing and complete it using `^X`!
@@ -114,7 +115,8 @@ Set-ExecutionPolicy Undefined -Scope CurrentUser
 
 ```
 [openai]
-secret_key = ...
+organization_id=...
+secret_key=...
 ```
 
 4. Run `bash`, start typing and complete it using `^X`!
@@ -128,14 +130,14 @@ If it is, we execute the command and exit.
 
 If it is not a command, we prefix the input with the shell name, the interactions in `openai_completion_input.txt` and pass it to Codex (which uses the context config). 
 
-Depending on whether context mode is on or off and the interaction was successful, we add the interaction to the current context file, letting you build off on interactions.
+Depending on whether multi-turn mode is on or off and the interaction was successful, we add the interaction to the current context file, letting you build off on interactions.
 
 ## Commands
 
 | Command | Description |
 |--|--|
-| `start context` | Starts a multi-turn experience |
-| `stop context` | Stops a multi-turn experience and loads default context |
+| `start multi-turn` | Starts a multi-turn experience |
+| `stop multi-turn` | Stops a multi-turn experience and loads default context |
 | `load context <filename>` | Loads the context file from `contexts` folder |
 | `default context` | Loads default shell context |
 | `edit context` | Opens the context file in a text editor |

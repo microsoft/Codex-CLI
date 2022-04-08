@@ -14,7 +14,7 @@ class PromptFile:
 
             # if we don't have a previous context, use the specified one
             if os.path.isfile(file_full_path):
-                context = "off"
+                multi_turn = "off"
 
                 if os.path.isfile(self.default_file_name):
                     with open(self.default_file_name, 'r') as f:
@@ -23,7 +23,7 @@ class PromptFile:
                         temperature = lines[1].split(':')[1].strip()
                         max_tokens = lines[2].split(':')[1].strip()
                         shell = lines[3].split(':')[1].strip()
-                        context = lines[4].split(':')[1].strip()
+                        multi_turn = lines[4].split(':')[1].strip()
                         token_count = lines[5].split(':')[1].strip()
                     
                     # use previously set configs
@@ -32,11 +32,11 @@ class PromptFile:
                         'temperature': float(temperature),
                         'max_tokens': int(max_tokens),
                         'shell': shell,
-                        'context': context,
+                        'multi_turn': multi_turn,
                         'token_count': int(token_count)
                     }
 
-                if context == "off":
+                if multi_turn == "off":
                     with open(file_full_path, 'r') as f:
                         lines = f.readlines()
                         with open(self.default_file_name, 'w') as f:
@@ -48,7 +48,7 @@ class PromptFile:
         if self.has_headers() == False:
             self.set_headers(self.config)
         
-        if config['context'] == 'on':
+        if config['multi_turn'] == 'on':
             self.config['token_count'] = self.get_token_count()
 
     def has_headers(self):
@@ -75,7 +75,7 @@ class PromptFile:
                 'temperature': 0,
                 'max_tokens': 300,
                 'shell': '',
-                'context': 'off',
+                'multi_turn': 'off',
                 'token_count': 0
             }
             return self.config
@@ -85,7 +85,7 @@ class PromptFile:
             temperature = lines[1].split(':')[1].strip()
             max_tokens = lines[2].split(':')[1].strip()
             shell = lines[3].split(':')[1].strip()
-            context = lines[4].split(':')[1].strip()    
+            multi_turn = lines[4].split(':')[1].strip()    
             token_count = lines[5].split(':')[1].strip()
         
         self.config = {
@@ -93,7 +93,7 @@ class PromptFile:
             'temperature': float(temperature),
             'max_tokens': int(max_tokens),
             'shell': shell,
-            'context': context,
+            'multi_turn': multi_turn,
             'token_count': int(token_count)
         }
 
@@ -118,7 +118,7 @@ class PromptFile:
         newf.append('## temperature: {}\n'.format(config['temperature']))
         newf.append('## max_tokens: {}\n'.format(config['max_tokens']))
         newf.append('## shell: {}\n'.format(config['shell']))
-        newf.append('## context_mode: {}\n'.format(config['context']))
+        newf.append('## multi_turn: {}\n'.format(config['multi_turn']))
         newf.append('## token_count: {}\n'.format(config['token_count']))
 
         if self.has_headers():
@@ -139,7 +139,7 @@ class PromptFile:
             f.write(user_query)
             f.write(prompt_response)
         
-        if self.config['context'] == 'on':
+        if self.config['multi_turn'] == 'on':
             self.config['token_count'] += len(user_query.split()) + len(prompt_response.split())
             self.set_headers(self.config)
     
@@ -242,22 +242,22 @@ class PromptFile:
             with Path(save_name).open('w') as f:
                 f.writelines(lines)
     
-    def turn_on_context(self):
+    def turn_on_multi_turn(self):
         """
         Turn on context mode
         """
-        self.config['context'] = 'on'
+        self.config['multi_turn'] = 'on'
         self.set_headers(self.config)
-        print("\n#   Context mode is now on")
+        print("\n#   Multi turn mode is on")
 
     
-    def turn_off_context(self):
+    def turn_off_multi_turn(self):
         """
         Turn off context mode
         """
-        self.config['context'] = 'off'
+        self.config['multi_turn'] = 'off'
         self.set_headers(self.config)
-        print("\n#   Context mode is now off")
+        print("\n#   Multi turn mode is off")
     
     def default_context(self):
         """
@@ -269,7 +269,7 @@ class PromptFile:
             # write the default context to the prompt file
             with open(default_context_path, 'r') as f:
                 lines = f.readlines()
-                lines[4] = '## context_mode: {}\n'.format(self.config['context'])
+                lines[4] = '## multi_turn: {}\n'.format(self.config['multi_turn'])
                 with open(self.file_name, 'w') as f:
                     f.writelines(lines)
             print("\n#   Context has been set to shell default")
@@ -279,11 +279,11 @@ class PromptFile:
     def load_context(self, filename):
         if not filename.endswith('.txt'):
             filename = filename + '.txt'
-        filename = os.path.join(os.path.dirname(self.file_name), "contexts", filename)
+        filename = Path(os.path.join(os.path.dirname(__file__), "contexts", filename))
 
         # check if the file exists
-        if os.path.isfile(filename):
-            with Path(filename).open('r') as f:
+        if filename.exists():
+            with filename.open('r') as f:
                 lines = f.readlines()
             # write to the current prompt file
             with open(self.file_name, 'w') as f:

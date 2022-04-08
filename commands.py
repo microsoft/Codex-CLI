@@ -10,8 +10,8 @@ def get_command_result(input, prompt_file):
     Currently supported commands:
     - unlearn
     - unlearn all
-    - start context
-    - stop context
+    - start multi-turn
+    - stop multi-turn
     - default context
     - show context <n>
     - edit context
@@ -88,21 +88,23 @@ def get_command_result(input, prompt_file):
             prompt_file.clear_last_interaction()
         return "unlearned interaction", prompt_file
 
-    # context commands
-    if input.__contains__("context"):
+    # multi turn/single turn commands
+    if input.__contains__("multi-turn"):
         # start context
         if input.__contains__("start"):
-            if config['context'] == 'off':
-                prompt_file.turn_on_context()
-                return "started context", prompt_file
+            if config['multi_turn'] == 'off':
+                prompt_file.turn_on_multi_turn()
+                return "multi turn mode on", prompt_file
             
-            return "started context", prompt_file
+            return "multi turn mode on", prompt_file
         
         # stop context
         if input.__contains__("stop"):
-            prompt_file.turn_off_context()
-            return "stopped context", prompt_file
-        
+            prompt_file.turn_off_multi_turn()
+            return "multi turn mode off", prompt_file
+    
+    # context file commands
+    if input.__contains__("context"):
         if input.__contains__("default"):
             prompt_file.default_context()
             return "stopped context", prompt_file
