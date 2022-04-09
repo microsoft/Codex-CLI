@@ -10,8 +10,8 @@ def get_command_result(input, prompt_file):
     Currently supported commands:
     - unlearn
     - unlearn all
-    - start context
-    - stop context
+    - start multi-turn
+    - stop multi-turn
     - default context
     - show context <n>
     - edit context
@@ -71,12 +71,7 @@ def get_command_result(input, prompt_file):
                 return "", prompt_file
 
     if input.__contains__("show config"):
-        print('\n')
-        # read the dictionary into a list of # lines
-        lines = []
-        for key, value in config.items():
-            lines.append('\n# {}: {}'.format(key, value))
-        print(''.join(lines))
+        prompt_file.show_config()
         return "config shown", prompt_file
 
     # interaction deletion commands
@@ -85,24 +80,29 @@ def get_command_result(input, prompt_file):
             prompt_file.default_context()
             return "unlearned interaction", prompt_file
         else:
-            prompt_file.clear_last_interaction()
+            if config['multi_turn'] == "on":
+                prompt_file.clear_last_interaction()
+            else:
+                print("# Multi-turn mode is off - cannot unlearn interaction, consider default context command")
         return "unlearned interaction", prompt_file
 
-    # context commands
-    if input.__contains__("context"):
+    # multi turn/single turn commands
+    if input.__contains__("multi-turn"):
         # start context
         if input.__contains__("start"):
-            if config['context'] == 'off':
-                prompt_file.turn_on_context()
-                return "started context", prompt_file
+            if config['multi_turn'] == 'off':
+                prompt_file.start_multi_turn()
+                return "multi turn mode on", prompt_file
             
-            return "started context", prompt_file
+            return "multi turn mode on", prompt_file
         
         # stop context
         if input.__contains__("stop"):
-            prompt_file.turn_off_context()
-            return "stopped context", prompt_file
-        
+            prompt_file.stop_multi_turn()
+            return "multi turn mode off", prompt_file
+    
+    # context file commands
+    if input.__contains__("context"):
         if input.__contains__("default"):
             prompt_file.default_context()
             return "stopped context", prompt_file
@@ -112,7 +112,7 @@ def get_command_result(input, prompt_file):
             print('\n')
             with open(prompt_file.file_name, 'r') as f:
                 lines = f.readlines()
-                lines = lines[5:] # skip headers
+                lines = lines[6:] # skip headers
             
             line_numbers = 0
             if len(input.split()) > 3:
@@ -126,12 +126,12 @@ def get_command_result(input, prompt_file):
             return "context shown", prompt_file
         
         # edit context
-        if input.__contains__("edit"):
+        if input.__contains__("view"):
             # open the prompt file in text editor
             if config['shell'] != 'powershell':
-                os.system('open {}'.format(prompt_file.file_name))
+                os.system('open {}'.format(prompt_file.file_path))
             else:
-                os.system('start {}'.format(prompt_file.file_name))
+                os.system('start {}'.format(prompt_file.file_path))
             return "context shown", prompt_file
 
         # save context <filename>
@@ -144,8 +144,6 @@ def get_command_result(input, prompt_file):
                 filename = input.split()[3]
             
             prompt_file.save_to(filename)
-            
-            print('\n#\tContext saved to {}'.format(filename))
             return "context saved", prompt_file
         
         # clear context
