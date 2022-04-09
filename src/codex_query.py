@@ -14,10 +14,10 @@ from pathlib import Path
 from prompt_file import PromptFile
 from commands import get_command_result
 
-CONTEXT_MODE = "off"
+MULTI_TURN = "off"
 SHELL = ""
 
-ENGINE = 'cushman-codex-msft'
+ENGINE = ''
 TEMPERATURE = 0
 MAX_TOKENS = 300
 
@@ -27,13 +27,15 @@ DEBUG_MODE = False
 CONFIG_DIR = os.getenv('XDG_CONFIG_HOME', os.path.expanduser(os.path.join('~','.config')))
 API_KEYS_LOCATION = os.path.join(CONFIG_DIR, 'openaiapirc')
 
-PROMPT_CONTEXT = Path(__file__).with_name('openai_completion_input.txt')
+PROMPT_CONTEXT = Path(__file__).with_name('current_context.txt')
 
 
 # Read the secret_key from the ini file ~/.config/openaiapirc
 # The format is:
 # [openai]
+# organization=<organization-id>
 # secret_key=<your secret key>
+# engine=<engine-name>
 def create_template_ini_file():
     """
     If the ini file does not exist create it and add secret_key
@@ -42,13 +44,16 @@ def create_template_ini_file():
         print('Please create a file called openaiapirc at {} and add your secret key'.format(CONFIG_DIR))
         print('The format is:\n')
         print('[openai]')
+        print('organization_id=<organization-id>')
         print('secret_key=<your secret key>\n')
+        print('engine=<engine-id>')
         sys.exit(1)
 
 def initialize():
     """
     Initialize openAI and shell mode
     """
+    global ENGINE
 
     # Check if file at API_KEYS_LOCATION exists
     create_template_ini_file()
@@ -56,13 +61,15 @@ def initialize():
     config.read(API_KEYS_LOCATION)
 
     openai.api_key = config['openai']['secret_key'].strip('"').strip("'")
+    openai.organization = config['openai']['organization_id'].strip('"').strip("'")
+    ENGINE = config['openai']['engine'].strip('"').strip("'")
 
     prompt_config = {
         'engine': ENGINE,
         'temperature': TEMPERATURE,
         'max_tokens': MAX_TOKENS,
         'shell': SHELL,
-        'context': CONTEXT_MODE,
+        'multi_turn': MULTI_TURN,
         'token_count': 0
     }
     
@@ -84,7 +91,7 @@ def get_query(prompt_file):
     # first we check if the input is a command
     command_result, prompt_file = get_command_result(entry, prompt_file)
 
-    # if input is not a command, then query Codex, otherwise exit command has been executed
+    # if input is not a command, then query Codex, otherwise exit command has been run successfully
     if command_result == "":
         return entry, prompt_file
     else:
@@ -101,7 +108,7 @@ def detect_shell():
 
     SHELL = "powershell" if POWERSHELL_MODE else "bash" if BASH_MODE else "zsh" if ZSH_MODE else "unknown"
 
-    shell_prompt_file = Path(os.path.join(os.path.dirname(__file__), "contexts", "{}_context.txt".format(SHELL)))
+    shell_prompt_file = Path(os.path.join(os.path.dirname(__file__), "..", "contexts", "{}-context.txt".format(SHELL)))
 
     if shell_prompt_file.is_file():
         PROMPT_CONTEXT = shell_prompt_file
@@ -118,7 +125,7 @@ if __name__ == '__main__':
             'temperature': TEMPERATURE,
             'max_tokens': MAX_TOKENS,
             'shell': SHELL,
-            'context': CONTEXT_MODE,
+            'multi_turn': MULTI_TURN,
             'token_count': 0
         }
 
@@ -146,7 +153,7 @@ if __name__ == '__main__':
         print(completion_all)
 
         # append output to prompt context file
-        if config['context'] == "on":
+        if config['multi_turn'] == "on":
             if completion_all != "" or len(completion_all) > 0:
                 prompt_file.add_input_output_pair(user_query, completion_all)
     except FileNotFoundError:
@@ -155,3 +162,5 @@ if __name__ == '__main__':
         print('\n\n# Codex CLI error: Rate limit exceeded, try later')
     except openai.error.APIConnectionError:
         print('\n\n# Codex CLI error: API connection error, are you connected to the internet?')
+    except openai.error.InvalidRequestError:
+        print('\n\n# Codex CLI error: Invalid request, is the engine/temperature valid?')
