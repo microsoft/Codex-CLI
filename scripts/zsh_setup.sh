@@ -3,11 +3,11 @@
 # A shell script to setup NL-CLI for zsh
 #
 # You can pass the following arguments to the script:
-#   --OpenAIOrgId: Required. Your OpenAI organization id.
+#   --OpenAIOrganizationId: Required. Your OpenAI organization id.
 #   --OpenAIEngineId: Required. The OpenAI engine id that provides access to a model.
 #   --RepoRoot: Optional. Default to the current folder. The value should be the path of NL-CLI folder.
 # For example:
-# ./zsh_setup.sh --OpenAIOrgId <YOUR_ORG_ID> --OpenAIEngineId <ENGINE_ID> --RepoRoot /Code/NL-CLI
+# ./zsh_setup.sh --OpenAIOrganizationId <YOUR_ORG_ID> --OpenAIEngineId <ENGINE_ID> --RepoRoot /Code/NL-CLI
 # 
 set -e
 
@@ -16,26 +16,28 @@ zmodload zsh/zutil
 zparseopts -E -D -- \
            -OpenAIOrganizationId:=o_orgId \
            -OpenAIEngineId:=o_engineId \
-           -RepoRoot:=o_repoRoot \
+           -RepoRoot:=o_repoRoot
+
+echo "${o_orgId[2]}, ${o_engineId[2]}, ${o_repoRoot[2]}"
 
 orgId=""
-if [[ -v ${o_orgId[2]} ]]; then
+if (( ${+o_orgId[2]} )); then
     orgId=${o_orgId[2]}
 else
-    echo 'Error: --OpenAIOrganizationId is required.'
-    exit 1
+    echo "Error: --OpenAIOrganizationId is required."
+    #exit 1
 fi
 
 engineId=""
-if [[ -v ${o_engineId[2]} ]]; then
+if (( ${+o_engineId[2]} )); then
     engineId=${o_engineId[2]}
 else
-    echo 'Error: --OpenAIEngineId is required.'
-    exit 1
+    echo "Error: --OpenAIEngineId is required."
+    #exit 1
 fi
 
 repoRoot=""
-if [[ -v ${o_repoRoot[2]} ]]; then
+if (( ${+o_repoRoot[2]} )); then
     repoRoot=${o_repoRoot[2]}
 else
     repoRoot=$PWD
