@@ -24,7 +24,7 @@ param
 
     [Parameter(Mandatory = $true)]
     [ValidateNotNullOrEmpty()]
-    $OpenAIEngine
+    $OpenAIEngineId
 )
 
 $plugInScriptPath = Join-Path $RepoRoot -ChildPath "scripts\powershell_plugin.ps1"
@@ -64,5 +64,5 @@ if ($PSVersionTable.PSVersion.Major -lt 7) {
 Set-Content -Path $openAIConfigPath "[openai]
 organization_id=$OpenAIOrganizationId
 secret_key=$openAIApiKeyPlainText
-engine=$OpenAIEngine"
+engine=$OpenAIEngineId"
 Write-Host "Updated OpenAI configuration file with secrets"
