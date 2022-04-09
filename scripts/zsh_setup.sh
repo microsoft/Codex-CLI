@@ -25,7 +25,7 @@ if (( ${+o_orgId[2]} )); then
     orgId=${o_orgId[2]}
 else
     echo "Error: --OpenAIOrganizationId is required."
-    #exit 1
+    exit 1
 fi
 
 engineId=""
@@ -33,7 +33,7 @@ if (( ${+o_engineId[2]} )); then
     engineId=${o_engineId[2]}
 else
     echo "Error: --OpenAIEngineId is required."
-    #exit 1
+    exit 1
 fi
 
 repoRoot=""
