@@ -12,6 +12,7 @@ Inspired by the [zsh_codex](https://github.com/tom-doerr/zsh_codex) project, it 
 
 ## Requirements
 * [Python](https://www.python.org/downloads/)
+    * \[Windows\]: Python is added to PATH.
 * An [OpenAI account](https://openai.com/api/) with OpenAI API Key, OpenAI Organization Id, and OpenAI Engine Id.
 
 ## Installation
