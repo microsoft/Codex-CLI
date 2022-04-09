@@ -37,7 +37,7 @@ Follow the steps for which shell you are using. Generally, Mac OS has zsh, Linux
 2. In zsh, go to `~/your/custom/path/` (the folder contains NL-CLI code), then run the following command to setup your zsh environment. It will prompt you for [OpenAI API key]((https://beta.openai.com/account/api-keys)).
 
 ```
-./scripts/zsh_setup.sh --OpenAIOrgId <YOUR_ORG_ID> --OpenAIEngineId <ENGINE_ID>
+./scripts/zsh_setup.sh --OpenAIOrganizationId <YOUR_ORG_ID> --OpenAIEngineId <ENGINE_ID>
 ```
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;See [About zsh_setup.sh](#about-zshsetupsh) section to learn script parameters.
 
