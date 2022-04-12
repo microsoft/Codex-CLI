@@ -103,7 +103,7 @@ git clone https://github.com/microsoft/NL-CLI.git "$USER_PATH"
 #     source "$ZSH_CUSTOM/NL-CLI/scripts/nl_cli.plugin.zsh"
 #     bindkey '^X' create_completion
 
-## updateBashrc
+updateBashrc
 
 
 # 3. Create a file called `openaiapirc` in `~/.config` with your SECRET_KEY.
