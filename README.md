@@ -2,11 +2,13 @@
 
 This project uses Codex to convert natural language commands into commands in PowerShell, Zshell and Bash. 
 
-![Babylex GIF](nl_cli.gif)
+![nl_cli GIF](nl_cli.gif)
+
 
 The Command Line Interface (CLI) was the first major User Interface we used to interact with machines. It's incredibly powerful, you can do almost anything with a CLI, but it requires the user to express their intent extremely precisely. The user needs to _know the language of the computer_. 
 
 With the advent of Large Language Models (LLMs), particularly those that have been trained on code, it's now possible to interact with a CLI using Natural Language (NL). In effect, these models understand natural language _and_ code well enough that they can translate from one to another. 
+
 
 This project aims to offer a cross-shell NL->Code experience to allow users to interact with their favorite CLI using NL. The user enters a command, like "what's my IP address", hits Ctrl + X and gets a suggestion for a command idiomatic to the shell they're using.
 
@@ -38,7 +40,7 @@ Follow the steps for which shell you are using. Generally, Mac OS has zsh, Linux
 ```
     # in your/custom/path you need to clone the repository
     export ZSH_CUSTOM="your/custom/path"
-    source "$ZSH_CUSTOM/NL-CLI/nl_cli.plugin.zsh"
+    source "$ZSH_CUSTOM/NL-CLI/scripts/nl_cli.plugin.zsh"
     bindkey '^X' create_completion
 ```
 
@@ -46,7 +48,9 @@ Follow the steps for which shell you are using. Generally, Mac OS has zsh, Linux
 
 ```
 [openai]
-secret_key = ...
+organization_id=...
+secret_key=...
+engine=...
 ```
 
 4. Run `zsh`, start typing and complete it using `^X`!
@@ -70,7 +74,7 @@ Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
 3. In the same Powershell window, go to `C:\your\custom\path\` (the folder contains NL-CLI code), then run the following command to setup your PowerShell environment. It will prompt you for OpenAI access key.
 
 ```
-.\powershell_setup.ps1
+.\scripts\powershell_setup.ps1
 ```
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;See [About powershell_setup.ps1](#about-powershellsetupps1) section to learn script parameters.
 
@@ -79,7 +83,7 @@ Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
 #### Clean up
 Once you are done, go to `C:\your\custom\path\` (the folder contains NL-CLI code), then run the following command to clean up.
 ```
-.\powershell_cleanup.ps1
+.\scripts\powershell_cleanup.ps1
 ```
 
 If you want to revert the execution policy, run this command
@@ -93,6 +97,8 @@ Set-ExecutionPolicy Undefined -Scope CurrentUser
 |--|--|--|--|
 | `-RepoRoot` | [FileInfo](https://docs.microsoft.com/en-us/dotnet/api/system.io.fileinfo) | Optional. Default to the current folder.<br>The value should be the path of NL-CLI folder|`.\powershell_setup.ps1 -RepoRoot 'C:\your\custom\path'`|
 | `-OpenAIApiKey` | [SecureString](https://docs.microsoft.com/en-us/dotnet/api/system.security.securestring) | Required. If is not supplied, the script will prompt you to input the value. If you would like to provide the value via PowerShell parameter, please refer to the example. | `.\powershell_setup.ps1 -OpenAIApiKey (ConvertTo-SecureString "YOUR_OPENAI_API_KEY" -AsPlainText -Force)` |
+| `-OpenAIOrganizationId` | String | Required. If is not supplied, the script will prompt you to input the value. If you would like to provide the value via PowerShell parameter, please refer to the example. | `.\powershell_setup.ps1 -OpenAIOrganizationId "YOUR_OPENAI_ORGANIZATION_ID"` |
+| `-OpenAIEngine` | String | Required. If is not supplied, the script will prompt you to input the value. If you would like to provide the value via PowerShell parameter, please refer to the example. | `.\powershell_setup.ps1 -OpenAIEngine "ENGINE_NAME"` |
 
 ### Bash instructions
 
@@ -108,7 +114,7 @@ Set-ExecutionPolicy Undefined -Scope CurrentUser
 ```
     # in your/custom/path you need to clone the repository
     export NL_CLI_PATH="your/custom/path/NL-CLI"
-    source "$NL_CLI_PATH/nl_cli.plugin.sh"
+    source "$NL_CLI_PATH/scripts/nl_cli.plugin.sh"
     bind -x '"\C-x":"create_completion"'
 ```
 
@@ -116,7 +122,9 @@ Set-ExecutionPolicy Undefined -Scope CurrentUser
 
 ```
 [openai]
-secret_key = ...
+organization_id=...
+secret_key=...
+engine=...
 ```
 
 4. Run `bash`, start typing and complete it using `^X`!
@@ -130,21 +138,32 @@ If it is, we execute the command and exit.
 
 If it is not a command, we prefix the input with the shell name, the interactions in `openai_completion_input.txt` and pass it to Codex (which uses the context config). 
 
-Depending on whether context mode is on or off and the interaction was successful, we add the interaction to the current context file, letting you build off on interactions.
+Depending on whether multi-turn mode is on or off and the interaction was successful, we add the interaction to the current context file, letting you build off on interactions.
 
 ## Commands
 
 | Command | Description |
 |--|--|
-| `start context` | Starts a multi-turn experience |
-| `stop context` | Stops a multi-turn experience and loads default context |
+| `start multi-turn` | Starts a multi-turn experience |
+| `stop multi-turn` | Stops a multi-turn experience and loads default context |
 | `load context <filename>` | Loads the context file from `contexts` folder |
 | `default context` | Loads default shell context |
-| `edit context` | Opens the context file in a text editor |
+| `view context` | Opens the context file in a text editor |
 | `save context <filename>` | Saves the context file to `contexts` folder, if name not specified, uses current date-time |
 | `show config` | Shows the current configuration of your interaction with the model |
 | `set <config-key> <config-value>` | Sets the configuration of your interaction with the model |
 | `unlearn` | Unlearns the last two lines of input-output from the model |
+
+
+## Context file system
+
+All contexts are loaded from the `contexts` folder. There are some shell defaults that we have added to get you started.
+
+You can create your own contexts using the multi-turn feature and the `save context` command. Otherwise, you can simply paste in your favorite prompt files into the `contexts` folder and load them in using the `load context <filename>` command.
+
+One important thing to consider is that if you add a new context, keep the multi-turn mode on to avoid our automatic defaulting (added to keep faulty contexts from breaking your experience).
+
+You can change the default context from our shell defaults to your context file inside `src\prompt_file.py`.
 
 ## Troubleshooting
 
