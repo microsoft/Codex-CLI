@@ -146,7 +146,7 @@ tzutil /s "Mountain Standard Time"
 tzutil /s "Pacific Standard Time"
 ```
 
-When multi-turn mode is on, this tool creates a `openai_completion_input.txt` file that keeps track of past interactions, and pass it to the model on each subsequent command. 
+When multi-turn mode is on, this tool creates a `current_context.txt` file that keeps track of past interactions, and pass it to the model on each subsequent command. 
 
 When multi-turn mode is off, this tool will not keep track of interaction history. There are tradeoffs to using multi-turn mode - though it enables compelling context resolution, it also increases overhead. If, for example, the model produces the wrong script for the job, the user will want to remove that from the context, otherwise future conversation turns will be more likely to produce the wrong script again. With multi-turn mode off, the model will behave completely deterministically - the same command will always produce the same output. 
 
