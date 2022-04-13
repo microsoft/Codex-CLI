@@ -14,7 +14,7 @@ This project aims to offer a cross-shell NL->Code experience to allow users to i
 
 **Note: The model can still make mistakes! Don't run a command if you don't understand it. If you're not sure what a command does, hit 'Ctrl + C' to cancel it**. 
 
-This project took technical inspiration from the [zsh_codex](https://github.com/tom-doerr/zsh_codex) project, extending its functionality to span multiple shells and to customize the prompts we pass to the model (see prompt engineering section below).
+This project took technical inspiration from the [zsh_codex](https://github.com/tom-doerr/zsh_codex) project, extending its functionality to span multiple shells and to customize the prompts passed to the model (see prompt engineering section below).
 
 ## Installation
 
@@ -148,7 +148,7 @@ tzutil /s "Pacific Standard Time"
 
 When multi-turn mode is on, this tool creates a `openai_completion_input.txt` file that keeps track of past interactions, and pass it to the model on each subsequent command. 
 
-When multi-turn mode is off, we this tool will not keep track of interaction history. There are tradeoffs to using multi-turn mode - though it enables compelling context resolution, it also increases overhead. If, for example, the model produces the wrong script for the job, the user will want to remove that from the context, otherwise future conversation turns will be more likely to produce the wrong script again. With multi-turn mode off, the model will behave completely deterministically - the same command will always produce the same output. 
+When multi-turn mode is off, this tool will not keep track of interaction history. There are tradeoffs to using multi-turn mode - though it enables compelling context resolution, it also increases overhead. If, for example, the model produces the wrong script for the job, the user will want to remove that from the context, otherwise future conversation turns will be more likely to produce the wrong script again. With multi-turn mode off, the model will behave completely deterministically - the same command will always produce the same output. 
 
 ## Commands
 
@@ -167,7 +167,8 @@ When multi-turn mode is off, we this tool will not keep track of interaction his
 
 ## Prompt Engineering and Context Folders
 
-This project uses a discipline called prompt engineering to coax GPT-3 Codex to generate commands from natural language. Specifically, we pass the model a series of examples of NL->Commands, to give it a sense of the kind of code it should be writing, and also to nudge it towards generating commands in the shell we're using. These examples live in the `contexts` directory. See snippet from the PowerShell context below:
+This project uses a discipline called prompt engineering to coax GPT-3 Codex to generate commands from natural language. Specifically, 
+pass the model a series of examples of NL->Commands, to give it a sense of the kind of code it should be writing, and also to nudge it towards generating commands idiomatic to the shell you're using. These examples live in the `contexts` directory. See snippet from the PowerShell context below:
 
 ```powershell
 # what's the weather in New York?
@@ -181,7 +182,7 @@ src" | Out-File .gitignore
 notepad .gitignore
 ```
 
-Note that we model our natural language commands as comments, and provide examples of the kind of PowerShell scripts we expect the model to write. These examples include single line completions, multi-line completions, and multi-turn completions (the "open it in notepad" example refers to the `.gitignore` file generated on the previous turn). 
+Note that this project models natural language commands as comments, and provide examples of the kind of PowerShell scripts we expect the model to write. These examples include single line completions, multi-line completions, and multi-turn completions (the "open it in notepad" example refers to the `.gitignore` file generated on the previous turn). 
 
 When a user enters a new command (say "what's my IP address"), we simple append that command onto the context (as a comment) and ask Codex to generate the code that should follow it. Having seen the examples above, Codex will know that it should write a short PowerShell script that satisfies the comment. 
 
