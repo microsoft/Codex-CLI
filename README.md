@@ -167,8 +167,7 @@ When multi-turn mode is off, this tool will not keep track of interaction histor
 
 ## Prompt Engineering and Context Files
 
-This project uses a discipline called prompt engineering to coax GPT-3 Codex to generate commands from natural language. Specifically, 
-pass the model a series of examples of NL->Commands, to give it a sense of the kind of code it should be writing, and also to nudge it towards generating commands idiomatic to the shell you're using. These examples live in the `contexts` directory. See snippet from the PowerShell context below:
+This project uses a discipline called prompt engineering to coax GPT-3 Codex to generate commands from natural language. Specifically, we pass the model a series of examples of NL->Commands, to give it a sense of the kind of code it should be writing, and also to nudge it towards generating commands idiomatic to the shell you're using. These examples live in the `contexts` directory. See snippet from the PowerShell context below:
 
 ```powershell
 # what's the weather in New York?
