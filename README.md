@@ -1,6 +1,6 @@
 # NL-CLI - Natural Language Command Line Interface
 
-This project uses Codex to convert natural language commands into commands in PowerShell, Zshell and Bash. 
+This project uses [GPT-3 Codex](https://openai.com/blog/openai-codex/) to convert natural language commands into commands in PowerShell, Zshell and Bash. 
 
 ![nl_cli GIF](nl_cli.gif)
 
