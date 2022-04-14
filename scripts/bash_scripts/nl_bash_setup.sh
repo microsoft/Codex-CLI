@@ -4,35 +4,47 @@
 
 printf "*** Starting NL-CLI bash setup ***\n"
 
-createOpenAIrc()
+createOpenAI()
 {
+    openAIfile=$HOME/.config/openaiapirc 
+    if [ -f "$openAIfile" ]; then
+        rm -f $openAIfile
+    fi
+
     mkdir -p $HOME/.config
     touch $HOME/.config/openaiapirc
-    file=$HOME/.config/openaiapirc 
+   
 
-    echo '[openai]' >> $file
-    echo "organization_id=$ORG_ID" >> $file
-    echo "secret_key=$SECRET_KEY" >> $file
-    echo "engine=..." >> $file
+    echo '[openai]' >> $openAIfile
+    echo "organization_id=$ORG_ID" >> $openAIfile
+    echo "secret_key=$SECRET_KEY" >> $openAIfile
+    echo "engine= " >> $openAIfile
 
     unset SECRET_KEY
     unset ORG_ID
-    unset file
+    unset openAIfile
 }
 
 updateBashrc() 
 {
     local bashfile=$HOME/.bashrc
+
+    if grep -Fq "BSH_CUSTOM" $bashfile; then 
+        #echo "what? "
+        return 0
+    fi
+
+    #echo "U passed?"
     ## backup the user's bashrc file 
     cp $HOME/.bashrc $HOME/.bashrc_
 
     ## Add NL-CLI features to bashrc file
     echo "export BSH_CUSTOM=${BSH_USER_PATH}" >> $bashfile ##testfile
-    echo 'source $BSH_CUSTOM/NL-CLI/scripts/nl_cli.plugin.sh' >> $bashfile testfile
+    echo 'source $BSH_CUSTOM/NL-CLI/scripts/nl_cli.plugin.sh' >> $bashfile 
 
     ## unbind all related to ctrl+x key first then bind to ctrl+x 
     bind -r "\C-x"
-    echo 'bind -x "\C-x":create_completion' >> $bashfile #testfile
+    echo 'bind -x "\C-x":create_completion' >> $bashfile
     source $bashfile 
 
 }
@@ -56,24 +68,24 @@ function getOptions
 {
   local OPTIND
   unset BSH_USER_PATH
-  echo "In options function"
-  while getopts ":p:s:h" opt ; do
+  ##echo "In options function"
+  while getopts ":p:s:o:k:h" opt ; do
       case "$opt" in
           p  )  # set custom User Path
               BSH_USER_PATH="$OPTARG"
-              echo $BSH_USER_PATH
+              #echo $BSH_USER_PATH
               ;;
           s  )  # script type (for future use)
               SHELL_TYPE="$OPTARG"
-              echo $SHELL_TYPE
+              #echo $SHELL_TYPE
               ;;
           o  )  # organization ID 
               ORG_ID="$OPTARG"
-              echo $ORG_ID
+              #echo $ORG_ID
               ;;
           k  )  # secret key
              SECRET_KEY="$OPTARG"
-             echo $SECRET_KEY
+             #echo $SECRET_KEY
              ;;
           h  )  # echo the help file
               key="h"   
@@ -90,7 +102,7 @@ function getOptions
   shift $((OPTIND-1))
 
   # set defaults if a User Path not supplied
-  echo "user $BSH_USER_PATH"
+  #echo "user $BSH_USER_PATH"
   if [ -z "$BSH_USER_PATH" ] ; then BSH_USER_PATH="$HOME/nl_cli" ; fi
   # if [ -z "$SHELL_TYPE" ] ; then SHELL_TYPE="bash" ; fi
 }
@@ -131,4 +143,3 @@ updateBashrc
 # Call create OpenAI function
 createOpenAI 
 
-return 0
