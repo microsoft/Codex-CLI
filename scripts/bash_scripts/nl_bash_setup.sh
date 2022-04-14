@@ -4,12 +4,33 @@
 
 printf "*** Starting NL-CLI bash setup ***\n"
 
+createOpenAIrc()
+{
+    mkdir -p $HOME/.config
+    touch $HOME/.config/openaiapirc
+    file=$HOME/.config/openaiapirc 
+
+    echo '[openai]' >> $file
+    echo "organization_id=$ORG_ID" >> $file
+    echo "secret_key=$SECRET_KEY" >> $file
+    echo "engine=..." >> $file
+
+    unset SECRET_KEY
+    unset ORG_ID
+    unset file
+}
+
 updateBashrc() 
 {
     local bashfile=$HOME/.bashrc
-    echo "export BSH_CUSTOM=${USER_PATH}" >> $bashfile ##testfile
+    ## backup the user's bashrc file 
+    cp $HOME/.bashrc $HOME/.bashrc_
+
+    ## Add NL-CLI features to bashrc file
+    echo "export BSH_CUSTOM=${BSH_USER_PATH}" >> $bashfile ##testfile
     echo 'source $BSH_CUSTOM/NL-CLI/scripts/nl_cli.plugin.sh' >> $bashfile testfile
-    ## unbind all related to key first then bind to ctrl+x 
+
+    ## unbind all related to ctrl+x key first then bind to ctrl+x 
     bind -r "\C-x"
     echo 'bind -x "\C-x":create_completion' >> $bashfile #testfile
     source $bashfile 
@@ -34,34 +55,32 @@ help()
 function getOptions 
 {
   local OPTIND
-  unset USER_PATH
-  unset key
+  unset BSH_USER_PATH
   echo "In options function"
   while getopts ":p:s:h" opt ; do
       case "$opt" in
-          p  )   # set custom User Path
-              USER_PATH="$OPTARG"
-              echo $USER_PATH
+          p  )  # set custom User Path
+              BSH_USER_PATH="$OPTARG"
+              echo $BSH_USER_PATH
               ;;
-          s  )   # Script type (for future use)
+          s  )  # script type (for future use)
               SHELL_TYPE="$OPTARG"
               echo $SHELL_TYPE
               ;;
-          o  ) 
+          o  )  # organization ID 
               ORG_ID="$OPTARG"
               echo $ORG_ID
               ;;
-          k  )
+          k  )  # secret key
              SECRET_KEY="$OPTARG"
              echo $SECRET_KEY
              ;;
-          h  )
-              # echo the help file
+          h  )  # echo the help file
               key="h"   
               help
               return 1
               ;;
-          \? )
+          \? ) # 
               key="e"
               echo "Invalid option: -$OPTARG" >&2
               return 1
@@ -70,49 +89,46 @@ function getOptions
   done
   shift $((OPTIND-1))
 
-  # set defaults if command not supplied
-  echo "user $USER_PATH"
-  if [ -z "$USER_PATH" ] ; then USER_PATH="$HOME/nl_cli" ; fi
+  # set defaults if a User Path not supplied
+  echo "user $BSH_USER_PATH"
+  if [ -z "$BSH_USER_PATH" ] ; then BSH_USER_PATH="$HOME/nl_cli" ; fi
   # if [ -z "$SHELL_TYPE" ] ; then SHELL_TYPE="bash" ; fi
 }
 
-## menu
+##################
+## *** Main *** ##
+##################
+
+## Script Menu Options ##
 getOptions "$@"
+# Tracking & return for help or wrong option selected
 if [ "$key" = "h" ] || [ "$key" = "e" ]; then
+    unset key
     return 1
 fi
 
-echo $USER_PATH
-if [ ! -d "$USER_PATH" ]; then
-    echo "$USER_PATH is not a directory."
-    mkdir -p "$USER_PATH"
+## Verifying and creating User defined Path ##
+echo "Installing NL-CLI in directory: "
+echo $BSH_USER_PATH
+if [ ! -d "$BSH_USER_PATH" ]; then
+    echo "$BSH_USER_PATH is not a valid directory; Creating directory..."
+    mkdir -p "$BSH_USER_PATH"
 fi
 
-# Remove existing NL-CLI folder if exists
-rm -rf "$USER_PATH/NL-CLI"
+## "Installing NL-CLI" Cloning NL-CL repo ##
 
 # 1. Download this project to `~/your/custom/path/`.
-# ```
-#     $ git clone https://github.com/microsoft/NL-CLI.git ~/your/custom/path/
-# ```
-git clone https://github.com/microsoft/NL-CLI.git "$USER_PATH"
+# Remove existing NL-CLI folder if exists
+rm -rf "$BSH_USER_PATH/NL-CLI"
+# $ git clone https://github.com/microsoft/NL-CLI.git ~/your/custom/path/
+git clone https://github.com/microsoft/NL-CLI.git "$BSH_USER_PATH"
 
-# 2. Add the following to your `~/.bashrc` file.
-#     # in your/custom/path you need to clone the repository
-#     export ZSH_CUSTOM="your/custom/path" 
-#     source "$ZSH_CUSTOM/NL-CLI/scripts/nl_cli.plugin.zsh"
-#     bindkey '^X' create_completion
-
+# 2. Add the custom lines in `~/.bashrc` file.
+# Call update Bash function
 updateBashrc
 
-
 # 3. Create a file called `openaiapirc` in `~/.config` with your SECRET_KEY.
-## Put this in a function - TEW
-mkdir -p $HOME/.config
-touch $HOME/.config/openaiapirc
-file=$HOME/.config/openaiapirc 
+# Call create OpenAI function
+createOpenAI 
 
-echo '[openai]' >> $file
-echo "organization_id=$ORG_ID" >> $file
-echo "secret_key=$SECRET_KEY" >> $file
-echo "engine=..." >> $file
+return 0
