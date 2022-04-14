@@ -34,15 +34,15 @@ updateBashrc()
         return 0
     fi
 
-    #echo "U passed?"
+    # echo "U passed?"
     ## backup the user's bashrc file 
     cp $HOME/.bashrc $HOME/.bashrc_
 
     ## Add NL-CLI features to bashrc file
-    echo "export BSH_CUSTOM=${BSH_USER_PATH}" >> $bashfile ##testfile
+    echo "export BSH_CUSTOM=${BSH_USER_PATH}" >> $bashfile
     echo 'source $BSH_CUSTOM/NL-CLI/scripts/nl_cli.plugin.sh' >> $bashfile 
 
-    ## unbind all related to ctrl+x key first then bind to ctrl+x 
+    ## Add binding for control key: ctrl+x to NL-CLI function 
     # gibind -r "\C-x"
     echo 'bind -x "\C-x":create_completion' >> $bashfile
     source $bashfile 
@@ -56,7 +56,7 @@ help()
    echo
    echo "Syntax: nl_bash_setup [-p|h|s|o|k]"
    echo "options:"
-   echo "p     Set the path for NL-CLI. If path not provided default path ~/nl_cli is used"
+   #echo "p     Set the path for NL-CLI. If path not provided default path ~/nl_cli is used"
    echo "h     Print this Help."
    echo "s     Set the Shell Type."
    echo "o     Set the OpenAI organization ID"
@@ -69,12 +69,12 @@ function getOptions
   local OPTIND
   unset BSH_USER_PATH
   ##echo "In options function"
-  while getopts ":p:s:o:k:h" opt ; do
+  while getopts ":s:o:k:h" opt ; do
       case "$opt" in
-          p  )  # set custom User Path
-              BSH_USER_PATH="$OPTARG"
-              #echo $BSH_USER_PATH
-              ;;
+          #p  )  # set custom User Path
+          #    BSH_USER_PATH="$OPTARG"
+          #    #echo $BSH_USER_PATH
+          #    ;;
           s  )  # script type (for future use)
               SHELL_TYPE="$OPTARG"
               #echo $SHELL_TYPE
@@ -103,7 +103,7 @@ function getOptions
 
   # set defaults if a User Path not supplied
   #echo "user $BSH_USER_PATH"
-  if [ -z "$BSH_USER_PATH" ] ; then BSH_USER_PATH="$HOME/nl_cli" ; fi
+  # if [ -z "$BSH_USER_PATH" ] ; then BSH_USER_PATH="$HOME/nl_cli" ; fi
   # if [ -z "$SHELL_TYPE" ] ; then SHELL_TYPE="bash" ; fi
 }
 
@@ -119,21 +119,10 @@ if [ "$key" = "h" ] || [ "$key" = "e" ]; then
     return 1
 fi
 
-## Verifying and creating User defined Path ##
-echo "Installing NL-CLI in directory: "
+## Set BSH_USER_PATH to root of NL-CLI repo##
+echo "Installing NL-CLI from: "
+BSH_USER_PATH= git rev-parse --show-toplevel
 echo $BSH_USER_PATH
-if [ ! -d "$BSH_USER_PATH" ]; then
-    echo "$BSH_USER_PATH is not a valid directory; Creating directory..."
-    mkdir -p "$BSH_USER_PATH"
-fi
-
-## "Installing NL-CLI" Cloning NL-CL repo ##
-
-# 1. Download this project to `~/your/custom/path/`.
-# Remove existing NL-CLI folder if exists
-rm -rf "$BSH_USER_PATH/NL-CLI"
-# $ git clone https://github.com/microsoft/NL-CLI.git ~/your/custom/path/
-git clone https://github.com/microsoft/NL-CLI.git "$BSH_USER_PATH"
 
 # 2. Add the custom lines in `~/.bashrc` file.
 # Call update Bash function
