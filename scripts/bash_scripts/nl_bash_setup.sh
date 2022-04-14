@@ -43,7 +43,7 @@ updateBashrc()
     echo 'source $BSH_CUSTOM/NL-CLI/scripts/nl_cli.plugin.sh' >> $bashfile 
 
     ## unbind all related to ctrl+x key first then bind to ctrl+x 
-    bind -r "\C-x"
+    # gibind -r "\C-x"
     echo 'bind -x "\C-x":create_completion' >> $bashfile
     source $bashfile 
 
