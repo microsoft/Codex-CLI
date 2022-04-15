@@ -6,7 +6,7 @@
 # 2. OpenAI configuration file (openaiapirc)
 ###
 
-$openAIConfigPath = Join-Path $env:USERPROFILE -ChildPath ".config\openaiapirc"
+$openAIConfigPath = Join-Path $HOME -ChildPath ".config\openaiapirc"
 
 function CleanUpOpenAiConfig() 
 {
