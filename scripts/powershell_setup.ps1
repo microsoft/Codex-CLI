@@ -93,4 +93,4 @@ secret_key=$openAIApiKeyPlainText
 engine=$OpenAIEngine"
 Write-Host "Updated OpenAI configuration file with secrets."
 
-Write-Host -ForegroundColor Blue "NL-CLI PowerShell (v$PSMajorVersion) setup completed. Please open a new powershell session, type in # followed by your natural language command and hit Ctrl+X!"
+Write-Host -ForegroundColor Blue "NL-CLI PowerShell (v$PSMajorVersion) setup completed. Please open a new PowerShell session, type in # followed by your natural language command and hit Ctrl+X!"
