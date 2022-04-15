@@ -32,3 +32,5 @@ function CleanUpProfileContent()
 
 CleanUpProfileContent
 CleanUpOpenAiConfig
+
+Write-Host -ForegroundColor Blue "NL-CLI PowerShell clean up completed. Please close this powershell session."

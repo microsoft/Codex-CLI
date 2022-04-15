@@ -31,6 +31,39 @@ $plugInScriptPath = Join-Path $RepoRoot -ChildPath "scripts\powershell_plugin.ps
 $codexQueryPath = Join-Path $RepoRoot -ChildPath "src\codex_query.py"
 $openAIConfigPath = Join-Path $env:USERPROFILE -ChildPath ".config\openaiapirc"
 
+# The major version of PowerShell
+$PSMajorVersion = $PSVersionTable.PSVersion.Major
+
+# Convert secure string to plain text
+if ($PSMajorVersion -lt 7) {
+    $binaryString = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($OpenAIApiKey);
+    $openAIApiKeyPlainText = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto($binaryString);
+} else {
+    $openAIApiKeyPlainText = ConvertFrom-SecureString -SecureString $OpenAIApiKey -AsPlainText
+}
+
+# Check the access with OpenAI API
+Write-Host "Checking OpenAI access..."
+$enginesApiUri = "https://api.openai.com/v1/engines"
+$response = $null
+try {
+    if ($PSMajorVersion -lt 7) {
+        $response = (Invoke-WebRequest -Uri $enginesApiUri -Headers @{"Authorization" = "Bearer $openAIApiKeyPlainText"; "OpenAI-Organization" = "$OpenAIOrganizationId"})
+    } else {
+        $response = (Invoke-WebRequest -Uri $enginesApiUri -Authentication Bearer -Token $OpenAIApiKey -Headers @{"OpenAI-Organization" = "$OpenAIOrganizationId"})
+    }
+} catch {
+    $statusCode = $_.Exception.Response.StatusCode.value__
+    Write-Error "Failed to access OpenAI api [$statusCode]. Please check your OpenAI API key (https://beta.openai.com/account/api-keys) and Organization ID (https://beta.openai.com/account/org-settings)."
+    exit 1
+}
+
+# Check if target engine is available to the user
+if ($null -eq (($response.Content | ConvertFrom-Json).data | Where-Object {$_.id -eq $OpenAIEngine})) {
+    Write-Error "Cannot find OpenAI engine: $OpenAIEngine. Please check the OpenAI engine id (https://beta.openai.com/docs/engines/codex-series-private-beta) and your Organization ID (https://beta.openai.com/account/org-settings)."
+    exit 1
+}
+
 # Create new PowerShell profile if doesn't exist. The profile type is for current user and current host.
 # To learn more about PowerShell profile, please refer to 
 # https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_profiles
@@ -54,15 +87,10 @@ if (!(Test-Path -Path $openAIConfigPath)) {
     New-Item -Type File -Path $openAIConfigPath -Force 
 }
 
-if ($PSVersionTable.PSVersion.Major -lt 7) {
-    $binaryString = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($OpenAIApiKey);
-    $openAIApiKeyPlainText = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto($binaryString);
-} else {
-    $openAIApiKeyPlainText = ConvertFrom-SecureString -SecureString $OpenAIApiKey -AsPlainText
-}
-
 Set-Content -Path $openAIConfigPath "[openai]
 organization_id=$OpenAIOrganizationId
 secret_key=$openAIApiKeyPlainText
 engine=$OpenAIEngine"
-Write-Host "Updated OpenAI configuration file with secrets"
+Write-Host "Updated OpenAI configuration file with secrets."
+
+Write-Host -ForegroundColor Blue "NL-CLI PowerShell (v$PSMajorVersion) setup completed. Please open a new powershell session, type in # followed by your natural language command and hit Ctrl+X!"
