@@ -29,7 +29,7 @@ param
 
 $plugInScriptPath = Join-Path $RepoRoot -ChildPath "scripts\powershell_plugin.ps1"
 $codexQueryPath = Join-Path $RepoRoot -ChildPath "src\codex_query.py"
-$openAIConfigPath = Join-Path $env:USERPROFILE -ChildPath ".config\openaiapirc"
+$openAIConfigPath = Join-Path $HOME -ChildPath ".config\openaiapirc"
 
 # Create new PowerShell profile if doesn't exist. The profile type is for current user and current host.
 # To learn more about PowerShell profile, please refer to 
