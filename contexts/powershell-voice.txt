@@ -35,5 +35,5 @@ Get-WmiObject -Class Win32_LogicalDisk | Select-Object -Property DeviceID,FreeSp
 (new-object -ComObject SAPI.SPVoice).Speak("The meaning of life is 42")
 
 # where are you located
-(new-object -ComObject SAPI.SPVoice).Speak("I live in " + $env:UserProfile)
+(new-object -ComObject SAPI.SPVoice).Speak("I live in " + $HOME)
 

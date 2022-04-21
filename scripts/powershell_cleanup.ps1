@@ -6,7 +6,7 @@
 # 2. OpenAI configuration file (openaiapirc)
 ###
 
-$openAIConfigPath = Join-Path $env:USERPROFILE -ChildPath ".config\openaiapirc"
+$openAIConfigPath = Join-Path $HOME -ChildPath ".config\openaiapirc"
 
 function CleanUpOpenAiConfig() 
 {
@@ -32,3 +32,5 @@ function CleanUpProfileContent()
 
 CleanUpProfileContent
 CleanUpOpenAiConfig
+
+Write-Host -ForegroundColor Blue "NL-CLI PowerShell clean up completed. Please close this PowerShell session."
