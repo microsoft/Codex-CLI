@@ -20,7 +20,7 @@ ENGINE = ''
 TEMPERATURE = 0
 MAX_TOKENS = 300
 
-DEBUG_MODE = True
+DEBUG_MODE = False
 
 # Get config dir from environment or default to ~/.config or ~\.config depending on OS
 CONFIG_DIR = os.getenv('XDG_CONFIG_HOME', os.path.expanduser(os.path.join('~','.config')))
