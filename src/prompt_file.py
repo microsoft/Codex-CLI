@@ -1,4 +1,3 @@
-from email.policy import default
 import os
 import time
 
@@ -6,128 +5,63 @@ from pathlib import Path
 
 
 class PromptFile:
-    default_file_name = "current_context.txt"
     default_file_path = os.path.join(os.path.dirname(__file__), "..", "current_context.txt")
-    default_context_path = "" 
+    default_config_path = os.path.join(os.path.dirname(__file__), "..", "current_context.txt.config")
+    default_context_name = "" 
 
     def __init__(self, file_name, config):
-        if file_name != self.default_file_name:
-            file_full_path = os.path.join(os.path.dirname(__file__), "..", "contexts", file_name)
-
-            # if we don't have a previous context, use the specified one
-            if os.path.isfile(file_full_path):
-                multi_turn = "off"
-
-                if os.path.isfile(self.default_file_path):
-                    with open(self.default_file_path, 'r') as f:
-                        lines = f.readlines()
-                        engine = lines[0].split(':')[1].strip()
-                        temperature = lines[1].split(':')[1].strip()
-                        max_tokens = lines[2].split(':')[1].strip()
-                        shell = lines[3].split(':')[1].strip()
-                        multi_turn = lines[4].split(':')[1].strip()
-                        token_count = lines[5].split(':')[1].strip()
-                    
-                    # use previously set configs
-                    config = {
-                        'engine': engine,
-                        'temperature': float(temperature),
-                        'max_tokens': int(max_tokens),
-                        'shell': shell,
-                        'multi_turn': multi_turn,
-                        'token_count': int(token_count)
-                    }
-
-                if multi_turn == "off":
-                    with open(file_full_path, 'r') as f:
-                        lines = f.readlines()
-                        with open(self.default_file_path, 'w') as f:
-                            f.writelines(lines)
+        self.default_context_name = "{}-context.txt".format(config['shell']) #  feel free to set your own default context path here
         
-        self.file_name = self.default_file_name
         self.file_path = self.default_file_path
-        self.config = config
+        self.config_path = self.default_config_path
 
-        # feel free to set your own default context path here
-        self.default_context_path = os.path.join(os.path.dirname(__file__), "..", "contexts", "{}-context.txt".format(self.config['shell']))
-        # self.default_context_path = os.path.join(os.path.dirname(__file__), "..", "contexts", "<your-context-name>.txt")
-        
-        if self.has_headers() == False:
-            self.set_headers(self.config)
-        
-        if config['multi_turn'] == 'on':
-            self.config['token_count'] = self.get_token_count()
+        # loading in one of the saved contexts
+        if file_name != "current_context.txt":
+            self.load_context(file_name, True)
 
-    def has_headers(self):
+    def has_config(self):
         """
-        Check if the prompt file has headers
+        Check if the prompt file has a corresponding config file
         """
-        if os.path.isfile(self.file_path) == False:
-            return False
-        with open(self.file_path, 'r') as f:
-            lines = f.readlines()
-            # this is not a strict check, but it should be enough
-            if lines[0].__contains__('## engine:'):
-                return True
-            else:
-                return False
+        return os.path.isfile(self.config_path)
     
-    def read_headers(self):
+    def read_config(self):
         """
-        Read the prompt headers and return a dictionary
+        Read the prompt config and return a dictionary
         """
-        if self.has_headers() == False:
+
+        if self.has_config() == False:
+            self.set_config(self.config)
             return self.config
-        with open(self.file_path, 'r') as f:
-            lines = f.readlines()
-            engine = lines[0].split(':')[1].strip()
-            temperature = lines[1].split(':')[1].strip()
-            max_tokens = lines[2].split(':')[1].strip()
-            shell = lines[3].split(':')[1].strip()
-            multi_turn = lines[4].split(':')[1].strip()    
-            token_count = lines[5].split(':')[1].strip()
         
-        self.config = {
-            'engine': engine,
-            'temperature': float(temperature),
-            'max_tokens': int(max_tokens),
-            'shell': shell,
-            'multi_turn': multi_turn,
-            'token_count': int(token_count)
+        with open(self.config_path, 'r') as f:
+            lines = f.readlines()
+
+        config = {
+            'engine': lines[0].split(':')[1].strip(),
+            'temperature': float(lines[1].split(':')[1].strip()),
+            'max_tokens': int(lines[2].split(':')[1].strip()),
+            'shell': lines[3].split(':')[1].strip(),
+            'multi_turn': lines[4].split(':')[1].strip(),
+            'token_count': int(lines[5].split(':')[1].strip())
         }
 
+        self.config = config
         return self.config 
     
-    def set_headers(self, config):
+    def set_config(self, config):
         """
         Set the prompt headers with the new config
         """
-        if self.file_name != self.default_file_name:
-            # we don't want to edit saved contexts
-            return
-        
         self.config = config
-        lines = []
-        if os.path.isfile(self.file_path):
-            lines = open(self.file_path, 'r').readlines() # read old content
-
-        newf = []
-        # add headers at the beginning
-        newf.append('## engine: {}\n'.format(config['engine']))
-        newf.append('## temperature: {}\n'.format(config['temperature']))
-        newf.append('## max_tokens: {}\n'.format(config['max_tokens']))
-        newf.append('## shell: {}\n'.format(config['shell']))
-        newf.append('## multi_turn: {}\n'.format(config['multi_turn']))
-        newf.append('## token_count: {}\n'.format(config['token_count']))
-
-        if self.has_headers():
-            lines = lines[6:] # drop old headers
         
-        # add lines to newf
-        newf.extend(lines)
-        
-        with open(self.file_path, 'w') as f:
-            f.writelines(newf)
+        with open(self.config_path, 'w') as f:
+            f.write('engine: {}\n'.format(self.config['engine']))
+            f.write('temperature: {}\n'.format(self.config['temperature']))
+            f.write('max_tokens: {}\n'.format(self.config['max_tokens']))
+            f.write('shell: {}\n'.format(self.config['shell']))
+            f.write('multi_turn: {}\n'.format(self.config['multi_turn']))
+            f.write('token_count: {}\n'.format(self.config['token_count']))
     
     def show_config(self):
         print('\n')
@@ -148,7 +82,7 @@ class PromptFile:
         
         if self.config['multi_turn'] == 'on':
             self.config['token_count'] += len(user_query.split()) + len(prompt_response.split())
-            self.set_headers(self.config)
+            self.set_config(self.config)
     
     def read_prompt_file(self, input):
         """
@@ -162,33 +96,26 @@ class PromptFile:
         need_to_refresh = (self.config['token_count'] + input_tokens_count > 2048)
 
         if need_to_refresh:
-            # TODO use multi-line metadata and dependency metadata to track this
             # delete first 2 lines of prompt context file
             with open(self.file_path, 'r') as f:
                 lines = f.readlines()
-                headers = lines[:6]
-                prompt = lines[8:] # drop first 2 lines of prompt
+                prompt = lines[2:] # drop first 2 lines of prompt
             with open(self.file_path, 'w') as f:
-                f.writelines(headers)
                 f.writelines(prompt)
 
-        prompt = ""
         # get input from prompt file
-        # skip the header lines
         with open(self.file_path, 'r') as f:
             lines = f.readlines()
-            lines = lines[6:] # skip headers
-            prompt = ''.join(lines)
 
-        return prompt
+        return ''.join(lines)
     
     def get_token_count(self):
         """
         Get the actual token count
         """
         token_count = 0
-        if self.has_headers():
-            with open(self.file_path, 'r') as f:
+        if self.has_config():
+            with open(self.config_path, 'r') as f:
                 lines = f.readlines()
                 token_count = int(lines[5].split(':')[1].strip())
         
@@ -196,12 +123,12 @@ class PromptFile:
         with open(self.file_path, 'r') as f:
             lines = f.readlines()
             # count the number of words in the prompt file
-            for line in lines[6:]:
+            for line in lines:
                 true_token_count += len(line.split())
         
         if true_token_count != token_count:
             self.config['token_count'] = true_token_count
-            self.set_headers(self.config)
+            self.set_config(self.config)
         
         return true_token_count
     
@@ -210,7 +137,7 @@ class PromptFile:
         Clear the prompt file, while keeping the headers
         Note: saves a copy to the deleted folder
         """
-        config = self.read_headers()
+        config = self.read_config()
         filename = time.strftime("%Y-%m-%d_%H-%M-%S") + ".txt"
         with open(self.file_path, 'r') as f:
             lines = f.readlines()
@@ -221,8 +148,9 @@ class PromptFile:
         # delete the prompt file
         with open(self.file_path, 'w') as f:
             f.write('')
-            print("\n#   Context has been cleared, temporarily saved to {}".format(filename))
-        self.set_headers(config)
+        
+        print("\n#   Context has been cleared, temporarily saved to {}".format(filename))
+        self.set_config(config)
     
     def clear_last_interaction(self):
         """
@@ -256,7 +184,7 @@ class PromptFile:
         Turn on context mode
         """
         self.config['multi_turn'] = 'on'
-        self.set_headers(self.config)
+        self.set_config(self.config)
         print("\n#   Multi turn mode is on")
 
     
@@ -265,26 +193,20 @@ class PromptFile:
         Turn off context mode
         """
         self.config['multi_turn'] = 'off'
-        self.set_headers(self.config)
+        self.set_config(self.config)
         print("\n#   Multi turn mode is off")
     
     def default_context(self):
         """
         Go to default context
         """
-
-        if os.path.exists(self.default_context_path):
-            # write the default context to the prompt file
-            with open(self.default_context_path, 'r') as f:
-                lines = f.readlines()
-                lines[4] = '## multi_turn: {}\n'.format(self.config['multi_turn'])
-                with open(self.file_path, 'w') as f:
-                    f.writelines(lines)
-            print("\n#   Context has been set to shell default")
-        else:
-            print("\n#   No default shell context found")
+        self.load_context(self.default_context_name)
     
-    def load_context(self, filename):
+    def load_context(self, filename, initialize=False):
+        """
+        Loads a context file into current_context
+
+        """
         if not filename.endswith('.txt'):
             filename = filename + '.txt'
         filepath = Path(os.path.join(os.path.dirname(__file__), "..", "contexts", filename))
@@ -293,10 +215,31 @@ class PromptFile:
         if filepath.exists():
             with filepath.open('r') as f:
                 lines = f.readlines()
-            # write to the current prompt file
-            with open(self.file_path, 'w') as f:
-                f.writelines(lines)
-            print('\n#   Context loaded from {}'.format(filename))
+            
+            config = {
+                'engine': lines[0].split(':')[1].strip(),
+                'temperature': float(lines[1].split(':')[1].strip()),
+                'max_tokens': int(lines[2].split(':')[1].strip()),
+                'shell': lines[3].split(':')[1].strip(),
+                'multi_turn': lines[4].split(':')[1].strip(),
+                'token_count': int(lines[5].split(':')[1].strip())
+            }
+
+            # use new config if old config doesn't exist
+            if initialize == False or self.has_config() == False:
+                self.set_config(config)
+            else:
+                self.config = self.read_config()
+
+            lines = lines[6:]
+
+            # write to the current prompt file if we are in multi-turn mode
+            if initialize == False or self.config['multi_turn'] == "off":
+                with open(self.file_path, 'w') as f:
+                    f.writelines(lines)
+                
+                if initialize == False:
+                    print('\n#   Context loaded from {}'.format(filename))
         else:
             print("\n#   File not found")
             return False

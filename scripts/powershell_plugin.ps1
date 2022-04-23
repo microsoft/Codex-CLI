@@ -7,8 +7,8 @@ function create_completion() {
         [Parameter (Mandatory = $true)] [string] $buffer
     )
     
-    if ($nl_cli_script -eq "") {
-        Write-Output "# Please update the nl_cli_script path in $profile"
+    if ($nl_cli_script -eq "" -or !(Test-Path($nl_cli_script))) {
+        Write-Output "# Please update the nl_cli_script path in the profile!"
         return "`nnotepad $profile"
     }
 
@@ -30,16 +30,13 @@ Set-PSReadLineKeyHandler -Key Ctrl+x `
 
     # get response from create_completion function
     $output = create_completion($line)
-
-    # move to the next line
-    [Microsoft.PowerShell.PSConsoleReadLine]::AddLine()
     
     # check if output is not null
     if ($output -ne $null) {
         foreach ($str in $output) {
             if ($str -ne $null -and $str -ne "") {
-                [Microsoft.PowerShell.PSConsoleReadLine]::Insert($str)
                 [Microsoft.PowerShell.PSConsoleReadLine]::AddLine()
+                [Microsoft.PowerShell.PSConsoleReadLine]::Insert($str)
             }
         }
     }
