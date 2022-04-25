@@ -59,8 +59,8 @@ try {
 }
 
 # Check if target engine is available to the user
-if ($null -eq (($response.Content | ConvertFrom-Json).data | Where-Object {$_.id -eq $OpenAIEngine})) {
-    Write-Error "Cannot find OpenAI engine: $OpenAIEngine. Please check the OpenAI engine id (https://beta.openai.com/docs/engines/codex-series-private-beta) and your Organization ID (https://beta.openai.com/account/org-settings)."
+if ($null -eq (($response.Content | ConvertFrom-Json).data | Where-Object {$_.id -eq $OpenAIEngineId})) {
+    Write-Error "Cannot find OpenAI engine: $OpenAIEngineId. Please check the OpenAI engine id (https://beta.openai.com/docs/engines/codex-series-private-beta) and your Organization ID (https://beta.openai.com/account/org-settings)."
     exit 1
 }
 
@@ -90,7 +90,7 @@ if (!(Test-Path -Path $openAIConfigPath)) {
 Set-Content -Path $openAIConfigPath "[openai]
 organization_id=$OpenAIOrganizationId
 secret_key=$openAIApiKeyPlainText
-engine=$OpenAIEngine"
+engine=$OpenAIEngineId"
 Write-Host "Updated OpenAI configuration file with secrets."
 
 Write-Host -ForegroundColor Blue "NL-CLI PowerShell (v$PSMajorVersion) setup completed. Please open a new PowerShell session, type in # followed by your natural language command and hit Ctrl+G!"
