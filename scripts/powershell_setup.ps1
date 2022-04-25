@@ -24,7 +24,7 @@ param
 
     [Parameter(Mandatory = $true)]
     [ValidateNotNullOrEmpty()]
-    $OpenAIEngine
+    $OpenAIEngineId
 )
 
 $plugInScriptPath = Join-Path $RepoRoot -ChildPath "scripts\powershell_plugin.ps1"
