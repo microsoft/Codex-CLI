@@ -14,7 +14,7 @@ def get_command_result(input, prompt_file):
     - stop multi-turn
     - default context
     - show context <n>
-    - edit context
+    - view context
     - save context
     - clear context
     - load context <filename>
@@ -36,7 +36,7 @@ def get_command_result(input, prompt_file):
             input = input.split()
             if len(input) == 4:
                 config['temperature'] = float(input[3])
-                prompt_file.set_headers(config)
+                prompt_file.set_config(config)
                 print("# Temperature set to " + str(config['temperature']))
                 return "config set", prompt_file
             else:
@@ -46,7 +46,7 @@ def get_command_result(input, prompt_file):
             input = input.split()
             if len(input) == 4:
                 config['max_tokens'] = int(input[3])
-                prompt_file.set_headers(config)
+                prompt_file.set_config(config)
                 print("# Max tokens set to " + str(config['max_tokens']))
                 return "config set", prompt_file
             else:
@@ -55,7 +55,7 @@ def get_command_result(input, prompt_file):
             input = input.split()
             if len(input) == 4:
                 config['shell'] = input[3]
-                prompt_file.set_headers(config)
+                prompt_file.set_config(config)
                 print("# Shell set to " + str(config['shell']))
                 return "config set", prompt_file
             else:
@@ -64,7 +64,7 @@ def get_command_result(input, prompt_file):
             input = input.split()
             if len(input) == 4:
                 config['engine'] = input[3]
-                prompt_file.set_headers(config)
+                prompt_file.set_config(config)
                 print("# Engine set to " + str(config['engine']))
                 return "config set", prompt_file
             else:

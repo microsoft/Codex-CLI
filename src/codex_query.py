@@ -5,7 +5,6 @@ import openai
 import sys
 import os
 import configparser
-import time
 import re
 import psutil
 
