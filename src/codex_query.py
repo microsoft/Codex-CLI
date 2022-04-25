@@ -77,6 +77,7 @@ def initialize():
 def is_sensitive_content(content):
     """
     Check if the content contains sensitive content
+    Refer to https://beta.openai.com/docs/engines/content-filter for explanation
     """
 
     if len(content) == 0:
