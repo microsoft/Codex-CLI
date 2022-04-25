@@ -1,12 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from cmd import PROMPT
 import openai
 import sys
 import os
 import configparser
-import time
 import re
 import psutil
 
