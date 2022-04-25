@@ -19,14 +19,17 @@ This project took technical inspiration from the [zsh_codex](https://github.com/
 ## Requirements
 * [Python](https://www.python.org/downloads/)
     * \[Windows\]: Python is added to PATH.
-* An [OpenAI account](https://openai.com/api/) with OpenAI API Key, OpenAI Organization Id, and OpenAI Engine Id.
+* An [OpenAI account](https://openai.com/api/)
+    * [OpenAI API Key](https://beta.openai.com/account/api-keys).
+    * [OpenAI Organization Id](https://beta.openai.com/account/org-settings). If you have multiple organizations, please update your [default organization](https://beta.openai.com/account/api-keys) to the one that has access to codex engines before getting the organization Id.
+    * [OpenAI Engine Id](https://beta.openai.com/docs/engines/codex-series-private-beta). It provides access to a model. For example, `code-davinci-002` or `code-cushman-001`. See [here](#what-openai-engines-are-available-to-me) for checking available engines.
 
 ## Installation
 Make sure you have python installed. Then install needed python packages.
 
 ```
-pip3 install openai
-pip3 install psutil
+python -m pip install openai
+python -m pip install psutil
 ```
 
 Follow the steps for which shell you are using. Generally, Mac OS has zsh, Linux has bash, Windows has powershell.
@@ -59,8 +62,8 @@ Once you are done, go to `~/your/custom/path/` (the folder contains NL-CLI code)
 `zsh_setup.sh` supports the following parameters:
 | Parameter | Description |
 |--|--|
-| `--OpenAIOrganizationId` | Required. Your [OpenAI organization id](https://beta.openai.com/account/org-settings).<br/>If you have multiple organizations, please update your [default organization](https://beta.openai.com/account/api-keys) to the one that has access to codex engines before getting the organization id. |
-|`--OpenAIEngineId` | Required. The [OpenAI engine id](https://beta.openai.com/docs/engines/codex-series-private-beta) that provides access to a model. For example, `code-davinci-002` or `code-cushman-001`.<br/>See [here](#what-openai-engines-are-available-to-me) for checking available engines.|
+| `--OpenAIOrganizationId` | Required. Your [OpenAI organization Id](https://beta.openai.com/account/org-settings). |
+|`--OpenAIEngineId` | Required. The [OpenAI engine Id](https://beta.openai.com/docs/engines/codex-series-private-beta) that provides access to a model.|
 | `--RepoRoot` | Optional. Default to the current folder.<br/>The value should be the path of NL-CLI folder. Example:<br/>`./zsh_setup.sh --RepoRoot /Code/NL-CLI`|
 
 ### Powershell instructions
@@ -78,7 +81,7 @@ Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
 ```
 
 
-3. In the same Powershell window, go to `C:\your\custom\path\` (the folder contains NL-CLI code), then run the following command to setup your PowerShell environment. It will prompt you for OpenAI access key.
+3. In the same Powershell window, go to `C:\your\custom\path\NL-CLI\` (the folder contains NL-CLI code). Copy the following command then replace `YOUR_OPENAI_ORGANIZATION_ID` and `ENGINE_ID` with your OpenAI organization Id and OpenAI engine Id. Run the command to setup your PowerShell environment. It will prompt you for OpenAI access key.
 
 ```
 .\scripts\powershell_setup.ps1 -OpenAIOrganizationId "YOUR_OPENAI_ORGANIZATION_ID" -OpenAIEngineId "ENGINE_ID"
@@ -103,8 +106,8 @@ Set-ExecutionPolicy Undefined -Scope CurrentUser
 | Parameter | Type | Description |
 |--|--|--|
 | `-OpenAIApiKey` | [SecureString](https://docs.microsoft.com/en-us/dotnet/api/system.security.securestring) | Required. If is not supplied, the script will prompt you to input the value. To provide the value via PowerShell parameter, this is an example for PowerShell 7: <br/> `.\scripts\powershell_setup.ps1 -OpenAIApiKey (ConvertTo-SecureString "YOUR_OPENAI_API_KEY" -AsPlainText -Force)` | 
-| `-OpenAIOrganizationId` | String | Required. Your [OpenAI organization id](https://beta.openai.com/account/org-settings).<br/>If you have multiple organizations, please update your [default organization](https://beta.openai.com/account/api-keys) to the one that has access to codex engines before getting the organization id. |
-| `-OpenAIEngineId` | String | Required. The [OpenAI engine id](https://beta.openai.com/docs/engines/codex-series-private-beta) that provides access to a model. For example, `code-davinci-002` or `code-cushman-001`.<br/>See [here](#what-openai-engines-are-available-to-me) for checking available engines. |
+| `-OpenAIOrganizationId` | String | Required. Your [OpenAI organization Id](https://beta.openai.com/account/org-settings). |
+| `-OpenAIEngineId` | String | Required. The [OpenAI engine Id](https://beta.openai.com/docs/engines/codex-series-private-beta) that provides access to a model.|
 | `-RepoRoot` | [FileInfo](https://docs.microsoft.com/en-us/dotnet/api/system.io.fileinfo) | Optional. Default to the current folder.<br>The value should be the path of NL-CLI folder. Example:<br/>`.\scripts\powershell_setup.ps1 -RepoRoot 'C:\your\custom\path'`|
 
 ### Bash instructions
