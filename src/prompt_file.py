@@ -5,18 +5,19 @@ from pathlib import Path
 
 
 class PromptFile:
-    default_file_path = os.path.join(os.path.dirname(__file__), "..", "current_context.txt")
-    default_config_path = os.path.join(os.path.dirname(__file__), "..", "current_context.txt.config")
-    default_context_name = "" 
+    context_source_filename = ""
+    default_context_filename = "current_context.txt"
+    default_file_path = os.path.join(os.path.dirname(__file__), "..", default_context_filename)
+    default_config_path = os.path.join(os.path.dirname(__file__), "..", "current_context.config")
 
     def __init__(self, file_name, config):
-        self.default_context_name = "{}-context.txt".format(config['shell']) #  feel free to set your own default context path here
+        self.context_source_filename = "{}-context.txt".format(config['shell']) #  feel free to set your own default context path here
         
         self.file_path = self.default_file_path
         self.config_path = self.default_config_path
 
         # loading in one of the saved contexts
-        if file_name != "current_context.txt":
+        if file_name != self.default_context_filename:
             self.load_context(file_name, True)
 
     def has_config(self):
@@ -134,7 +135,7 @@ class PromptFile:
     
     def clear(self):
         """
-        Clear the prompt file, while keeping the headers
+        Clear the prompt file, while keeping the config
         Note: saves a copy to the deleted folder
         """
         config = self.read_config()
@@ -200,7 +201,7 @@ class PromptFile:
         """
         Go to default context
         """
-        self.load_context(self.default_context_name)
+        self.load_context(self.context_source_filename)
     
     def load_context(self, filename, initialize=False):
         """
