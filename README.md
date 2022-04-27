@@ -10,7 +10,7 @@ The Command Line Interface (CLI) was the first major User Interface we used to i
 With the advent of Large Language Models (LLMs), particularly those that have been trained on code, it's now possible to interact with a CLI using Natural Language (NL). In effect, these models understand natural language _and_ code well enough that they can translate from one to another. 
 
 
-This project aims to offer a cross-shell NL->Code experience to allow users to interact with their favorite CLI using NL. The user enters a command, like "what's my IP address", hits Ctrl + X and gets a suggestion for a command idiomatic to the shell they're using. The project uses the GPT-3 Codex model off-the-shelf, meaning the model has not been explicitly trained for the task. Instead we rely on a discipline called prompt engineering (see [section](#prompt-engineering-and-context-files) below) to coax the right commands from Codex. 
+This project aims to offer a cross-shell NL->Code experience to allow users to interact with their favorite CLI using NL. The user enters a command, like "what's my IP address", hits Ctrl + G and gets a suggestion for a command idiomatic to the shell they're using. The project uses the GPT-3 Codex model off-the-shelf, meaning the model has not been explicitly trained for the task. Instead we rely on a discipline called prompt engineering (see [section](#prompt-engineering-and-context-files) below) to coax the right commands from Codex. 
 
 **Note: The model can still make mistakes! Don't run a command if you don't understand it. If you're not sure what a command does, hit 'Ctrl + C' to cancel it**. 
 
@@ -50,7 +50,7 @@ Follow the steps for which shell you are using. Generally, Mac OS has zsh, Linux
 ```
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;See [About zsh_setup.sh](#about-zshsetupsh) section to learn script parameters.
 
-3. Run `zsh`, start typing and complete it using `^X`!
+3. Run `zsh`, start typing and complete it using `^G`!
 
 #### Clean up
 Once you are done, go to `~/your/custom/path/` (the folder contains NL-CLI code), then run the following command to clean up.
@@ -88,7 +88,7 @@ Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
 ```
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;See [About powershell_setup.ps1](#about-powershell_setupps1) section to learn script parameters.
 
-4. Open a new powershell session, type in `#` followed by your natural language command and hit Ctrl+X!
+4. Open a new powershell session, type in `#` followed by your natural language command and hit Ctrl + G!
 
 #### Clean up
 Once you are done, go to `C:\your\custom\path\` (the folder contains NL-CLI code), then run the following command to clean up.
@@ -125,7 +125,7 @@ Set-ExecutionPolicy Undefined -Scope CurrentUser
     # in your/custom/path you need to clone the repository
     export NL_CLI_PATH="your/custom/path/NL-CLI"
     source "$NL_CLI_PATH/scripts/nl_cli.plugin.sh"
-    bind -x '"\C-x":"create_completion"'
+    bind -x '"\C-g":"create_completion"'
 ```
 
 3. Create a file called `openaiapirc` in `~/.config` with your SECRET_KEY.
@@ -137,12 +137,12 @@ secret_key=...
 engine=...
 ```
 
-4. Run `bash`, start typing and complete it using `^X`!
+4. Run `bash`, start typing and complete it using `^G`!
 
 
 ## Usage
 
-Once configured for your shell of preference, you can use the NL-CLI by writing a comment (starting with `#`) into your shell, and then hitting Ctrl+X. 
+Once configured for your shell of preference, you can use the NL-CLI by writing a comment (starting with `#`) into your shell, and then hitting Ctrl + G. 
 
 The NL-CLI supports two primary modes: single-turn and multi-turn. If the multi-turn mode is on, the NL-CLI will "remember" past interactions with the model, allowing you to refer back to previous actions and entities. If, for example, you asked the NL-CLI to change your time zone to mountain, and then said "change it back to pacific", the model would have the context from the previous interaction to know that "it" is the user's timezone:
 

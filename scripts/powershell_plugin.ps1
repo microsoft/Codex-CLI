@@ -17,7 +17,7 @@ function create_completion() {
     return $output
 }
 
-Set-PSReadLineKeyHandler -Key Ctrl+x `
+Set-PSReadLineKeyHandler -Key Ctrl+g `
                          -BriefDescription NLCLI `
                          -LongDescription "Calls NL-CLI tool on the current buffer" `
                          -ScriptBlock {

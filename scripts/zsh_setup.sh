@@ -59,7 +59,7 @@ echo "Removed previous settings in $zshrcPath if present"
 echo "### NL-CLI setup - start
 export ZSH_CUSTOM=$repoRoot
 source \"\$ZSH_CUSTOM/scripts/nl_cli.plugin.zsh\"
-bindkey '^X' create_completion
+bindkey '^G' create_completion
 ### NL-CLI setup - end" >> $zshrcPath   
 echo "Added settings in $zshrcPath"
 
