@@ -4,7 +4,7 @@
 # 
 set -e
 
-openAIConfigPath="$HOME/.config/openaiapirc"
+openAIConfigPath="$PWD/src/openaiapirc"
 zshrcPath="$HOME/.zshrc"
 
 # 1. Remove settings in .zshrc
@@ -15,4 +15,4 @@ echo "Removed settings in $zshrcPath if present"
 rm -f $openAIConfigPath
 echo "Removed $openAIConfigPath"
 
-echo "NL-CLI clean up completed. Please open a new zsh to continune."
+echo "NL-CLI clean up completed. Please open a new zsh to continue."

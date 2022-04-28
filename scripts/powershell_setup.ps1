@@ -29,7 +29,7 @@ param
 
 $plugInScriptPath = Join-Path $RepoRoot -ChildPath "scripts\powershell_plugin.ps1"
 $codexQueryPath = Join-Path $RepoRoot -ChildPath "src\codex_query.py"
-$openAIConfigPath = Join-Path $HOME -ChildPath ".config\openaiapirc"
+$openAIConfigPath = Join-Path $RepoRoot -ChildPath "src\openaiapirc"
 
 # The major version of PowerShell
 $PSMajorVersion = $PSVersionTable.PSVersion.Major
