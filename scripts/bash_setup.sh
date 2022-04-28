@@ -8,6 +8,15 @@ BASH_NL_PATH=$(git rev-parse --show-toplevel)
 #############################
 ## *** Setup Functions *** ##
 #############################
+
+hasOpenAIaccess() {
+    local url=${1:-https://api.openai.com/v1/engines}
+    local code=${2:-500}
+    local status=$(curl --head --location --connect-timeout 5 --write-out %{http_code} --silent --output /dev/null -H Authorization: Bearer $SECRET_KEY -H OpenAI-Organization: $ORG_ID ${url})
+    [[ $status == 500 ]] || [[ $status == 000 ]] && echo "No access to OpenAI"
+    return 1
+}
+
 resetAIOptions()
 {
     echo "testing"
@@ -17,9 +26,8 @@ resetAIOptions()
     read -p 'Organization ID: ' ORG_ID
     read -p 'OpenAI key: ' SECRET_KEY
 
-    echo $ORG_ID
-    echo $SECRET_KEY
-
+    #echo $ORG_ID
+    #echo $SECRET_KEY
 }
 
 help() 
@@ -47,6 +55,7 @@ function getOptions
             s  )  # script type (for future use)
                 key="s"
                 resetAIOptions
+                continue
                 ;;
             o  )  # organization ID 
                 ORG_ID="$OPTARG"
@@ -73,6 +82,7 @@ function getOptions
     then
         echo "ERROR: No options were not specified"
         echo "Please provide required options. See help info"
+        echo
         showhelp=1 
         return
     fi
@@ -128,7 +138,7 @@ updateBashrc()
 
     #echo "U passed?"
     ## backup the user's bashrc file 
-    cp $HOME/.bashrc $HOME/.bashrc_
+    cp $HOME/.bashrc $HOME/.bashrc__
 
     ## Add NL-CLI features to bashrc file
     echo "export BSH_CUSTOM=${BASH_NL_PATH}" >> $bashfile
@@ -141,11 +151,6 @@ updateBashrc()
 
 }
 
-# testpath()
-# {
-#     echo "testing"
-#     echo "$BASH_NL_PATH"
-# }
 
 ##################
 ## *** Main *** ##
@@ -166,8 +171,11 @@ fi
 
 # Add the custom lines in `~/.bashrc` file.
 # Call update Bash function
-#updateBashrc
+updateBashrc
+
+#Test OpenAI Access with Organization & API Key
+#hasOpenAIaccess
 
 # Create a file called `openaiapirc` in `~/.config` with your SECRET_KEY.
 # Call create OpenAI function
-#createOpenAI 
+createOpenAI 
