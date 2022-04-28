@@ -8,17 +8,31 @@ BASH_NL_PATH=$(git rev-parse --show-toplevel)
 #############################
 ## *** Setup Functions *** ##
 #############################
+resetAIOptions()
+{
+    echo "testing"
+    unset ORG_ID
+    unset SECRET_KEY
+
+    read -p 'Organization ID: ' ORG_ID
+    read -p 'OpenAI key: ' SECRET_KEY
+
+    echo $ORG_ID
+    echo $SECRET_KEY
+
+}
 
 help() 
 {
     # Display Help
    echo "Help for NL-CLI Bash Setup Options"
    echo
-   echo "Syntax: nl_bash_setup [-h|o|k]"
+   echo "Syntax: nl_bash_setup [-h|o|k|s]"
    echo "options:"
    echo "h     Print this Help."
    echo "o     Set the OpenAI organization ID (required)"
    echo "k     Set the OpenAI API key (required)"
+   echo "s     Reset OpenAI options ex. Org ID & API key"
    echo
 }
 
@@ -26,35 +40,41 @@ function getOptions
 {
     local OPTIND 
     showhelp=0
-    #echo "path: $BASH_NL_PATH"
+    echo "path: $BASH_NL_PATH"
 
-    ##echo "In options function"
-    while getopts ":o:k:h" opt ; do
-        case "$opt" in
+    while getopts ":so:k:h" opt ; do
+        case $opt in
+            s  )  # script type (for future use)
+                key="s"
+                resetAIOptions
+                ;;
             o  )  # organization ID 
                 ORG_ID="$OPTARG"
+                #echo $ORG_ID
                 ;;
             k  )  # secret key
                 SECRET_KEY="$OPTARG"
-                #[ -z "$SECRET_KEY" ] && showhelp=1
+                #echo $SECRET_KEY
                 ;;
             h  )  # echo the help file
                 key="h"   
                 help
                 return 1
                 ;;
-            \? ) # Invalid option
+            \? ) # 
                 key="e"
                 echo "Invalid option: -$OPTARG" >&2
                 return 1
                 ;;
         esac
     done
- 
+
     if ((OPTIND == 1)) 
     then
-        echo "ERROR: Required options were not specified"
+        echo "ERROR: No options were not specified"
+        echo "Please provide required options. See help info"
         showhelp=1 
+        return
     fi
     
     if [ -z "$ORG_ID" ]; then 
@@ -65,23 +85,17 @@ function getOptions
     if [ -z "$SECRET_KEY" ]; then 
         showhelp=1 
         echo "ERROR: **OpenAI API Key is required**"
-    fi        
+    fi
 
     shift $((OPTIND-1))
 
+    #echo "key: $key"
+  # set defaults if a User Path not supplied
+  #echo "user $BSH_USER_PATH"
+  # if [ -z "$BSH_USER_PATH" ] ; then BSH_USER_PATH="$HOME/nl_cli" ; fi
+  # if [ -z "$SHELL_TYPE" ] ; then SHELL_TYPE="bash" ; fi
 }
 
-resetOpenAI()
-{
-    unset ORG_ID
-    unset SECRET_KEY
-
-    read -p 'Organization ID: ' ORG_ID
-    read -p 'OpenAI key: ' SECRET_KEY
-
-    echo $ORG_ID
-    echo $SECRET_KEY
-}
 
 createOpenAI()
 {
@@ -92,7 +106,6 @@ createOpenAI()
 
     mkdir -p $HOME/.config
     touch $HOME/.config/openaiapirc
-   
 
     echo '[openai]' >> $openAIfile
     echo "organization_id=$ORG_ID" >> $openAIfile
@@ -141,7 +154,7 @@ updateBashrc()
 ## Script Menu Options ##
 getOptions "$@"
 # Tracking & return for help or wrong option selected
-if [ "$key" = "h" ] || [ "$key" = "e" ]; then
+if [ "$key" = "h" ] || [ "$key" = "e" ] || [ "$key" = "s" ] ; then
     unset key
     return 1
 fi
@@ -153,9 +166,8 @@ fi
 
 # Add the custom lines in `~/.bashrc` file.
 # Call update Bash function
-updateBashrc
-
+#updateBashrc
 
 # Create a file called `openaiapirc` in `~/.config` with your SECRET_KEY.
 # Call create OpenAI function
-createOpenAI 
+#createOpenAI 
