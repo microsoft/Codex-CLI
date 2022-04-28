@@ -26,7 +26,7 @@ This project took technical inspiration from the [zsh_codex](https://github.com/
 
 ## Installation
 
-Please follow the installation instructions for powershell, bash or zsh from [here](./Installation.md).
+Please follow the installation instructions for PowerShell, bash or zsh from [here](./Installation.md).
 
 ## Usage
 
@@ -127,11 +127,11 @@ You might have access to different [OpenAI engines](https://beta.openai.com/docs
 * PowerShell
 
     PowerShell v5 (The default one comes with Windows)
-    ```PowerShell
+    ```powershell
     (Invoke-WebRequest -Uri https://api.openai.com/v1/engines -Headers @{"Authorization" = "Bearer YOUR_API_KEY"; "OpenAI-Organization" = "YOUR_ORG_ID"}).Content
     ```
 
     PowerShell v7
-    ```PowerShell
+    ```powershell
     (Invoke-WebRequest -Uri https://api.openai.com/v1/engines -Authentication Bearer -Token (ConvertTo-SecureString "YOUR_API_KEY" -AsPlainText -Force) -Headers @{"OpenAI-Organization" = "YOUR_ORG_ID"}).Content
     ```

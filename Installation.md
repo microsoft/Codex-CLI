@@ -11,7 +11,7 @@ Mac OS uses zsh as the default shell.
 
 Linux uses bash as the default shell.
 
-Windows uses powershell.
+Windows uses PowerShell.
 
 Follow the steps for whichever shell you are using. 
 
@@ -97,14 +97,14 @@ Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
 ```
 .\scripts\powershell_setup.ps1 -OpenAIOrganizationId "YOUR_OPENAI_ORGANIZATION_ID" -OpenAIEngineId "ENGINE_ID"
 ```
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;See [About powershell_setup.ps1](#about-powershell_setupps1) section to learn script parameters.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;See [About powershell_setup_setup.ps1](#about-powershell_setup_setupps1) section to learn script parameters.
 
-4. Open a new powershell session, type in `#` followed by your natural language command and hit Ctrl + G!
+4. Open a new PowerShell session, type in `#` followed by your natural language command and hit Ctrl + G!
 
 ### Clean up
 Once you are done, go to `C:\your\custom\path\` (the folder contains NL-CLI code), then run the following command to clean up.
 ```
-.\scripts\powershell_cleanup.ps1
+.\scripts\powershell_setup_cleanup.ps1
 ```
 
 If you want to revert the execution policy, run this command
@@ -112,11 +112,11 @@ If you want to revert the execution policy, run this command
 Set-ExecutionPolicy Undefined -Scope CurrentUser
 ```
 
-### About powershell_setup.ps1
-`powershell_setup.ps1` supports the following parameters:
+### About powershell_setup_setup.ps1
+`powershell_setup_setup.ps1` supports the following parameters:
 | Parameter | Type | Description |
 |--|--|--|
-| `-OpenAIApiKey` | [SecureString](https://docs.microsoft.com/en-us/dotnet/api/system.security.securestring) | Required. If is not supplied, the script will prompt you to input the value. To provide the value via PowerShell parameter, this is an example for PowerShell 7: <br/> `.\scripts\powershell_setup.ps1 -OpenAIApiKey (ConvertTo-SecureString "YOUR_OPENAI_API_KEY" -AsPlainText -Force)` | 
+| `-OpenAIApiKey` | [SecureString](https://docs.microsoft.com/en-us/dotnet/api/system.security.securestring) | Required. If is not supplied, the script will prompt you to input the value. To provide the value via PowerShell parameter, this is an example for PowerShell 7: <br/> `.\scripts\powershell_setup_setup.ps1 -OpenAIApiKey (ConvertTo-SecureString "YOUR_OPENAI_API_KEY" -AsPlainText -Force)` | 
 | `-OpenAIOrganizationId` | String | Required. Your [OpenAI organization Id](https://beta.openai.com/account/org-settings). |
 | `-OpenAIEngineId` | String | Required. The [OpenAI engine Id](https://beta.openai.com/docs/engines/codex-series-private-beta) that provides access to a model.|
-| `-RepoRoot` | [FileInfo](https://docs.microsoft.com/en-us/dotnet/api/system.io.fileinfo) | Optional. Default to the current folder.<br>The value should be the path of NL-CLI folder. Example:<br/>`.\scripts\powershell_setup.ps1 -RepoRoot 'C:\your\custom\path'`|
+| `-RepoRoot` | [FileInfo](https://docs.microsoft.com/en-us/dotnet/api/system.io.fileinfo) | Optional. Default to the current folder.<br>The value should be the path of NL-CLI folder. Example:<br/>`.\scripts\powershell_setup_setup.ps1 -RepoRoot 'C:\your\custom\path'`|

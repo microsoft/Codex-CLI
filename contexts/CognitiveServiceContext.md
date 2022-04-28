@@ -20,7 +20,7 @@ Follow the instructions in [Azure Speech CLI Quickstart](https://docs.microsoft.
 
 If you are setting up for the first time, here is what you may have to do: 
 1. Download [.NET Core 3.1 SDK](https://docs.microsoft.com/en-us/dotnet/core/install/windows) and [Microsoft Visual C++ Redistributable for Visual Studio 2019](https://support.microsoft.com/help/2977003/the-latest-supported-visual-c-downloads)
-2. Install speech CLI in powershell using this command: `dotnet tool install --global Microsoft.CognitiveServices.Speech.CLI`
+2. Install speech CLI in PowerShell using this command: `dotnet tool install --global Microsoft.CognitiveServices.Speech.CLI`
 3. Use the subsription key and region that you obtained from the Cognitive Services Speech Service page and input into the following commands
 
 `spx config @key --set SUBSCRIPTION-KEY`  
