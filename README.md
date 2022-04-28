@@ -103,7 +103,7 @@ Add your context to the `contexts` folder and run `load context <filename>` to l
 
 Note that Codex will often produce correct scripts without any examples. Having been trained on a large corpus of code, it frequently knows how to produce specific commands. That said, building your own contexts helps coax the specific kind of script you're looking for - whether it's long or short, whether it declares variables or not, whether it refers back to previous commands, etc. You can also provide examples of your own CLI commmands and scripts, to show Codex other tools it should consider using.
 
-One important thing to consider is that if you add a new context, keep the multi-turn mode on to avoid our automatic defaulting (added to keep faulty contexts from breaking your experience).
+One important thing to consider is that if you add a new context, keep the multi-turn mode on to avoid our automatic defaulting (which was added to keep faulty contexts from breaking your experience).
 
 We have added a [cognitive services context](./contexts/CognitiveServiceContext.md) which uses the cognitive services API to provide text to speech type responses as an example.
 
