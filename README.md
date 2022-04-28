@@ -16,6 +16,9 @@ This project aims to offer a cross-shell NL->Code experience to allow users to i
 
 This project took technical inspiration from the [zsh_codex](https://github.com/tom-doerr/zsh_codex) project, extending its functionality to span multiple shells and to customize the prompts passed to the model (see prompt engineering section below).
 
+## Statement of Purpose
+This repository aims to grow the understanding of using Codex in applications by providing an example of implementation and references to support the [Microsoft Build conference in 2022](https://mybuild.microsoft.com/). It is not intended to be a released product. Therefore, this repository is not for discussing OpenAI API or requesting new features.
+
 ## Requirements
 * [Python](https://www.python.org/downloads/)
     * \[Windows\]: Python is added to PATH.
