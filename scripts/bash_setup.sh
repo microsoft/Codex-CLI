@@ -174,7 +174,7 @@ fi
 updateBashrc
 
 #Test OpenAI Access with Organization & API Key
-#hasOpenAIaccess
+hasOpenAIaccess
 
 # Create a file called `openaiapirc` in `~/.config` with your SECRET_KEY.
 # Call create OpenAI function
