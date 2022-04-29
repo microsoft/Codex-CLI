@@ -106,13 +106,13 @@ function getOptions
 
 createOpenAI()
 {
-    openAIfile=$HOME/.config/openaiapirc 
+    openAIfile=$BASH_NL_PATH/src/openaiapirc 
     if [ -f "$openAIfile" ]; then
         rm -f $openAIfile
     fi
 
-    mkdir -p $HOME/.config
-    touch $HOME/.config/openaiapirc
+    #mkdir -p $HOME/.config
+    touch $openAIfile
 
     echo '[openai]' >> $openAIfile
     echo "organization_id=$ORG_ID" >> $openAIfile
@@ -168,8 +168,6 @@ esac
 
 [[ $showhelp -eq 1 ]] && help && return 1
 
-#Testing function calls 
-#testpath
 
 # Add the custom lines in `~/.bashrc` file.
 # Call update Bash function
@@ -177,7 +175,7 @@ updateBashrc
 
 #Test valid access to OpenAI Access with Organization & API Key
 result=$(hasOpenAIaccess)
-echo "OpenAI: $result"
+#echo "OpenAI: $result"
 
 if [ $result != 200 ]; then 
     echo "*** ERROR ***"
