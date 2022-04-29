@@ -232,8 +232,13 @@ If you are setting up for the first time, here is what you may have to do:
 2. Install speech CLI in powershell using this command: `dotnet tool install --global Microsoft.CognitiveServices.Speech.CLI`
 3. Use the subsription key and region that you obtained from the Cognitive Services Speech Service page and input into the following commands
 
+For Terminal:
 `spx config @key --set SUBSCRIPTION-KEY`  
 `spx config @region --set REGION`
+
+For Powershell:
+`spx --% config @key --set SUBSCRIPTION-KEY`  
+`spx --% config @region --set REGION`
 
 ### Load the example speech context file
 

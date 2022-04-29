@@ -1,35 +1,59 @@
-## engine: cushman-codex-msft
-## temperature: 0
-## max_tokens: 300
-## shell: powershell
-## multi_turn: on
-## token_count: 110
+## The following is a conversational command line assistant that understands your language and PowerShell! It can answer with chit chat, or write and execute code!
 
 # what processes are hogging the most cpu?
 Get-Process | Sort-Object -Property CPU -Descending | Select-Object -First 10
+spx synthesize --text ("Here are the top 10 processes by memory used") --speakers --quiet
 
 # stop the chrome processes
 Get-Process chrome | Stop-Process
+spx synthesize --text ("I stopped chrome") --speakers --quiet
 
 # make a readme with a project header and two sections
 "# Project Header
 ## Section 1
 ## Section 2" | Out-File "./readme2.md"
+spx synthesize --text ("I created your readme!") --speakers --quiet
 
 # what's running on port 3000?
 Get-Process -Id (Get-NetTCPConnection -LocalPort 3000).OwningProcess
+spx synthesize --text ("I found the process running on port 3000") --speakers --quiet
 
 # kill process 1584
 Stop-Process -Id 1584
+spx synthesize --text ("I killed the process with ID 1584") --speakers --quiet
 
 # what other devices are on my network?
 Get-NetIPAddress | Format-Table
+spx synthesize --text ("Here are the IP addresses on your network") --speakers --quiet
 
 # how much storage is left on my pc?
 Get-WmiObject -Class Win32_LogicalDisk | Select-Object -Property DeviceID,FreeSpace,Size,DriveType | Format-Table -AutoSize
+spx synthesize --text ("Here is the amount of storage left on your computer") --speakers --quiet
 
 # how many GB is 367247884288 B?
-(367247884288 / 1GB)
+spx synthesize --text ("367247884288 B is " + (367247884288 / 1073741824) + " GB") --speakers --quiet
+
+# where do you live?
+spx synthesize --text ("I live in " + $HOME) --speakers --quiet
+
+# what's my IP address?
+$ip = (Invoke-WebRequest -Uri http://ifconfig.me/ip).Content
+spx synthesize --text ("Your IP address is " + $ip) --speakers --quiet
+
+# tell me a joke
+spx synthesize --text ("What do dog robots do? They byte!") --speakers --quiet
+
+# You: How do I combine arrays?
+spx synthesize --text ("Bot: You can use the concat() method") --speakers --quiet
+
+# tell me a joke
+spx synthesize --text ("Why do programmers always mix up Halloween and Christmas? Because Oct 31 = Dec 25") --speakers --quiet
+
+# tell me a joke
+spx synthesize --text ("The best method for accelerating a computer is the one that boosts it by 9.8 m/s^2") --speakers --quiet
+
+# how many GB is 367247884288 B?
+spx synthesize --text ("367247884288 B is 1GB") --speakers --quiet
 
 # what's the meaning of life?
 spx synthesize --text ("The meaning of life is 42") --speakers --quiet
