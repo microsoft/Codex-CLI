@@ -21,9 +21,8 @@ MAX_TOKENS = 300
 
 DEBUG_MODE = False
 
-# Get config dir from environment or default to ~/.config or ~\.config depending on OS
-CONFIG_DIR = os.getenv('XDG_CONFIG_HOME', os.path.expanduser(os.path.join('~','.config')))
-API_KEYS_LOCATION = os.path.join(CONFIG_DIR, 'openaiapirc')
+# api keys located in the same directory as this file
+API_KEYS_LOCATION = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'openaiapirc')
 
 PROMPT_CONTEXT = Path(__file__).with_name('current_context.txt')
 
@@ -39,12 +38,12 @@ def create_template_ini_file():
     If the ini file does not exist create it and add secret_key
     """
     if not os.path.isfile(API_KEYS_LOCATION):
-        print('Please create a file called openaiapirc at {} and add your secret key'.format(CONFIG_DIR))
-        print('The format is:\n')
-        print('[openai]')
-        print('organization_id=<organization-id>')
-        print('secret_key=<your secret key>\n')
-        print('engine=<engine-id>')
+        print('# Please create a file at {} and add your secret key'.format(API_KEYS_LOCATION))
+        print('# The format is:\n')
+        print('# [openai]')
+        print('# organization_id=<organization-id>')
+        print('# secret_key=<your secret key>\n')
+        print('# engine=<engine-id>')
         sys.exit(1)
 
 def initialize():
