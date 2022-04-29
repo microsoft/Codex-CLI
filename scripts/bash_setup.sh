@@ -10,16 +10,17 @@ BASH_NL_PATH=$(git rev-parse --show-toplevel)
 #############################
 
 hasOpenAIaccess() {
-    local url=${1:-https://api.openai.com/v1/engines}
-    local code=${2:-500}
-    local status=$(curl --head --location --connect-timeout 5 --write-out %{http_code} --silent --output /dev/null -H Authorization: Bearer $SECRET_KEY -H OpenAI-Organization: $ORG_ID ${url})
-    [[ $status == 500 ]] || [[ $status == 000 ]] && echo "No access to OpenAI"
-    return 1
+    local url=https://api.openai.com/v1/engines
+    
+    status=$(curl -w --head "$url" --write-out "%{http_code}" -s -o /dev/null -H 'Authorization: Bearer '$SECRET_KEY'' -H 'OpenAI-Organization: '$ORG_ID'')
+    #local status="test OpenAI call"
+    #echo "stat code: $status"
+    echo $status
 }
 
 resetAIOptions()
 {
-    echo "testing"
+    #echo "testing"
     unset ORG_ID
     unset SECRET_KEY
 
@@ -55,7 +56,6 @@ function getOptions
             s  )  # script type (for future use)
                 key="s"
                 resetAIOptions
-                continue
                 ;;
             o  )  # organization ID 
                 ORG_ID="$OPTARG"
@@ -73,6 +73,8 @@ function getOptions
             \? ) # 
                 key="e"
                 echo "Invalid option: -$OPTARG" >&2
+                echo "Please see help (-h) for options"
+                echo 
                 return 1
                 ;;
         esac
@@ -81,7 +83,7 @@ function getOptions
     if ((OPTIND == 1)) 
     then
         echo "ERROR: No options were not specified"
-        echo "Please provide required options. See help info"
+        echo "Please provide required options. See help (-h) for info"
         echo
         showhelp=1 
         return
@@ -98,12 +100,7 @@ function getOptions
     fi
 
     shift $((OPTIND-1))
-
-    #echo "key: $key"
-  # set defaults if a User Path not supplied
-  #echo "user $BSH_USER_PATH"
-  # if [ -z "$BSH_USER_PATH" ] ; then BSH_USER_PATH="$HOME/nl_cli" ; fi
-  # if [ -z "$SHELL_TYPE" ] ; then SHELL_TYPE="bash" ; fi
+    #echo $showhelp
 }
 
 
@@ -158,24 +155,50 @@ updateBashrc()
 
 ## Script Menu Options ##
 getOptions "$@"
-# Tracking & return for help or wrong option selected
-if [ "$key" = "h" ] || [ "$key" = "e" ] || [ "$key" = "s" ] ; then
-    unset key
-    return 1
-fi
 
-#echo $showhelp
-[ showhelp ] && help
+## Track option selected and respond accordingly
+## If error show help to user
+case $key in
+    e|h )
+        unset key
+        return 1;;
+    s ) 
+        unset key;;
+esac
+
+[[ $showhelp -eq 1 ]] && help && return 1
+
 #Testing function calls 
 #testpath
 
 # Add the custom lines in `~/.bashrc` file.
 # Call update Bash function
-updateBashrc
+# updateBashrc
 
-#Test OpenAI Access with Organization & API Key
-hasOpenAIaccess
+#Test valid access to OpenAI Access with Organization & API Key
+result=$(hasOpenAIaccess)
+echo "OpenAI: $result"
+
+if [ $result != 200 ]; then 
+    echo "*** ERROR ***"
+    echo "Failed to access OpenAI api w/result: [$result]."
+    echo "Please check your OpenAI API key (https://beta.openai.com/account/api-keys)" 
+    echo "and Organization ID (https://beta.openai.com/account/org-settings)."
+    echo "*************"
+    return 1
+fi
+
+echo "*** Validated OpenAI Access ***"
+echo 
+echo "Creating OpenAI config file.........."
 
 # Create a file called `openaiapirc` in `~/.config` with your SECRET_KEY.
 # Call create OpenAI function
-createOpenAI 
+createOpenAI
+echo "*** OpenAI config successfully created"
+echo
+echo "*******************************************************"
+echo "**** NL-CL Bash Setup completed ****"
+echo "Please open a new Bash terminal, type in # followed by"
+echo "your natural language command and hit Ctrl+g!"
+echo "********************************************************"
