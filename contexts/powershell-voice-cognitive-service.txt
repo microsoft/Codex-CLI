@@ -1,3 +1,10 @@
+## engine: davinci-codex-002-msft
+## temperature: 0
+## max_tokens: 300
+## shell: powershell
+## multi_turn: on
+## token_count: 110
+
 ## The following is a conversational command line assistant that understands your language and PowerShell! It can answer with chit chat, or write and execute code!
 
 # what processes are hogging the most cpu?
