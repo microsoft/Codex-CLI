@@ -173,7 +173,7 @@ esac
 
 # Add the custom lines in `~/.bashrc` file.
 # Call update Bash function
-# updateBashrc
+updateBashrc
 
 #Test valid access to OpenAI Access with Organization & API Key
 result=$(hasOpenAIaccess)
