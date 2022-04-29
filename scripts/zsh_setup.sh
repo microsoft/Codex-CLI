@@ -47,7 +47,7 @@ echo "RepoRoot is $repoRoot"
 # Prompt user for OpenAI access key
 read -rs 'secret?OpenAI access key:'
 
-openAIConfigPath="$HOME/.config/openaiapirc"
+openAIConfigPath="$repoRoot/src/openaiapirc"
 zshrcPath="$HOME/.zshrc"
 
 # 1. Append settings in .zshrc
@@ -59,7 +59,7 @@ echo "Removed previous settings in $zshrcPath if present"
 echo "### NL-CLI setup - start
 export ZSH_CUSTOM=$repoRoot
 source \"\$ZSH_CUSTOM/scripts/nl_cli.plugin.zsh\"
-bindkey '^X' create_completion
+bindkey '^G' create_completion
 ### NL-CLI setup - end" >> $zshrcPath   
 echo "Added settings in $zshrcPath"
 

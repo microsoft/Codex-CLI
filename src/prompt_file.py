@@ -168,14 +168,23 @@ class PromptFile:
     
     def save_to(self, save_name):
         """
-        Save the prompt file to a new location
+        Save the prompt file to a new location with the config
         """
+        if not save_name.endswith('.txt'):
+            save_name = save_name + '.txt'
+        save_path = os.path.join(os.path.dirname(__file__), "..", "contexts", save_name)
+
+        # first write the config
+        with open(self.config_path, 'r') as f:
+            lines = f.readlines()
+            lines = ['## ' + line for line in lines]
+            with Path(save_path).open('w') as f:
+                f.writelines(lines)
+        
+        # then write the prompt file
         with open(self.file_path, 'r') as f:
             lines = f.readlines()
-            if not save_name.endswith('.txt'):
-                save_name = save_name + '.txt'
-            save_path = os.path.join(os.path.dirname(__file__), "..", "contexts", save_name)
-            with Path(save_path).open('w') as f:
+            with Path(save_path).open('a') as f:
                 f.writelines(lines)
         
         print('\n#   Context saved to {}'.format(save_name))
