@@ -7,12 +7,14 @@ set -o history -o histexpand
 
 
 #####################################
-## *** NL-CLI plugin Functions *** ##
+## *** NL-CLI plugin Function *** ##
 #####################################
 
 create_completion() {
     # Get the text typed until now.
     text=$(echo !!)
+    cmd_line=$(history | tail -2 | head -1 | cut -c8-999)
+
     completion=$(echo -n "$text" | $NL_CLI_PATH/codex_query.py)
     # Add completion to the current buffer.
     BUFFER="${text}${completion}"
@@ -22,21 +24,3 @@ create_completion() {
 
 cmd_line=$(history | tail -2 | head -1 | cut -c8-999)
 echo $cmd_line
-
-while read line -p "$"
-do 
-    echo $line
-    valtest+="${line}\n"
-    printf -v testvalue "$testvalue\n$line\n"
-    echo $valtest
-    printf "okay $valtest"
-
-    if [[ $line == $'\a' ]];
-    then
-        echo "I fired the Ctrl+G"
-        output=create_completion $valtest
-        break
-    fi
-    echo "next value" 
-    echo $testvalue
-done < "${1:-/dev/stdin}" 
