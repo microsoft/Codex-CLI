@@ -142,6 +142,11 @@ updateBashrc()
     source $bashfile 
 }
 
+allowExecution()
+{
+    chmod +x "$BASH_NL_PATH/src/codex_query.py"
+    echo "Allow execution of $BASH_NL_PATH/src/codex_query.py"
+}
 
 ##################
 ## *** Main *** ##
@@ -177,6 +182,10 @@ echo "Creating OpenAI config file.........."
 # Create a file called `openaiapirc` in `~/.config` with your SECRET_KEY.
 # Call create OpenAI function
 createOpenAI
+
+# Change file mode of codex_query.py to allow execution
+allowExecution
+
 echo "OpenAI config successfully created"
 echo
 echo "*******************************************************"
