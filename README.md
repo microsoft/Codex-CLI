@@ -28,126 +28,18 @@ This repository aims to grow the understanding of using Codex in applications by
     * [OpenAI Engine Id](https://beta.openai.com/docs/engines/codex-series-private-beta). It provides access to a model. For example, `code-davinci-002` or `code-cushman-001`. See [here](#what-openai-engines-are-available-to-me) for checking available engines.
 
 ## Installation
-Make sure you have python installed. Then install needed python packages.
 
-```
-python -m pip install openai
-python -m pip install psutil
-```
-
-Follow the steps for which shell you are using. Generally, Mac OS has zsh, Linux has bash, Windows has powershell.
-
-### Zsh instructions
-
-
-1. Download this project to `~/your/custom/path/`.
-
-```
-    $ git clone https://github.com/microsoft/NL-CLI.git ~/your/custom/path/
-```
-
-2. In zsh, go to `~/your/custom/path/` (the folder contains NL-CLI code), then run the following command to setup your zsh environment. It will prompt you for [OpenAI API key]((https://beta.openai.com/account/api-keys)).
-
-```
-./scripts/zsh_setup.sh --OpenAIOrganizationId <YOUR_ORG_ID> --OpenAIEngineId <ENGINE_ID>
-```
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;See [About zsh_setup.sh](#about-zshsetupsh) section to learn script parameters.
-
-3. Run `zsh`, start typing and complete it using `^G`!
-
-#### Clean up
-Once you are done, go to `~/your/custom/path/` (the folder contains NL-CLI code), then run the following command to clean up.
-```
-./scripts/zsh_cleanup.sh
-```
-
-#### About zsh_setup.sh
-`zsh_setup.sh` supports the following parameters:
-| Parameter | Description |
-|--|--|
-| `--OpenAIOrganizationId` | Required. Your [OpenAI organization Id](https://beta.openai.com/account/org-settings). |
-|`--OpenAIEngineId` | Required. The [OpenAI engine Id](https://beta.openai.com/docs/engines/codex-series-private-beta) that provides access to a model.|
-| `--RepoRoot` | Optional. Default to the current folder.<br/>The value should be the path of NL-CLI folder. Example:<br/>`./zsh_setup.sh --RepoRoot /Code/NL-CLI`|
-
-### Powershell instructions
-
-1. Download this project to wherever you want `C:\your\custom\path\`.
-
-```
-    $ git clone https://github.com/microsoft/NL-CLI.git C:\your\custom\path\
-```
-
-2. Open PowerShell as Administrator and run the following command.
-
-```
-Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
-```
-
-
-3. In the same Powershell window, go to `C:\your\custom\path\NL-CLI\` (the folder contains NL-CLI code). Copy the following command then replace `YOUR_OPENAI_ORGANIZATION_ID` and `ENGINE_ID` with your OpenAI organization Id and OpenAI engine Id. Run the command to setup your PowerShell environment. It will prompt you for OpenAI access key.
-
-```
-.\scripts\powershell_setup.ps1 -OpenAIOrganizationId "YOUR_OPENAI_ORGANIZATION_ID" -OpenAIEngineId "ENGINE_ID"
-```
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;See [About powershell_setup.ps1](#about-powershell_setupps1) section to learn script parameters.
-
-4. Open a new powershell session, type in `#` followed by your natural language command and hit Ctrl + G!
-
-#### Clean up
-Once you are done, go to `C:\your\custom\path\` (the folder contains NL-CLI code), then run the following command to clean up.
-```
-.\scripts\powershell_cleanup.ps1
-```
-
-If you want to revert the execution policy, run this command
-```
-Set-ExecutionPolicy Undefined -Scope CurrentUser
-```
-
-#### About powershell_setup.ps1
-`powershell_setup.ps1` supports the following parameters:
-| Parameter | Type | Description |
-|--|--|--|
-| `-OpenAIApiKey` | [SecureString](https://docs.microsoft.com/en-us/dotnet/api/system.security.securestring) | Required. If is not supplied, the script will prompt you to input the value. To provide the value via PowerShell parameter, this is an example for PowerShell 7: <br/> `.\scripts\powershell_setup.ps1 -OpenAIApiKey (ConvertTo-SecureString "YOUR_OPENAI_API_KEY" -AsPlainText -Force)` | 
-| `-OpenAIOrganizationId` | String | Required. Your [OpenAI organization Id](https://beta.openai.com/account/org-settings). |
-| `-OpenAIEngineId` | String | Required. The [OpenAI engine Id](https://beta.openai.com/docs/engines/codex-series-private-beta) that provides access to a model.|
-| `-RepoRoot` | [FileInfo](https://docs.microsoft.com/en-us/dotnet/api/system.io.fileinfo) | Optional. Default to the current folder.<br>The value should be the path of NL-CLI folder. Example:<br/>`.\scripts\powershell_setup.ps1 -RepoRoot 'C:\your\custom\path'`|
-
-### Bash instructions
-
-
-1. Download this project to `~/your/custom/path/`.
-
-```
-    $ git clone https://github.com/microsoft/NL-CLI.git ~/your/custom/path/
-```
-
-2. Add the following to your `~/.bashrc` file.
-
-```
-    # in your/custom/path you need to clone the repository
-    export NL_CLI_PATH="your/custom/path/NL-CLI"
-    source "$NL_CLI_PATH/scripts/nl_cli.plugin.sh"
-    bind -x '"\C-g":"create_completion"'
-```
-
-3. Create a file called `openaiapirc` in `~/.config` with your SECRET_KEY.
-
-```
-[openai]
-organization_id=...
-secret_key=...
-engine=...
-```
-
-4. Run `bash`, start typing and complete it using `^G`!
-
+Please follow the installation instructions for PowerShell, bash or zsh from [here](./Installation.md).
 
 ## Usage
 
 Once configured for your shell of preference, you can use the NL-CLI by writing a comment (starting with `#`) into your shell, and then hitting Ctrl + G. 
 
-The NL-CLI supports two primary modes: single-turn and multi-turn. If the multi-turn mode is on, the NL-CLI will "remember" past interactions with the model, allowing you to refer back to previous actions and entities. If, for example, you asked the NL-CLI to change your time zone to mountain, and then said "change it back to pacific", the model would have the context from the previous interaction to know that "it" is the user's timezone:
+The NL-CLI supports two primary modes: single-turn and multi-turn. 
+
+By default, multi-turn mode is off. It can be toggled on and off using the `# start multi-turn` and `# stop multi-turn` commands.
+
+If the multi-turn mode is on, the NL-CLI will "remember" past interactions with the model, allowing you to refer back to previous actions and entities. If, for example, you asked the NL-CLI to change your time zone to mountain, and then said "change it back to pacific", the model would have the context from the previous interaction to know that "it" is the user's timezone:
 
 ```powershell
 # change my timezone to mountain
@@ -157,9 +49,11 @@ tzutil /s "Mountain Standard Time"
 tzutil /s "Pacific Standard Time"
 ```
 
-When multi-turn mode is on, this tool creates a `current_context.txt` file that keeps track of past interactions, and pass it to the model on each subsequent command. 
+The tool creates a `current_context.txt` file that keeps track of past interactions, and pass it to the model on each subsequent command. 
 
 When multi-turn mode is off, this tool will not keep track of interaction history. There are tradeoffs to using multi-turn mode - though it enables compelling context resolution, it also increases overhead. If, for example, the model produces the wrong script for the job, the user will want to remove that from the context, otherwise future conversation turns will be more likely to produce the wrong script again. With multi-turn mode off, the model will behave completely deterministically - the same command will always produce the same output. 
+
+Any time the model seems to output consistently incorrect commands, you can use the `# stop multi-turn` command to stop the model from remembering past interactions and load in your default context. Alternatively, the `# default context` command does the same while preserving the multi-turn mode as on.
 
 ## Commands
 
@@ -175,6 +69,8 @@ When multi-turn mode is off, this tool will not keep track of interaction histor
 | `set <config-key> <config-value>` | Sets the configuration of your interaction with the model |
 | `unlearn` | Unlearns the last two lines of input-output from the model |
 
+
+Feel free to improve your experience by changing the token limit, engine id and temperature using the set command. For example, `# set engine cushman-codex`, `# set temperature 0.5`, `# set max_tokens 50`.
 
 ## Prompt Engineering and Context Files
 
@@ -210,7 +106,9 @@ Add your context to the `contexts` folder and run `load context <filename>` to l
 
 Note that Codex will often produce correct scripts without any examples. Having been trained on a large corpus of code, it frequently knows how to produce specific commands. That said, building your own contexts helps coax the specific kind of script you're looking for - whether it's long or short, whether it declares variables or not, whether it refers back to previous commands, etc. You can also provide examples of your own CLI commmands and scripts, to show Codex other tools it should consider using.
 
-One important thing to consider is that if you add a new context, keep the multi-turn mode on to avoid our automatic defaulting (added to keep faulty contexts from breaking your experience).
+One important thing to consider is that if you add a new context, keep the multi-turn mode on to avoid our automatic defaulting (which was added to keep faulty contexts from breaking your experience).
+
+We have added a [cognitive services context](./contexts/CognitiveServiceContext.md) which uses the cognitive services API to provide text to speech type responses as an example.
 
 ## Troubleshooting
 
@@ -232,11 +130,11 @@ You might have access to different [OpenAI engines](https://beta.openai.com/docs
 * PowerShell
 
     PowerShell v5 (The default one comes with Windows)
-    ```PowerShell
+    ```powershell
     (Invoke-WebRequest -Uri https://api.openai.com/v1/engines -Headers @{"Authorization" = "Bearer YOUR_API_KEY"; "OpenAI-Organization" = "YOUR_ORG_ID"}).Content
     ```
 
     PowerShell v7
-    ```PowerShell
+    ```powershell
     (Invoke-WebRequest -Uri https://api.openai.com/v1/engines -Authentication Bearer -Token (ConvertTo-SecureString "YOUR_API_KEY" -AsPlainText -Force) -Headers @{"OpenAI-Organization" = "YOUR_ORG_ID"}).Content
     ```

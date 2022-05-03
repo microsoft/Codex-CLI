@@ -5,8 +5,9 @@
 # 1. PowerShell profile (Remove file if the content only has NL-CLI setup; otherwise, wipe the NL-CLI setup content)
 # 2. OpenAI configuration file (openaiapirc)
 ###
+$RepoRoot = (Get-Location)
 
-$openAIConfigPath = Join-Path $HOME -ChildPath ".config\openaiapirc"
+$openAIConfigPath = Join-Path $RepoRoot -ChildPath "src\openaiapirc"
 
 function CleanUpOpenAiConfig() 
 {

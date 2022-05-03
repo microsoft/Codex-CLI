@@ -47,7 +47,7 @@ echo "RepoRoot is $repoRoot"
 # Prompt user for OpenAI access key
 read -rs 'secret?OpenAI access key:'
 
-openAIConfigPath="$HOME/.config/openaiapirc"
+openAIConfigPath="$repoRoot/src/openaiapirc"
 zshrcPath="$HOME/.zshrc"
 
 # 1. Append settings in .zshrc
