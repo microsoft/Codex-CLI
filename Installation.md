@@ -53,7 +53,13 @@ To leverage the NL-CLI on WSL and Linux environments using Bash please follow th
 	cd </your/custom/path>/NL-CLI
 ```
 
-In the NL-CLI folder, there is a folder named scripts. Within the scripts folder is the shell script, `bash_setup.sh`, for the setup of the Bash environment. To run this setup successfully, enter the OpenAI API key, OpenAI organization id, and the OpenAI engine id as these are required fields. 
+3. Setup your Bash NL-CLI environment.
+
+	In the NL-CLI folder, there is a folder named scripts.
+	Within the scripts folder is the shell script,
+	`bash_setup.sh`, which is used to setup the Bash environment.
+	
+	To run this setup, enter the OpenAI API key, OpenAI organization id, and the OpenAI engine id as these are required settings. 
 
 Run the following commands to execute setup:
 ```
@@ -72,7 +78,7 @@ source ./scripts/bash_cleanup.sh
 ```
 
 ### About bash_setup.sh
-bash_setup.sh` supports the following parameters:
+The `bash_setup.sh` scripts supports the following parameters:
 | Parameter | Description |
 |--|--|
 | `-o`  | Required. Your [OpenAI Organization Id](https://beta.openai.com/account/org-settings). |
@@ -87,6 +93,7 @@ source ./bash_setup.sh -h
 ```
 
 ![](images/NL-CLI-bashhelp-small.png)
+
 
 ## Zsh instructions
 
