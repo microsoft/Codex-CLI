@@ -61,13 +61,13 @@ To leverage the NL-CLI on WSL and Linux environments using Bash please follow th
 	
 	To run this setup, enter the OpenAI API key, OpenAI organization id, and the OpenAI engine id as these are required settings. 
 
-Run the following commands to execute setup:
-```
-cd scripts
-source ./bash_setup.sh -o <OPENAI ORG ID> -k <OPENAI API KEY> -e <OPENAI ENGINE ID>
-```
-
-This setup will create an OpenAI config file and update your bash environment. 
+	Run the following commands to execute setup:
+	```
+	cd scripts
+	source ./bash_setup.sh -o <OPENAI ORG ID> -k <OPENAI API KEY> -e <OPENAI ENGINE ID>
+	```
+	
+	This setup will create an OpenAI config file and update your bash environment. 
 
 4. Open a new Bash terminal. Type in `#` followed by your natural language request. Press Ctrl+g to execute!
 
