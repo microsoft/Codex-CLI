@@ -86,7 +86,7 @@ For help running the NL-CLI Bash setup, please run the following command:
 source ./bash_setup.sh -h
 ```
 
-![](images/NL-CLI-bashhelp.png)
+![](images/NL-CLI-bashhelp-small.png)
 
 ## Zsh instructions
 
