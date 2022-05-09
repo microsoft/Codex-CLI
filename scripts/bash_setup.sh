@@ -9,10 +9,15 @@ BASH_NL_PATH=$(git rev-parse --show-toplevel)
 ## *** Setup Functions *** ##
 #############################
 
-hasOpenAIaccess() {
+hasOpenAIaccess() 
+{
     local url=https://api.openai.com/v1/engines
+    local openaidata=$(curl -w --head "$url" --write-out "%{http_code}" -s -H 'Authorization: Bearer '$SECRET_KEY'' -H 'OpenAI-Organization: '$ORG_ID'')
+    local oaiengresult=$(awk 'index($0,'\"\\\"$ENGINE_ID\\\"\"')' <<< $openaidata)
+    local openaieng=$(expr substr "$oaiengresult" 14 $(expr length "$ENGINE_ID"))
     
-    status=$(curl -w --head "$url" --write-out "%{http_code}" -s -o /dev/null -H 'Authorization: Bearer '$SECRET_KEY'' -H 'OpenAI-Organization: '$ORG_ID'')
+    oaistatus=${openaidata:$(expr length "$openaidata")-3}
+    echo $openaieng $oaistatus
 }
 
 resetAIOptions()
@@ -37,7 +42,7 @@ help()
    echo "o     Set the OpenAI organization ID (required)"
    echo "k     Set the OpenAI API key (required)"
    echo "e     Set the OpenAI engine ID (required)"
-   echo "s     Reset OpenAI options ex. Org ID & API key"
+   echo "s     Reset OpenAI options i.e. Org ID, API key, Engine ID"
    echo
 }
 
@@ -62,8 +67,9 @@ function getOptions
                 ENGINE_ID="$OPTARG"
                 ;;
             h  )  # echo the help file
-                help
-                exit 0
+                #help
+                showhelp=1
+                return 0
                 ;;
             \? ) # invalid options
                 echo "Invalid option: -$OPTARG" >&2
@@ -96,6 +102,7 @@ function getOptions
         echo "ERROR: **OpenAI Engine ID is required**"
     fi
 
+    #echo "options"
     shift $((OPTIND-1))
 }
 
@@ -152,19 +159,24 @@ allowExecution()
 ## *** Main *** ##
 ##################
 
-## Script Menu Options ##
+# **** Script Menu Options **** #
 getOptions "$@"
 
-[[ $showhelp -eq 1 ]] && echo && help && exit 1
+# **** Help requested or error occurred ****
+[[ $showhelp -eq 1 ]] && echo && help && return 0
 
-
-# Add the custom lines in `~/.bashrc` file.
-# Call update Bash function
+# **** Add the custom lines in `~/.bashrc` file. ****
+# **** Call update Bash function ****
 updateBashrc
 
-# Test valid access to OpenAI Access with Organization & API Key
-result=$(hasOpenAIaccess)
+# **** Test valid access to OpenAI Access with Organization & API Key ****
+# **** Test valid OpenAI engine was provided ****
 
+echo "*** Validating Open AI Access..."
+openairesult=$(hasOpenAIaccess)
+
+result=${openairesult:$(expr length "$openairesult")-3}
+engresult=$(expr substr "$openairesult" 1 $(($(expr length "$openairesult") - 3)))
 
 if [ $result -ne 200 ]; then 
     echo "*** ERROR ***"
@@ -172,18 +184,30 @@ if [ $result -ne 200 ]; then
     echo "Please check your OpenAI API key (https://beta.openai.com/account/api-keys)" 
     echo "and Organization ID (https://beta.openai.com/account/org-settings)."
     echo "*************"
-    exit 1
+    return 1
 fi
 
-echo "*** Validated OpenAI Access ***"
+if [ -z $engresult ]; then
+    echo "Cannot find OpenAI engine: $ENGINE_ID." 
+    echo "Please check the OpenAI engine id (https://beta.openai.com/docs/engines/codex-series-private-beta) "
+    echo "and your Organization ID (https://beta.openai.com/account/org-settings)."
+    return 1
+fi
+
+#**** Clean up OpenAI variable for testing access since script is sourced ****
+unset openairesult
+unset result
+unset engresult
+
+echo "*** Successfully Validated OpenAI Access ***"
 echo 
 echo "Creating OpenAI config file.........."
 
-# Create a file called `openaiapirc` in `~/.config` with your SECRET_KEY.
-# Call create OpenAI function
+# **** Create a file called `openaiapirc` in `~/.config` with your SECRET_KEY. ****
+# **** Call create OpenAI function ****
 createOpenAI
 
-# Change file mode of codex_query.py to allow execution
+# **** Change file mode of codex_query.py to allow execution ****
 allowExecution
 
 echo "OpenAI config successfully created"
