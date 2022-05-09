@@ -171,7 +171,6 @@ updateBashrc
 
 # **** Test valid access to OpenAI Access with Organization & API Key ****
 # **** Test valid OpenAI engine was provided ****
-
 echo "*** Validating Open AI Access..."
 openairesult=$(hasOpenAIaccess)
 
