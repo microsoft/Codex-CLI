@@ -5,7 +5,7 @@
 #############################################
 
 ## Remove the openaiapirc file ##
-rmdir -f $NL_CLI_PATH/src/openaiapirc
+rm -f $NL_CLI_PATH/src/openaiapirc
 
 ## Remove the env variables ##
 unset NL_CLI_PATH
