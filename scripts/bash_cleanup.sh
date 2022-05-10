@@ -20,3 +20,4 @@ if [ -f "$bkupBash" ]; then
     rm -f $currBash
     mv $bkupBash $currBash
 fi
+    

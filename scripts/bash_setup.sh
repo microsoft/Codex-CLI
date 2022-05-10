@@ -165,10 +165,6 @@ getOptions "$@"
 # **** Help requested or error occurred ****
 [[ $showhelp -eq 1 ]] && echo && help && return 0
 
-# **** Add the custom lines in `~/.bashrc` file. ****
-# **** Call update Bash function ****
-updateBashrc
-
 # **** Test valid access to OpenAI Access with Organization & API Key ****
 # **** Test valid OpenAI engine was provided ****
 echo "*** Validating Open AI Access..."
@@ -193,10 +189,9 @@ if [ -z $engresult ]; then
     return 1
 fi
 
-#**** Clean up OpenAI variable for testing access since script is sourced ****
-unset openairesult
-unset result
-unset engresult
+# **** Add the custom lines in `~/.bashrc` file. ****
+# **** Call update Bash function ****
+updateBashrc
 
 echo "*** Successfully Validated OpenAI Access ***"
 echo 
@@ -205,6 +200,11 @@ echo "Creating OpenAI config file.........."
 # **** Create a file called `openaiapirc` in `~/.config` with your SECRET_KEY. ****
 # **** Call create OpenAI function ****
 createOpenAI
+
+#**** Clean up OpenAI variable for testing access since script is sourced ****
+unset openairesult
+unset result
+unset engresult
 
 # **** Change file mode of codex_query.py to allow execution ****
 allowExecution
