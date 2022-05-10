@@ -189,13 +189,13 @@ if [ -z $engresult ]; then
     return 1
 fi
 
+echo "*** Successfully Validated OpenAI Access ***"
+echo 
+echo "Creating OpenAI config file and updating bash options .........."
+
 # **** Add the custom lines in `~/.bashrc` file. ****
 # **** Call update Bash function ****
 updateBashrc
-
-echo "*** Successfully Validated OpenAI Access ***"
-echo 
-echo "Creating OpenAI config file.........."
 
 # **** Create a file called `openaiapirc` in `~/.config` with your SECRET_KEY. ****
 # **** Call create OpenAI function ****
