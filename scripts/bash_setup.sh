@@ -101,8 +101,7 @@ function getOptions
         showhelp=1 
         echo "ERROR: **OpenAI Engine ID is required**"
     fi
-
-    #echo "options"
+    
     shift $((OPTIND-1))
 }
 
@@ -158,6 +157,7 @@ allowExecution()
 ##################
 ## *** Main *** ##
 ##################
+
 
 # **** Script Menu Options **** #
 getOptions "$@"
