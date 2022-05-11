@@ -1,49 +1,99 @@
-# Installation
+# NL-CLI Installation
 
-Make sure you have python installed. Then install needed python packages.
+In order to leverage the NL-CLI tool, you will need to prepare your environment for the shell of your choice. Installation instructions are shown below for each supported shell environment. 
+
+The following terminal environments are supported:  
+
+* Windows:    [Powershell](#powershell-instructions)
+* Linux/WSL:  [Bash](#bash-instructions) 
+* Mac OS:     [Zsh](#zsh-instructions)
+
+
+## Prerequisites
+
+
+In order to run the NL-CLI, ensure that you have python installed. To install the required python packages, please go to the command line in the shell of your choice and enter the following commands: 
 
 ```
 python -m pip install openai
 python -m pip install psutil
 ```
 
-Mac OS uses zsh as the default shell.
+Additionally, the OpenAI API key, organization id, and engine id are required to execute the NL-CLI tool. 
 
-Linux uses bash as the default shell.
+To obtain the OpenAI API key information, go to (https://beta.openai.com/account/api-keys) and login into your account. 
 
-Windows uses PowerShell.
+Once logged in you will see: 
+![](images/OpenAI-apikey.png)
 
-Follow the steps for whichever shell you are using. 
+Copy the API key by clicking the Copy button and save the copied key where you can retrieve it. 
 
+To obtain the OpenAI organization id, go to OpenAI Settings page (https://beta.openai.com/account/org-settings) and copy the id shown underneath the Organization ID heading. Save the copied id with the API key that was stored in previous step. 
+
+See image below for reference: 
+![](images/OpenAI-orgid.png)
+
+To obtain the OpenAI engine id, go to OpenAI Engines page (https://beta.openai.com/docs/engines/codex-series-private-beta) for the engines available for Codex models. Select the desired engine and save the engine id with the API key and organization id stored in previous steps. 
+
+See image below for reference: 
+![](images/OpenAI-engineid.png)
 
 ## Bash instructions
 
+To leverage the NL-CLI on WSL and Linux environments using Bash please follow the steps below: 
 
-1. Download this project to `~/your/custom/path/`.
-
+1. Open Bash shell and download the NL-CLI project to your desired location in Linux by cloning the NL-CLI repo using the following command: 
 ```
-    $ git clone https://github.com/microsoft/NL-CLI.git ~/your/custom/path/
-```
-
-2. Add the following to your `~/.bashrc` file.
-
-```
-    # in your/custom/path you need to clone the repository
-    export NL_CLI_PATH="your/custom/path/NL-CLI"
-    source "$NL_CLI_PATH/scripts/nl_cli.plugin.sh"
-    bind -x '"\C-g":"create_completion"'
+    $ git clone https://github.com/microsoft/NL-CLI.git /your/custom/path/
 ```
 
-3. Create a file called `openaiapirc` in `~/.config` with your SECRET_KEY.
+2. Once you have the project cloned. Go to the directory that contains the NL-CLI code.
 
 ```
-[openai]
-organization_id=...
-secret_key=...
-engine=...
+	cd </your/custom/path>/NL-CLI
 ```
 
-4. Run `bash`, start typing and complete it using `^G`!
+3. Setup your Bash NL-CLI environment.
+
+	In the NL-CLI folder, there is a folder named scripts.
+	Within the scripts folder is the shell script,
+	`bash_setup.sh`, which is used to setup the Bash environment.
+	
+	To run this setup, enter the OpenAI API key, OpenAI organization id, and the OpenAI engine id as these are required settings. 
+
+	Run the following commands to execute setup:
+	```
+	cd scripts
+	source ./bash_setup.sh -o <OPENAI ORG ID> -k <OPENAI API KEY> -e <OPENAI ENGINE ID>
+	```
+	
+	This setup will create an OpenAI config file and update your bash environment. 
+
+4. Open a new Bash terminal. Type in `#` followed by your natural language request. Press Ctrl+g to execute!
+
+### Clean up
+Once you have finished using the NL-CLI tool, go to the folder that contains the NL-CLI code. ex `cd ~/your/custom/path/NL-CLI`. Run the following command to clean up the NL-CLI bash environment.
+```
+source ./scripts/bash_cleanup.sh
+```
+
+### About bash_setup.sh
+The `bash_setup.sh` scripts supports the following parameters:
+| Parameter | Description |
+|--|--|
+| `-o`  | Required. Your [OpenAI Organization Id](https://beta.openai.com/account/org-settings). |
+| `-k`  | Required. Your [OpenAI API key](https://beta.openai.com/account/api-keys). |
+|`-e` | Required. The [OpenAI Engine Id](https://beta.openai.com/docs/engines/codex-series-private-beta).|
+|`-s` | Optional. Reset the OpenAI API key, Organization ID and Engine ID. This will rewrite the OpenAI config with new settings.|
+| `-h` | Optional. Display help for the Bash NL-CLI tool setup. *(see info below for running help)*`|
+
+For help running the NL-CLI Bash setup, please run the following command:   
+```
+source ./bash_setup.sh -h
+```
+
+![](images/NL-CLI-bashhelp-small.png)
+
 
 ## Zsh instructions
 
