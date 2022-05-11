@@ -52,6 +52,11 @@ function getOptions
     showhelp=0
     echo "path: $BASH_NL_PATH"
 
+    #*** All option values are reset upon run on command & options *** 
+    unset ORG_ID
+    unset ENGINE_ID
+    unset SECRET_KEY
+
     while getopts ":so:k:e:h" opt ; do
         case $opt in
             s  )  # reset OpenAI options
