@@ -221,5 +221,5 @@ if __name__ == '__main__':
         print('\n\n# Codex CLI error: Rate limit exceeded, try later')
     except openai.error.APIConnectionError:
         print('\n\n# Codex CLI error: API connection error, are you connected to the internet?')
-    except openai.error.InvalidRequestError:
-        print('\n\n# Codex CLI error: Invalid request, is the engine/temperature valid?')
+    except openai.error.InvalidRequestError as e:
+        print('\n\n# Codex CLI error: Invalid request - ' + str(e))
