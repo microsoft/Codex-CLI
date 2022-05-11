@@ -19,7 +19,7 @@ ENGINE = ''
 TEMPERATURE = 0
 MAX_TOKENS = 300
 
-DEBUG_MODE = False
+DEBUG_MODE = True
 
 # api keys located in the same directory as this file
 API_KEYS_LOCATION = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'openaiapirc')
@@ -206,7 +206,7 @@ if __name__ == '__main__':
         completion_all = response['choices'][0]['text']
 
         if is_sensitive_content(user_query + '\n' + completion_all):
-            print("\n#\tSensitive content detected, response has been redacted")
+            print("\n#   Sensitive content detected, response has been redacted")
         else:
             print(completion_all)
 
