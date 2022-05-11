@@ -223,3 +223,5 @@ if __name__ == '__main__':
         print('\n\n# Codex CLI error: API connection error, are you connected to the internet?')
     except openai.error.InvalidRequestError as e:
         print('\n\n# Codex CLI error: Invalid request - ' + str(e))
+    except Exception as e:
+        print('\n\n# Codex CLI error: Unexpected exception - ' + str(e))
