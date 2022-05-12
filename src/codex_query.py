@@ -19,7 +19,7 @@ ENGINE = ''
 TEMPERATURE = 0
 MAX_TOKENS = 300
 
-DEBUG_MODE = True
+DEBUG_MODE = False
 
 # api keys located in the same directory as this file
 API_KEYS_LOCATION = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'openaiapirc')
