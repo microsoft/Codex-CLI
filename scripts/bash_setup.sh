@@ -174,4 +174,9 @@ configureBash
 enableApp
 cleanupEnv
 
-echo "*** Setup complete! ***";
+echo -e "*** Setup complete! ***\n";
+
+echo "**********************************************"
+echo "Open a new Bash terminal, type '#' followed by"
+echo "your natural language command and hit Ctrl+g!"
+echo "**********************************************"
