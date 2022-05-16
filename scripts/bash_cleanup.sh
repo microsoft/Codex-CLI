@@ -14,7 +14,7 @@ uninstall()
         bind -r "\C-g"
     fi
 
-    echo "NL-CLI has been removed."
+    echo "Codex CLI has been removed."
 }
 
 # Detect if the script is sourced

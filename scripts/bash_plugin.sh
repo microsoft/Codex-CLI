@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 #############################################
-## *** NL-CLI plugin function for Bash *** ##
+## *** Codex CLI plugin function for Bash *** ##
 #############################################
 
 create_completion() {
@@ -9,11 +9,11 @@ create_completion() {
     local SETTINGS="$NL_CLI_PATH/src/openaiapirc"
     local SIZE=$(wc -c $SETTINGS | awk '{print $1}')
     if [ ! -f "$SETTINGS" ]; then
-        echo "OpenAI NL-CLI configuration is missing. Try reinstalling NL CLI."
+        echo "Codex CLI configuration is missing, try reinstalling."
         return
     fi
     if (( $SIZE < 10 )); then
-        echo "OpenAI NL-CLI configuration is missing. Try reinstalling NL CLI."
+        echo "Codex CLI configuration is missing, try reinstalling."
         return
     fi
     # Get the text typed until now

@@ -6,7 +6,7 @@ trap 'exitScript' ERR
 help()
 {
     cat <<- _EOF_
-Help for NL-CLI Bash setup script
+Help for Codex CLI Bash setup script
 
 Usage: source bash_setup.sh [optional parameters]
 
@@ -16,8 +16,8 @@ Usage: source bash_setup.sh [optional parameters]
     -d           Print some system information for debugging.
     -h           Print this help content.
 
-To uninstall NL-CLI use bash_cleanup.sh.
-For more information visit https://github.com/microsoft/NL-CLI
+To uninstall Codex CLI use bash_cleanup.sh.
+For more information visit https://github.com/microsoft/Codex-CLI
 _EOF_
 }
 
@@ -43,7 +43,7 @@ readParameters()
 # Prompt user for OpenAI settings
 askSettings()
 {
-    echo "*** Starting NL-CLI bash setup ***"
+    echo "*** Starting Codex CLI bash setup ***"
     if [ -z "$ORG_ID" ]; then
         echo -n 'OpenAI Organization Id: '; read ORG_ID
     fi
@@ -118,7 +118,7 @@ enableApp()
     if grep -Fq ".openairc" $HOME/.bashrc; then 
         return 0
     fi
-    echo -e "\n# Initialize OpenAI NL-CLI" >> $HOME/.bashrc
+    echo -e "\n# Initialize Codex CLI" >> $HOME/.bashrc
     echo 'if [ -f "$HOME/.openairc" ]; then' >> $HOME/.bashrc
     echo '    . "$HOME/.openairc"' >> $HOME/.bashrc
     echo 'fi' >> $HOME/.bashrc
