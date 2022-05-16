@@ -1,25 +1,25 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-#############################################
-## *** NL-CLI Cleanup Script for Bash *** ##
-#############################################
+uninstall()
+{
+    # Remove the script sourced by .bashrc
+    rm -f $HOME/.openairc
 
-## *** Remove the openaiapirc file *** ##
-rm -f $NL_CLI_PATH/src/openaiapirc
+    # Remove credentials and other personal settings
+    local BASH_NL_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd .. && pwd )/"
+    echo -n > $BASH_NL_PATH/src/openaiapirc
 
-## *** Remove the env variables ***##
-unset NL_CLI_PATH
-unset BASH_NL_PATH
-unset ORG_ID
-unset ENGINE_ID
-unset SECRET_KEY
+    # Remove key binding (works only for sourced script calls)
+    if [ $SOURCED -eq 1 ]; then
+        bind -r "\C-g"
+    fi
 
+    echo "NL-CLI has been removed."
+}
 
-## *** Restore the original user bashrc file *** ##
-## *** Verify backup bashrc exists BEFORE removing and replacing bashrc ***##
-bkupBash=$HOME/.bashrc__
-currBash=$HOME/.bashrc
-if [ -f "$bkupBash" ]; then
-    rm -f $currBash
-    mv $bkupBash $currBash
-fi
+# Detect if the script is sourced
+(return 0 2>/dev/null) && SOURCED=1 || SOURCED=0
+
+uninstall
+
+unset SOURCED
