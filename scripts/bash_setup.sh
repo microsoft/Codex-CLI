@@ -86,8 +86,7 @@ validateSettings()
 configureApp()
 { 
     echo "*** Configuring application [$OPENAI_RC_FILE] ***"
-    echo -n > $OPENAI_RC_FILE
-    echo '[openai]' >> $OPENAI_RC_FILE
+    echo '[openai]' > $OPENAI_RC_FILE
     echo "organization_id=$ORG_ID" >> $OPENAI_RC_FILE
     echo "secret_key=$SECRET_KEY" >> $OPENAI_RC_FILE
     echo "engine=$ENGINE_ID" >> $OPENAI_RC_FILE
@@ -150,7 +149,7 @@ systemInfo()
 # Remove variables and functions from the environment, in case the script was sourced
 cleanupEnv()
 {
-    unset ORG_ID SECRET_KEY ENGINE_ID SOURCED CODEX_CLI_PATH OPENAI_RC_FILE BASH_RC_FILE
+    unset ORG_ID SECRET_KEY ENGINE_ID SOURCED OPENAI_RC_FILE BASH_RC_FILE
     unset -f askSettings validateSettings configureApp configureBash enableApp readParameters
 }
 

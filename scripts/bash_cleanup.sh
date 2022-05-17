@@ -11,7 +11,7 @@ uninstall()
     # Remove the plugin loaded by .bashrc
     rm -f $BASH_RC_FILE
     # Remove credentials and other personal settings
-    echo -n > $OPENAI_RC_FILE
+    rm -f $OPENAI_RC_FILE
     # Remove key binding (works only for sourced script calls)
     if [ $SOURCED -eq 1 ]; then
         bind -r "\C-g"
