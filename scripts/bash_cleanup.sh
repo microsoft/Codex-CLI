@@ -2,13 +2,16 @@
 
 uninstall()
 {
-    # Remove the script sourced by .bashrc
-    rm -f $HOME/.openairc
-
+    # Path to Codex CLI source
+    local CODEX_CLI_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd .. && pwd )"
+    # Path to OpenAI API settings
+    local OPENAI_RC_FILE="$CODEX_CLI_PATH/src/openaiapirc"
+    # Path to Bash settings loaded when a Bash session starts
+    local BASH_RC_FILE="$HOME/.codexclirc"
+    # Remove the plugin loaded by .bashrc
+    rm -f $BASH_RC_FILE
     # Remove credentials and other personal settings
-    local BASH_NL_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd .. && pwd )/"
-    echo -n > $BASH_NL_PATH/src/openaiapirc
-
+    echo -n > $OPENAI_RC_FILE
     # Remove key binding (works only for sourced script calls)
     if [ $SOURCED -eq 1 ]; then
         bind -r "\C-g"

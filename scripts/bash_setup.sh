@@ -84,43 +84,41 @@ validateSettings()
 
 # Store API key and other settings in `openaiapirc`
 configureApp()
-{
-    local BASH_NL_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd .. && pwd )/"
-    echo "*** Configuring application [$BASH_NL_PATH/src/openaiapirc] ***"
-    chmod +x "$BASH_NL_PATH/src/codex_query.py"
-    echo -n > $BASH_NL_PATH/src/openaiapirc
-    echo '[openai]' >> $BASH_NL_PATH/src/openaiapirc
-    echo "organization_id=$ORG_ID" >> $BASH_NL_PATH/src/openaiapirc
-    echo "secret_key=$SECRET_KEY" >> $BASH_NL_PATH/src/openaiapirc
-    echo "engine=$ENGINE_ID" >> $BASH_NL_PATH/src/openaiapirc
+{ 
+    echo "*** Configuring application [$OPENAI_RC_FILE] ***"
+    echo -n > $OPENAI_RC_FILE
+    echo '[openai]' >> $OPENAI_RC_FILE
+    echo "organization_id=$ORG_ID" >> $OPENAI_RC_FILE
+    echo "secret_key=$SECRET_KEY" >> $OPENAI_RC_FILE
+    echo "engine=$ENGINE_ID" >> $OPENAI_RC_FILE
+    chmod +x "$CODEX_CLI_PATH/src/codex_query.py"
 }
 
-# Create and load ~/.openairc to setup bash CTRL-g binding
+# Create and load ~/.codexclirc to setup bash CTRL-g binding
 configureBash()
 {
-    echo "*** Configuring bash [$HOME/.openairc] ***"
-    local BASH_NL_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd .. && pwd )/"
-    echo -n > $HOME/.openairc
-    echo "export NL_CLI_PATH=\"${BASH_NL_PATH}\"" >> $HOME/.openairc
-    echo 'source "$NL_CLI_PATH/scripts/bash_plugin.sh"' >> $HOME/.openairc
-    echo "bind -x '\"\C-g\":\"create_completion\"'" >> $HOME/.openairc
+    echo "*** Configuring bash [$BASH_RC_FILE] ***"
+    echo -n > $HOME/.codexclirc
+    echo "export CODEX_CLI_PATH=\"${CODEX_CLI_PATH}\"" >> $BASH_RC_FILE
+    echo 'source "$CODEX_CLI_PATH/scripts/bash_plugin.sh"' >> $BASH_RC_FILE
+    echo "bind -x '\"\C-g\":\"create_completion\"'" >> $BASH_RC_FILE
     if [ $SOURCED -eq 1 ]; then
-        echo "*** Testing bash settings [$HOME/.openairc] ***"
-        source "$HOME/.openairc"
+        echo "*** Testing bash settings [$BASH_RC_FILE] ***"
+        source "$BASH_RC_FILE"
     fi
 }
 
-# Add call to .openairc into .bashrc
+# Add call to .codexclirc into .bashrc
 enableApp()
 {
     echo "*** Activating application [$HOME/.bashrc] ***"
     # Check if already installed
-    if grep -Fq ".openairc" $HOME/.bashrc; then 
+    if grep -Fq ".codexclirc" $HOME/.bashrc; then
         return 0
     fi
     echo -e "\n# Initialize Codex CLI" >> $HOME/.bashrc
-    echo 'if [ -f "$HOME/.openairc" ]; then' >> $HOME/.bashrc
-    echo '    . "$HOME/.openairc"' >> $HOME/.bashrc
+    echo 'if [ -f "$HOME/.codexclirc" ]; then' >> $HOME/.bashrc
+    echo '    . "$HOME/.codexclirc"' >> $HOME/.bashrc
     echo 'fi' >> $HOME/.bashrc
 }
 
@@ -152,7 +150,7 @@ systemInfo()
 # Remove variables and functions from the environment, in case the script was sourced
 cleanupEnv()
 {
-    unset ORG_ID SECRET_KEY ENGINE_ID SOURCED
+    unset ORG_ID SECRET_KEY ENGINE_ID SOURCED CODEX_CLI_PATH OPENAI_RC_FILE BASH_RC_FILE
     unset -f askSettings validateSettings configureApp configureBash enableApp readParameters
 }
 
@@ -166,6 +164,14 @@ exitScript()
 # Detect if the script is sourced
 (return 0 2>/dev/null) && SOURCED=1 || SOURCED=0
 
+# Path to Codex CLI source
+CODEX_CLI_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd .. && pwd )"
+# Path to OpenAI API settings
+OPENAI_RC_FILE="$CODEX_CLI_PATH/src/openaiapirc"
+# Path to Bash settings loaded when a Bash session starts
+BASH_RC_FILE="$HOME/.codexclirc"
+
+# Start installation
 readParameters $*
 askSettings
 validateSettings
