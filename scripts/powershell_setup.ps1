@@ -1,5 +1,5 @@
 ### 
-# PowerShell script to setup NL-CLI for PowerShell
+# PowerShell script to setup Codex CLI for PowerShell
 ###
 param
 (
@@ -7,7 +7,7 @@ param
     [System.IO.FileInfo]
     [ValidateScript( {
             if (-Not ($_ | Test-Path) ) {
-                throw "Folder does not exist. Did you clone the NL-CLI repo?" 
+                throw "Folder does not exist. Did you clone the Codex CLI repo?" 
             }
             return $true
         })]
@@ -71,7 +71,7 @@ if (!(Test-Path -Path $PROFILE)) {
     New-Item -Type File -Path $PROFILE -Force 
 } else {
     # Clean up the content before append new one. This allow users to setup multiple times without running cleanup script
-    (Get-Content -Path $PROFILE -Raw) -replace "(?ms)### NL-CLI setup - start.*?### NL-CLI setup - end", "" | Set-Content -Path $PROFILE
+    (Get-Content -Path $PROFILE -Raw) -replace "(?ms)### Codex CLI setup - start.*?### Codex CLI setup - end", "" | Set-Content -Path $PROFILE
     Write-Host "Removed previous setup script from $PROFILE."
 }
 
@@ -93,4 +93,4 @@ secret_key=$openAIApiKeyPlainText
 engine=$OpenAIEngineId"
 Write-Host "Updated OpenAI configuration file with secrets."
 
-Write-Host -ForegroundColor Blue "NL-CLI PowerShell (v$PSMajorVersion) setup completed. Please open a new PowerShell session, type in # followed by your natural language command and hit Ctrl+G!"
+Write-Host -ForegroundColor Blue "Codex CLI PowerShell (v$PSMajorVersion) setup completed. Please open a new PowerShell session, type in # followed by your natural language command and hit Ctrl+G!"

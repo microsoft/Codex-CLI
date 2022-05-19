@@ -1,8 +1,8 @@
 ### 
-# PowerShell script to clean up the NL-CLI settings for PowerShell
+# PowerShell script to clean up the Codex CLI settings for PowerShell
 #
 # File/Content to be removed:
-# 1. PowerShell profile (Remove file if the content only has NL-CLI setup; otherwise, wipe the NL-CLI setup content)
+# 1. PowerShell profile (Remove file if the content only has Codex CLI setup; otherwise, wipe the Codex CLI setup content)
 # 2. OpenAI configuration file (openaiapirc)
 ###
 $RepoRoot = (Get-Location)
@@ -21,7 +21,7 @@ function CleanUpProfileContent()
 {
     if (Test-Path -Path $PROFILE) {
         # RegEx match setup code, replace with empty string.
-        (Get-Content -Path $PROFILE -Raw) -replace "(?ms)### NL-CLI setup - start.*?### NL-CLI setup - end", "" | Set-Content -Path $PROFILE
+        (Get-Content -Path $PROFILE -Raw) -replace "(?ms)### Codex CLI setup - start.*?### Codex CLI setup - end", "" | Set-Content -Path $PROFILE
 
         # Delete the file if its content is empty
         if ([String]::IsNullOrWhiteSpace((Get-Content -Path $PROFILE))) {
@@ -34,4 +34,4 @@ function CleanUpProfileContent()
 CleanUpProfileContent
 CleanUpOpenAiConfig
 
-Write-Host -ForegroundColor Blue "NL-CLI PowerShell clean up completed. Please close this PowerShell session."
+Write-Host -ForegroundColor Blue "Codex CLI PowerShell clean up completed. Please close this PowerShell session."

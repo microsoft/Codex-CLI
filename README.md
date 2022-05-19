@@ -1,8 +1,8 @@
-# NL-CLI - Natural Language Command Line Interface
+# Codex CLI - Natural Language Command Line Interface
 
 This project uses [GPT-3 Codex](https://openai.com/blog/openai-codex/) to convert natural language commands into commands in PowerShell, Zshell and Bash. 
 
-![nl_cli GIF](nl_cli.gif)
+![Codex Cli GIF](codex_cli.gif)
 
 
 The Command Line Interface (CLI) was the first major User Interface we used to interact with machines. It's incredibly powerful, you can do almost anything with a CLI, but it requires the user to express their intent extremely precisely. The user needs to _know the language of the computer_. 
@@ -20,7 +20,7 @@ This project took technical inspiration from the [zsh_codex](https://github.com/
 This repository aims to grow the understanding of using Codex in applications by providing an example of implementation and references to support the [Microsoft Build conference in 2022](https://mybuild.microsoft.com/). It is not intended to be a released product. Therefore, this repository is not for discussing OpenAI API or requesting new features.
 
 ## Requirements
-* [Python](https://www.python.org/downloads/)
+* [Python 3](https://www.python.org/downloads/)
     * \[Windows\]: Python is added to PATH.
 * An [OpenAI account](https://openai.com/api/)
     * [OpenAI API Key](https://beta.openai.com/account/api-keys).
@@ -33,13 +33,13 @@ Please follow the installation instructions for PowerShell, bash or zsh from [he
 
 ## Usage
 
-Once configured for your shell of preference, you can use the NL-CLI by writing a comment (starting with `#`) into your shell, and then hitting Ctrl + G. 
+Once configured for your shell of preference, you can use the Codex CLI by writing a comment (starting with `#`) into your shell, and then hitting Ctrl + G. 
 
-The NL-CLI supports two primary modes: single-turn and multi-turn. 
+The Codex CLI supports two primary modes: single-turn and multi-turn. 
 
 By default, multi-turn mode is off. It can be toggled on and off using the `# start multi-turn` and `# stop multi-turn` commands.
 
-If the multi-turn mode is on, the NL-CLI will "remember" past interactions with the model, allowing you to refer back to previous actions and entities. If, for example, you asked the NL-CLI to change your time zone to mountain, and then said "change it back to pacific", the model would have the context from the previous interaction to know that "it" is the user's timezone:
+If the multi-turn mode is on, the Codex CLI will "remember" past interactions with the model, allowing you to refer back to previous actions and entities. If, for example, you asked the Codex CLI to change your time zone to mountain, and then said "change it back to pacific", the model would have the context from the previous interaction to know that "it" is the user's timezone:
 
 ```powershell
 # change my timezone to mountain
@@ -94,7 +94,7 @@ When a user enters a new command (say "what's my IP address"), we simple append 
 
 ## Building your own Contexts
 
-This project comes pre-loaded with contexts for each shell, along with some bonus contexts with other capabilities. Beyond these, you can build your own contexts to coax other behaviors out of the model. For example, if you want the NL-CLI to produce Kubernetes scripts, you can create a new context with examples of commands and the `kubectl` script the model might produce:
+This project comes pre-loaded with contexts for each shell, along with some bonus contexts with other capabilities. Beyond these, you can build your own contexts to coax other behaviors out of the model. For example, if you want the Codex CLI to produce Kubernetes scripts, you can create a new context with examples of commands and the `kubectl` script the model might produce:
 
 ```bash
 # make a K8s cluster IP called my-cs running on 5678:8080
