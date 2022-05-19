@@ -1,4 +1,4 @@
-### NL-CLI setup - start
+### Codex CLI setup - start
 $nl_cli_script = "{{codex_query_path}}"
 
 # this function takes the input from the buffer and passes it to codex_query.py
@@ -19,7 +19,7 @@ function create_completion() {
 
 Set-PSReadLineKeyHandler -Key Ctrl+g `
                          -BriefDescription NLCLI `
-                         -LongDescription "Calls NL-CLI tool on the current buffer" `
+                         -LongDescription "Calls Codex CLI tool on the current buffer" `
                          -ScriptBlock {
     param($key, $arg)
     
@@ -41,4 +41,4 @@ Set-PSReadLineKeyHandler -Key Ctrl+g `
         }
     }
 }
-### NL-CLI setup - end
+### Codex CLI setup - end
