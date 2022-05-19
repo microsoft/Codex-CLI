@@ -1,24 +1,83 @@
 #!/bin/zsh
 #
-# A shell script to setup NL-CLI for zsh
+# A shell script to setup Codex CLI for zsh
 #
 # You can pass the following arguments to the script:
 #   --OpenAIOrganizationId: Required. Your OpenAI organization id.
 #   --OpenAIEngineId: Required. The OpenAI engine id that provides access to a model.
-#   --RepoRoot: Optional. Default to the current folder. The value should be the path of NL-CLI folder.
+#   --RepoRoot: Optional. Default to the current folder. The value should be the path of Codex CLI folder.
 # For example:
-# ./zsh_setup.sh --OpenAIOrganizationId <YOUR_ORG_ID> --OpenAIEngineId <ENGINE_ID> --RepoRoot /Code/NL-CLI
+# ./zsh_setup.sh --OpenAIOrganizationId <YOUR_ORG_ID> --OpenAIEngineId <ENGINE_ID> --RepoRoot /Code/Codex-CLI
 # 
 set -e
 
+# Call OpenAI API with the given settings to verify everythin is in order
+validateSettings()
+{
+    echo -n "*** Testing Open AI access... "
+    local TEST=$(curl -s 'https://api.openai.com/v1/engines' -H "Authorization: Bearer $secret" -H "OpenAI-Organization: $orgId" -w '%{http_code}')
+    local STATUS_CODE=$(echo "$TEST"|tail -n 1)
+    if [ $STATUS_CODE -ne 200 ]; then
+        echo "ERROR [$STATUS_CODE]"
+        echo "Failed to access OpenAI API, result: $STATUS_CODE"
+        echo "Please check your OpenAI API key (https://beta.openai.com/account/api-keys)" 
+        echo "and Organization ID (https://beta.openai.com/account/org-settings)."
+        echo "*************"
+        exitScript
+        return
+    fi
+    local ENGINE_FOUND=$(echo "$TEST"|grep '"id"'|grep "\"$engineId\"")
+    if [ -z "$ENGINE_FOUND" ]; then
+        echo "ERROR"
+        echo "Cannot find OpenAI engine: $engineId" 
+        echo "Please check the OpenAI engine id (https://beta.openai.com/docs/engines/codex-series-private-beta)."
+        echo "*************"
+        exitScript
+        return
+    fi
+    echo "OK ***"
+}
+
+# Append settings and CTRL-g binding in .zshrc
+configureZsh()
+{
+    # Remove previous settings
+    sed -i '' '/### Codex CLI setup - start/,/### Codex CLI setup - end/d' $zshrcPath
+    echo "Removed previous settings in $zshrcPath if present"
+
+    # Update the latest settings
+    echo "### Codex CLI setup - start" >> $zshrcPath
+    echo "export ZSH_CUSTOM=$repoRoot" >> $zshrcPath
+    echo "source \"\$ZSH_CUSTOM/scripts/zsh_plugin.zsh\"" >> $zshrcPath
+    echo "bindkey '^G' create_completion" >> $zshrcPath
+    echo "### Codex CLI setup - end" >> $zshrcPath
+    
+    echo "Added settings in $zshrcPath"
+}
+
+# Store API key and other settings in `openaiapirc`
+configureApp()
+{
+    echo "[openai]" > $openAIConfigPath
+    echo "organization_id=$orgId" >> $openAIConfigPath
+    echo "secret_key=$secret" >> $openAIConfigPath
+    echo "engine=$engineId" >> $openAIConfigPath
+    
+    echo "Updated OpenAI configuration file ($openAIConfigPath) with secrets"
+
+    # Change file mode of codex_query.py to allow execution
+    chmod +x "$repoRoot/src/codex_query.py"
+    echo "Allow execution of $repoRoot/src/codex_query.py"
+}
+
+# Start installation
 # Use zparseopts to parse parameters
 zmodload zsh/zutil
 zparseopts -E -D -- \
-           -OpenAIOrganizationId:=o_orgId \
-           -OpenAIEngineId:=o_engineId \
-           -RepoRoot:=o_repoRoot
+          -OpenAIOrganizationId:=o_orgId \
+          -OpenAIEngineId:=o_engineId \
+          -RepoRoot:=o_repoRoot
 
-echo "${o_orgId[2]}, ${o_engineId[2]}, ${o_repoRoot[2]}"
 
 orgId=""
 if (( ${+o_orgId[2]} )); then
@@ -47,31 +106,17 @@ echo "RepoRoot is $repoRoot"
 # Prompt user for OpenAI access key
 read -rs 'secret?OpenAI access key:'
 
+validateSettings
+
 openAIConfigPath="$repoRoot/src/openaiapirc"
 zshrcPath="$HOME/.zshrc"
 
-# 1. Append settings in .zshrc
-# Remove previous settings
-sed -i '' '/### NL-CLI setup - start/,/### NL-CLI setup - end/d' $zshrcPath
-echo "Removed previous settings in $zshrcPath if present"
+configureZsh
+configureApp
 
-# Update the latest settings
-echo "### NL-CLI setup - start
-export ZSH_CUSTOM=$repoRoot
-source \"\$ZSH_CUSTOM/scripts/nl_cli.plugin.zsh\"
-bindkey '^G' create_completion
-### NL-CLI setup - end" >> $zshrcPath   
-echo "Added settings in $zshrcPath"
+echo -e "*** Setup complete! ***\n";
 
-# 2. Create opanaiapirc in /.config for secrects
-echo "[openai]
-organization_id=$orgId
-secret_key=$secret
-engine=$engineId" > $openAIConfigPath
-echo "Updated OpenAI configuration file ($openAIConfigPath) with secrets"
-
-# Change file mode of codex_query.py to allow execution
-chmod +x "$repoRoot/src/codex_query.py"
-echo "Allow execution of $repoRoot/src/codex_query.py"
-
-echo "zsh setup completed. Please open a new zsh to use NL-CLI."
+echo "**********************************************"
+echo "Open a new zsh terminal, type '#' followed by"
+echo "your natural language command and hit Ctrl+g!"
+echo "**********************************************"
