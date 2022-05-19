@@ -81,6 +81,13 @@ def is_sensitive_content(content):
     if len(content) == 0:
         return False
     
+    # check if the content contains any words from the filter.txt file
+    with open(os.path.join(os.path.dirname(__file__), "filter.txt"), "r") as f:
+        filter_list = f.read().splitlines()
+        for word in filter_list:
+            if word in content:
+                return True
+    
     response = openai.Completion.create(
         engine="content-filter-alpha",
         prompt = "<|endoftext|>"+content+"\n--\nLabel:",
