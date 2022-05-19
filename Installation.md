@@ -13,8 +13,7 @@ The following terminal environments are supported:
 In order to run the NL-CLI, ensure that you have python installed. To install the required python packages, please go to the command line in the shell of your choice and enter the following commands: 
 
 ```
-python -m pip install openai
-python -m pip install psutil
+python -m pip install -r requirements.txt
 ```
 
 Additionally, the OpenAI API key, organization id, and engine id are required to execute the NL-CLI tool. 
