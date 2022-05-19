@@ -1,6 +1,6 @@
-# NL-CLI Installation
+# Codex CLI Installation
 
-In order to leverage the NL-CLI tool, you will need to prepare your environment for the shell of your choice. Installation instructions are shown below for each supported shell environment. 
+In order to leverage the Codex CLI tool, you will need to prepare your environment for the shell of your choice. Installation instructions are shown below for each supported shell environment. 
 
 The following terminal environments are supported:  
 
@@ -10,14 +10,14 @@ The following terminal environments are supported:
 
 ## Prerequisites
 
-In order to run the NL-CLI, ensure that you have python installed. To install the required python packages, please go to the command line in the shell of your choice and enter the following commands: 
+In order to run the Codex CLI, ensure that you have python installed. To install the required python packages, please go to the command line in the shell of your choice and enter the following commands: 
 
 ```
 python -m pip install openai
 python -m pip install psutil
 ```
 
-Additionally, the OpenAI API key, organization id, and engine id are required to execute the NL-CLI tool. 
+Additionally, the OpenAI API key, organization id, and engine id are required to execute the Codex CLI tool. 
 
 To obtain the OpenAI API key information, go to (https://beta.openai.com/account/api-keys) and login into your account. 
 
@@ -38,21 +38,21 @@ See image below for reference:
 
 ## Bash instructions
 
-To leverage the NL-CLI on WSL and Linux environments using Bash please follow the steps below: 
+To leverage the Codex CLI on WSL and Linux environments using Bash please follow the steps below: 
 
-1. Open Bash shell and download the NL-CLI project to your desired location in Linux by cloning the NL-CLI repo using the following command: 
+1. Open Bash shell and download the Codex CLI project to your desired location in Linux by cloning the Codex CLI repo using the following command: 
     ```
-    $ git clone https://github.com/microsoft/NL-CLI.git /your/custom/path/
-    ```
-
-2. Once you have the project cloned. Go to the directory that contains the NL-CLI code.
-    ```
-	cd </your/custom/path>/NL-CLI
+    $ git clone https://github.com/microsoft/Codex-CLI.git /your/custom/path/
     ```
 
-3. Setup your Bash NL-CLI environment.
+2. Once you have the project cloned. Go to the directory that contains the Codex CLI code.
+    ```
+	cd </your/custom/path>/Codex-CLI
+    ```
 
-	In the NL-CLI folder, there is a folder named `scripts` where you will find a `bash_setup.sh` script which is used to setup the Bash environment.
+3. Setup your Bash Codex CLI environment.
+
+	In the Codex CLI folder, there is a folder named `scripts` where you will find a `bash_setup.sh` script which is used to setup the Bash environment.
 	
 	Run this setup and enter your OpenAI organization id, OpenAI API key, and the OpenAI engine id required settings.
 
@@ -69,7 +69,7 @@ To leverage the NL-CLI on WSL and Linux environments using Bash please follow th
 
 ### Clean up
 
-Once you have finished using the NL-CLI tool, go to the folder that contains the NL-CLI code. ex `cd ~/your/custom/path/NL-CLI`. Run the following command to clean up the NL-CLI bash environment.
+Once you have finished using the Codex CLI tool, go to the folder that contains the Codex CLI code. ex `cd ~/your/custom/path/Codex-CLI`. Run the following command to clean up the Codex CLI bash environment.
 ```
 source ./scripts/bash_cleanup.sh
 ```
@@ -91,22 +91,22 @@ Example:
 source bash_setup.sh -o myorgid -k myapikey -e someengineid
 ```
 
-For help running the NL-CLI Bash setup, please run the following command:   
+For help running the Codex CLI Bash setup, please run the following command:   
 ```
 source bash_setup.sh -h
 ```
 
-![](images/NL-CLI-bashhelp.png)
+![](images/Codex-CLI-bashhelp.png)
 
 ## Zsh instructions
 
 1. Download this project to `~/your/custom/path/`.
 
 ```
-    $ git clone https://github.com/microsoft/NL-CLI.git ~/your/custom/path/
+    $ git clone https://github.com/microsoft/Codex-CLI.git ~/your/custom/path/
 ```
 
-2. In zsh, go to `~/your/custom/path/` (the folder contains NL-CLI code), then run the following command to setup your zsh environment. It will prompt you for [OpenAI API key]((https://beta.openai.com/account/api-keys)).
+2. In zsh, go to `~/your/custom/path/` (the folder contains Codex CLI code), then run the following command to setup your zsh environment. It will prompt you for [OpenAI API key]((https://beta.openai.com/account/api-keys)).
 
 ```
 ./scripts/zsh_setup.sh --OpenAIOrganizationId <YOUR_ORG_ID> --OpenAIEngineId <ENGINE_ID>
@@ -116,7 +116,7 @@ source bash_setup.sh -h
 3. Run `zsh`, start typing and complete it using `^G`!
 
 ### Clean up
-Once you are done, go to `~/your/custom/path/` (the folder contains NL-CLI code), then run the following command to clean up.
+Once you are done, go to `~/your/custom/path/` (the folder contains Codex CLI code), then run the following command to clean up.
 ```
 ./scripts/zsh_cleanup.sh
 ```
@@ -127,14 +127,14 @@ Once you are done, go to `~/your/custom/path/` (the folder contains NL-CLI code)
 |--|--|
 | `--OpenAIOrganizationId` | Required. Your [OpenAI organization Id](https://beta.openai.com/account/org-settings). |
 |`--OpenAIEngineId` | Required. The [OpenAI engine Id](https://beta.openai.com/docs/engines/codex-series-private-beta) that provides access to a model.|
-| `--RepoRoot` | Optional. Default to the current folder.<br/>The value should be the path of NL-CLI folder. Example:<br/>`./zsh_setup.sh --RepoRoot /Code/NL-CLI`|
+| `--RepoRoot` | Optional. Default to the current folder.<br/>The value should be the path of Codex CLI folder. Example:<br/>`./zsh_setup.sh --RepoRoot /Code/Codex-CLI`|
 
 ## Powershell instructions
 
 1. Download this project to wherever you want `C:\your\custom\path\`.
 
 ```
-    $ git clone https://github.com/microsoft/NL-CLI.git C:\your\custom\path\
+    $ git clone https://github.com/microsoft/Codex-CLI.git C:\your\custom\path\
 ```
 
 2. Open PowerShell as Administrator and run the following command.
@@ -144,7 +144,7 @@ Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
 ```
 
 
-3. In the same Powershell window, go to `C:\your\custom\path\NL-CLI\` (the folder contains NL-CLI code). Copy the following command then replace `YOUR_OPENAI_ORGANIZATION_ID` and `ENGINE_ID` with your OpenAI organization Id and OpenAI engine Id. Run the command to setup your PowerShell environment. It will prompt you for OpenAI access key.
+3. In the same Powershell window, go to `C:\your\custom\path\Codex-CLI\` (the folder contains Codex CLI code). Copy the following command then replace `YOUR_OPENAI_ORGANIZATION_ID` and `ENGINE_ID` with your OpenAI organization Id and OpenAI engine Id. Run the command to setup your PowerShell environment. It will prompt you for OpenAI access key.
 
 ```
 .\scripts\powershell_setup.ps1 -OpenAIOrganizationId "YOUR_OPENAI_ORGANIZATION_ID" -OpenAIEngineId "ENGINE_ID"
@@ -154,7 +154,7 @@ Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
 4. Open a new PowerShell session, type in `#` followed by your natural language command and hit Ctrl + G!
 
 ### Clean up
-Once you are done, go to `C:\your\custom\path\` (the folder contains NL-CLI code), then run the following command to clean up.
+Once you are done, go to `C:\your\custom\path\` (the folder contains Codex CLI code), then run the following command to clean up.
 ```
 .\scripts\powershell_cleanup.ps1
 ```
@@ -171,4 +171,4 @@ Set-ExecutionPolicy Undefined -Scope CurrentUser
 | `-OpenAIApiKey` | [SecureString](https://docs.microsoft.com/en-us/dotnet/api/system.security.securestring) | Required. If is not supplied, the script will prompt you to input the value. You can find this value at [https://beta.openai.com/account/api-keys](https://beta.openai.com/account/api-keys). To provide the value via PowerShell parameter, this is an example for PowerShell 7: <br/> `.\scripts\powershell_setup.ps1 -OpenAIApiKey (ConvertTo-SecureString "YOUR_OPENAI_API_KEY" -AsPlainText -Force)` | 
 | `-OpenAIOrganizationId` | String | Required. Your [OpenAI organization Id](https://beta.openai.com/account/org-settings). |
 | `-OpenAIEngineId` | String | Required. The [OpenAI engine Id](https://beta.openai.com/docs/engines/codex-series-private-beta) that provides access to a model.|
-| `-RepoRoot` | [FileInfo](https://docs.microsoft.com/en-us/dotnet/api/system.io.fileinfo) | Optional. Default to the current folder.<br>The value should be the path of NL-CLI folder. Example:<br/>`.\scripts\powershell_setup.ps1 -RepoRoot 'C:\your\custom\path'`|
+| `-RepoRoot` | [FileInfo](https://docs.microsoft.com/en-us/dotnet/api/system.io.fileinfo) | Optional. Default to the current folder.<br>The value should be the path of Codex CLI folder. Example:<br/>`.\scripts\powershell_setup.ps1 -RepoRoot 'C:\your\custom\path'`|
