@@ -208,7 +208,7 @@ if __name__ == '__main__':
         if is_sensitive_content(user_query + '\n' + completion_all):
             print("\n#   Sensitive content detected, response has been redacted")
         elif completion_all == "" or len(completion_all) == 0:
-            print("\n#   No response from codex, consider retrying with `# default context`")
+            print("\n#   No response from codex, consider retrying after running `# default context`")
         else:
             print(completion_all)
 
