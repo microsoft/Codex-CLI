@@ -12,6 +12,10 @@ function create_completion() {
         return "`nnotepad $profile"
     }
 
+    # loading response
+    [Microsoft.PowerShell.PSConsoleReadLine]::AddLine()
+    [Microsoft.PowerShell.PSConsoleReadLine]::Insert("# ...")
+
     $output = echo -n $buffer | python $nl_cli_script 
     
     return $output

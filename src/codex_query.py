@@ -207,13 +207,14 @@ if __name__ == '__main__':
 
         if is_sensitive_content(user_query + '\n' + completion_all):
             print("\n#   Sensitive content detected, response has been redacted")
+        elif completion_all == "" or len(completion_all) == 0:
+            print("\n#   No response from codex, consider retrying with `# default context`")
         else:
             print(completion_all)
 
             # append output to prompt context file
             if config['multi_turn'] == "on":
-                if completion_all != "" or len(completion_all) > 0:
-                    prompt_file.add_input_output_pair(user_query, completion_all)
+                prompt_file.add_input_output_pair(user_query, completion_all)
         
     except FileNotFoundError:
         print('\n\n# Codex CLI error: Prompt file not found, try again')
