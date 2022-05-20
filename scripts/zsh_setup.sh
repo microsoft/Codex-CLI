@@ -23,8 +23,8 @@ validateSettings()
         echo "Please check your OpenAI API key (https://beta.openai.com/account/api-keys)" 
         echo "and Organization ID (https://beta.openai.com/account/org-settings)."
         echo "*************"
-        exitScript
-        return
+
+        exit 1
     fi
     local ENGINE_FOUND=$(echo "$TEST"|grep '"id"'|grep "\"$engineId\"")
     if [ -z "$ENGINE_FOUND" ]; then
@@ -32,8 +32,8 @@ validateSettings()
         echo "Cannot find OpenAI engine: $engineId" 
         echo "Please check the OpenAI engine id (https://beta.openai.com/docs/engines/codex-series-private-beta)."
         echo "*************"
-        exitScript
-        return
+
+        exit 1
     fi
     echo "OK ***"
 }
@@ -105,6 +105,7 @@ echo "RepoRoot is $repoRoot"
 
 # Prompt user for OpenAI access key
 read -rs 'secret?OpenAI access key:'
+echo -e "\n"
 
 validateSettings
 
