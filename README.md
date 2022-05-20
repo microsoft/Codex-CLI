@@ -67,7 +67,6 @@ Any time the model seems to output consistently incorrect commands, you can use 
 | `save context <filename>` | Saves the context file to `contexts` folder, if name not specified, uses current date-time |
 | `show config` | Shows the current configuration of your interaction with the model |
 | `set <config-key> <config-value>` | Sets the configuration of your interaction with the model |
-| `unlearn` | Unlearns the last two lines of input-output from the model |
 
 
 Feel free to improve your experience by changing the token limit, engine id and temperature using the set command. For example, `# set engine cushman-codex`, `# set temperature 0.5`, `# set max_tokens 50`.

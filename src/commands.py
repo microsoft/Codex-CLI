@@ -8,8 +8,6 @@ def get_command_result(input, prompt_file):
     """
     Checks if the input is a command and if so, executes it
     Currently supported commands:
-    - unlearn
-    - unlearn all
     - start multi-turn
     - stop multi-turn
     - default context
@@ -73,18 +71,6 @@ def get_command_result(input, prompt_file):
     if input.__contains__("show config"):
         prompt_file.show_config()
         return "config shown", prompt_file
-
-    # interaction deletion commands
-    if input.__contains__("unlearn"):
-        if input.__contains__("all"):
-            prompt_file.default_context()
-            return "unlearned interaction", prompt_file
-        else:
-            if config['multi_turn'] == "on":
-                prompt_file.clear_last_interaction()
-            else:
-                print("# Multi-turn mode is off - cannot unlearn interaction, consider default context command")
-        return "unlearned interaction", prompt_file
 
     # multi turn/single turn commands
     if input.__contains__("multi-turn"):
