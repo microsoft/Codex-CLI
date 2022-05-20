@@ -28,10 +28,15 @@ Set-PSReadLineKeyHandler -Key Ctrl+g `
 
     [Microsoft.PowerShell.PSConsoleReadLine]::GetBufferState([ref]$line, [ref]$cursor)
 
+    # move to the beginning of the line and insert '#'
+    [Microsoft.PowerShell.PSConsoleReadLine]::BeginningOfLine()
+    [Microsoft.PowerShell.PSConsoleReadLine]::Insert("# ")
+    
     # get response from create_completion function
     $output = create_completion($line)
     
-    # check if output is not null
+    # insert responses after end of line if available
+    [Microsoft.PowerShell.PSConsoleReadLine]::EndOfLine()
     if ($output -ne $null) {
         foreach ($str in $output) {
             if ($str -ne $null -and $str -ne "") {

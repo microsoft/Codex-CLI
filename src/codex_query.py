@@ -143,6 +143,11 @@ def get_query(prompt_file):
         entry = input("prompt: ") + '\n'
     else:
         entry = sys.stdin.read()
+    
+    # check if entry starts with # otherwise add it to entry
+    if entry.startswith('#') == False:
+        entry = "# " + entry
+    
     # first we check if the input is a command
     command_result, prompt_file = get_command_result(entry, prompt_file)
 
