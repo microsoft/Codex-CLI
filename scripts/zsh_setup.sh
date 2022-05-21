@@ -47,8 +47,8 @@ configureZsh()
 
     # Update the latest settings
     echo "### Codex CLI setup - start" >> $zshrcPath
-    echo "export ZSH_CUSTOM=$repoRoot" >> $zshrcPath
-    echo "source \"\$ZSH_CUSTOM/scripts/zsh_plugin.zsh\"" >> $zshrcPath
+    echo "export CODEX_CLI_PATH=$CODEX_CLI_PATH" >> $zshrcPath
+    echo "source \"\$CODEX_CLI_PATH/scripts/zsh_plugin.zsh\"" >> $zshrcPath
     echo "bindkey '^G' create_completion" >> $zshrcPath
     echo "### Codex CLI setup - end" >> $zshrcPath
     
@@ -66,8 +66,8 @@ configureApp()
     echo "Updated OpenAI configuration file ($openAIConfigPath) with secrets"
 
     # Change file mode of codex_query.py to allow execution
-    chmod +x "$repoRoot/src/codex_query.py"
-    echo "Allow execution of $repoRoot/src/codex_query.py"
+    chmod +x "$CODEX_CLI_PATH/src/codex_query.py"
+    echo "Allow execution of $CODEX_CLI_PATH/src/codex_query.py"
 }
 
 # Start installation
@@ -95,13 +95,13 @@ else
     exit 1
 fi
 
-repoRoot=""
+CODEX_CLI_PATH=""
 if (( ${+o_repoRoot[2]} )); then
-    repoRoot=${o_repoRoot[2]}
+    CODEX_CLI_PATH=${o_repoRoot[2]}
 else
-    repoRoot=$PWD
+    CODEX_CLI_PATH=$PWD
 fi
-echo "RepoRoot is $repoRoot"
+echo "CODEX_CLI_PATH is $CODEX_CLI_PATH"
 
 # Prompt user for OpenAI access key
 read -rs 'secret?OpenAI access key:'
@@ -109,7 +109,7 @@ echo -e "\n"
 
 validateSettings
 
-openAIConfigPath="$repoRoot/src/openaiapirc"
+openAIConfigPath="$CODEX_CLI_PATH/src/openaiapirc"
 zshrcPath="$HOME/.zshrc"
 
 configureZsh
