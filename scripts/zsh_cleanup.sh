@@ -4,7 +4,8 @@
 # 
 set -e
 
-openAIConfigPath="$PWD/src/openaiapirc"
+CODEX_CLI_PATH="$( cd "$( dirname "$0" )" && cd .. && pwd )"
+openAIConfigPath="$CODEX_CLI_PATH/src/openaiapirc"
 zshrcPath="$HOME/.zshrc"
 
 # 1. Remove settings in .zshrc

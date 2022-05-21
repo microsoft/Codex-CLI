@@ -3,11 +3,10 @@
 # A shell script to setup Codex CLI for zsh
 #
 # You can pass the following arguments to the script:
-#   --OpenAIOrganizationId: Required. Your OpenAI organization id.
-#   --OpenAIEngineId: Required. The OpenAI engine id that provides access to a model.
-#   --RepoRoot: Optional. Default to the current folder. The value should be the path of Codex CLI folder.
+#   -o: Required. Your OpenAI organization id.
+#   -e: Required. The OpenAI engine id that provides access to a model.
 # For example:
-# ./zsh_setup.sh --OpenAIOrganizationId <YOUR_ORG_ID> --OpenAIEngineId <ENGINE_ID> --RepoRoot /Code/Codex-CLI
+# ./zsh_setup.sh -o <YOUR_ORG_ID> -e <ENGINE_ID>
 # 
 set -e
 
@@ -74,38 +73,33 @@ configureApp()
 # Use zparseopts to parse parameters
 zmodload zsh/zutil
 zparseopts -E -D -- \
-          -OpenAIOrganizationId:=o_orgId \
-          -OpenAIEngineId:=o_engineId \
-          -RepoRoot:=o_repoRoot
+          o:=o_orgId \
+          e:=o_engineId \
+          k:=o_key
 
-
-orgId=""
 if (( ${+o_orgId[2]} )); then
     orgId=${o_orgId[2]}
 else
-    echo "Error: --OpenAIOrganizationId is required."
-    exit 1
+    echo -n 'OpenAI Organization Id: '; read orgId
 fi
 
-engineId=""
 if (( ${+o_engineId[2]} )); then
     engineId=${o_engineId[2]}
 else
-    echo "Error: --OpenAIEngineId is required."
-    exit 1
+    echo -n 'OpenAI Engine Id: '; read engineId
 fi
 
-CODEX_CLI_PATH=""
-if (( ${+o_repoRoot[2]} )); then
-    CODEX_CLI_PATH=${o_repoRoot[2]}
+if (( ${+o_key[2]} )); then
+    secret=${o_key[2]}
 else
-    CODEX_CLI_PATH=$PWD
+   # Prompt user for OpenAI access key
+   read -rs 'secret?OpenAI access key:'
+   echo -e "\n"
 fi
-echo "CODEX_CLI_PATH is $CODEX_CLI_PATH"
 
-# Prompt user for OpenAI access key
-read -rs 'secret?OpenAI access key:'
-echo -e "\n"
+# Detect Codex CLI folder path
+CODEX_CLI_PATH="$( cd "$( dirname "$0" )" && cd .. && pwd )"
+echo "CODEX_CLI_PATH is $CODEX_CLI_PATH"
 
 validateSettings
 

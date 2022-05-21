@@ -52,8 +52,6 @@ To leverage the Codex CLI on WSL and Linux environments using Bash please follow
 3. Setup your Bash Codex CLI environment.
 
 	In the Codex CLI folder, there is a folder named `scripts` where you will find a `bash_setup.sh` script which is used to setup the Bash environment.
-	
-	Run this setup and enter your OpenAI organization id, OpenAI API key, and the OpenAI engine id required settings.
 
 	Run the following commands to setup your environment, the script will prompt
 	for Organization id, API key and engine id:
@@ -105,10 +103,10 @@ source bash_setup.sh -h
     $ git clone https://github.com/microsoft/Codex-CLI.git ~/your/custom/path/
 ```
 
-2. In zsh, go to `~/your/custom/path/` (the folder contains Codex CLI code), then run the following command to setup your zsh environment. It will prompt you for [OpenAI API key]((https://beta.openai.com/account/api-keys)).
+2. In zsh, go to `~/your/custom/path/` (the folder contains Codex CLI code), then run the following command to setup your zsh environment. The script will prompt for Organization id, API key and engine id:
 
 ```
-./scripts/zsh_setup.sh --OpenAIOrganizationId <YOUR_ORG_ID> --OpenAIEngineId <ENGINE_ID>
+./scripts/zsh_setup.sh
 ```
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;See [About zsh_setup.sh](#about-zshsetupsh) section to learn script parameters.
 
@@ -122,11 +120,12 @@ Once you are done, go to `~/your/custom/path/` (the folder contains Codex CLI co
 
 ### About zsh_setup.sh
 `zsh_setup.sh` supports the following parameters:
-| Parameter | Description |
-|--|--|
-| `--OpenAIOrganizationId` | Required. Your [OpenAI organization Id](https://beta.openai.com/account/org-settings). |
-|`--OpenAIEngineId` | Required. The [OpenAI engine Id](https://beta.openai.com/docs/engines/codex-series-private-beta) that provides access to a model.|
-| `--RepoRoot` | Optional. Default to the current folder.<br/>The value should be the path of Codex CLI folder. Example:<br/>`./zsh_setup.sh --RepoRoot /Code/Codex-CLI`|
+| Parameter    | Description |
+|--------------|-------------|
+| `-o <value>` | To pass your [OpenAI Organization Id](https://beta.openai.com/account/org-settings) |
+| `-k <value>` | To pass your [OpenAI API key](https://beta.openai.com/account/api-keys) |
+| `-e <value>` | To specify the [OpenAI Engine Id](https://beta.openai.com/docs/engines/codex-series-private-beta) |
+
 
 ## Powershell instructions
 
