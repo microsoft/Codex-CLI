@@ -3,9 +3,9 @@
 # A shell script to setup Codex CLI for zsh
 #
 # You can pass the following arguments to the script:
-#   -o: Required. Your OpenAI organization id.
-#   -k: Required. Your OpenAI API key.
-#   -e: Required. The OpenAI engine id that provides access to a model.
+#   -o: Your OpenAI organization id.
+#   -k: Your OpenAI API key.
+#   -e: The OpenAI engine id that provides access to a model.
 #
 # For example:
 # ./zsh_setup.sh -o <YOUR_ORG_ID> -k <YOUR_API_KEY> -e <ENGINE_ID>
