@@ -139,4 +139,4 @@ You might have access to different [OpenAI engines](https://beta.openai.com/docs
     ```
 
 ### Can I run the sample on Azure?
-The sample code can be currently be used with Codex on OpenAI’s API. In the coming months, the sample will be updated to be used with the [Azure OpenAI Service](https://aka.ms/azure-openai). 
+The sample code can be currently be used with Codex on OpenAI’s API. In the coming months, the sample will be updated so you can also use it with the [Azure OpenAI Service](https://aka.ms/azure-openai). 
