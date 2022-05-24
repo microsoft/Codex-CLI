@@ -7,8 +7,7 @@ This project uses [GPT-3 Codex](https://openai.com/blog/openai-codex/) to conver
 
 The Command Line Interface (CLI) was the first major User Interface we used to interact with machines. It's incredibly powerful, you can do almost anything with a CLI, but it requires the user to express their intent extremely precisely. The user needs to _know the language of the computer_. 
 
-With the advent of Large Language Models (LLMs), particularly those that have been trained on code, it's now possible to interact with a CLI using Natural Language (NL). In effect, these models understand natural language _and_ code well enough that they can translate from one to another. 
-
+With the advent of Large Language Models (LLMs), particularly those that have been trained on code, it's possible to interact with a CLI using Natural Language (NL). In effect, these models understand natural language _and_ code well enough that they can translate from one to another. 
 
 This project aims to offer a cross-shell NL->Code experience to allow users to interact with their favorite CLI using NL. The user enters a command, like "what's my IP address", hits Ctrl + G and gets a suggestion for a command idiomatic to the shell they're using. The project uses the GPT-3 Codex model off-the-shelf, meaning the model has not been explicitly trained for the task. Instead we rely on a discipline called prompt engineering (see [section](#prompt-engineering-and-context-files) below) to coax the right commands from Codex. 
 
