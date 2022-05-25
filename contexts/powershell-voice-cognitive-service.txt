@@ -16,7 +16,7 @@ spx synthesize --text ("I stopped chrome") --speakers --quiet
 # make a readme with a project header and two sections
 "# Project Header
 ## Section 1
-## Section 2" | Out-File "./readme2.md"
+## Section 2" | Out-File "./readme.md"
 spx synthesize --text ("I created your readme!") --speakers --quiet
 
 # what's running on port 3000?
@@ -56,9 +56,6 @@ spx synthesize --text ("Why do programmers always mix up Halloween and Christmas
 
 # tell me a joke
 spx synthesize --text ("The best method for accelerating a computer is the one that boosts it by 9.8 m/s^2") --speakers --quiet
-
-# how many GB is 367247884288 B?
-spx synthesize --text ("367247884288 B is 1GB") --speakers --quiet
 
 # what's the meaning of life?
 spx synthesize --text ("The meaning of life is 42") --speakers --quiet
