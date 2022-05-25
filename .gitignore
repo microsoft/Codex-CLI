@@ -2,7 +2,4 @@ current_context.txt
 current_context.config
 contexts/test.txt
 src/__pycache__/
-key
-log-*
-region
 src/openaiapirc

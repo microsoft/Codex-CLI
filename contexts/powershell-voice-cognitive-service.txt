@@ -5,8 +5,6 @@
 ## multi_turn: on
 ## token_count: 110
 
-## The following is a conversational command line assistant that understands your language and PowerShell! It can answer with chit chat, or write and execute code!
-
 # what processes are hogging the most cpu?
 Get-Process | Sort-Object -Property CPU -Descending | Select-Object -First 10
 spx synthesize --text ("Here are the top 10 processes by memory used") --speakers --quiet
