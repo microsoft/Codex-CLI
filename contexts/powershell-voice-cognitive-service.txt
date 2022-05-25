@@ -1,4 +1,4 @@
-## engine: davinci-codex-002-msft
+## engine: code-cushman-001
 ## temperature: 0
 ## max_tokens: 300
 ## shell: powershell

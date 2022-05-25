@@ -1,8 +1,11 @@
 import os
 import time
+import configparser
 
 from pathlib import Path
 
+
+API_KEYS_LOCATION = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'openaiapirc')
 
 class PromptFile:
     context_source_filename = ""
@@ -215,7 +218,6 @@ class PromptFile:
     def load_context(self, filename, initialize=False):
         """
         Loads a context file into current_context
-
         """
         if not filename.endswith('.txt'):
             filename = filename + '.txt'
@@ -226,8 +228,13 @@ class PromptFile:
             with filepath.open('r') as f:
                 lines = f.readlines()
             
+            # read in the engine name from openaiapirc
+            config = configparser.ConfigParser()
+            config.read(API_KEYS_LOCATION)
+            ENGINE = config['openai']['engine'].strip('"').strip("'")
+
             config = {
-                'engine': lines[0].split(':')[1].strip(),
+                'engine': ENGINE,
                 'temperature': float(lines[1].split(':')[1].strip()),
                 'max_tokens': int(lines[2].split(':')[1].strip()),
                 'shell': lines[3].split(':')[1].strip(),

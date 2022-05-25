@@ -33,7 +33,7 @@ For Powershell:
 
 ### Load the example speech context file
 
-Load the example Cognitive Services speech context file using  ` # load context powershell-voice-cognitive-service.txt ` and then hit Ctrl + G to let the NL-CLI load the file
+Load the example Cognitive Services speech context file using  ` # load context powershell-voice-cognitive-service.txt ` and then hit Ctrl + G to let the Codex CLI load the file
 
 And that's it! To get started with an example, go ahead and type `# whats the meaning of life`.
 You can develop your own context with more speech functions as mentioned in the previous section. 
