@@ -15,3 +15,5 @@ create_completion() {
 
 # Bind the create_completion function to a key.
 zle -N create_completion
+
+setopt interactivecomments
