@@ -7,8 +7,7 @@ This project uses [GPT-3 Codex](https://openai.com/blog/openai-codex/) to conver
 
 The Command Line Interface (CLI) was the first major User Interface we used to interact with machines. It's incredibly powerful, you can do almost anything with a CLI, but it requires the user to express their intent extremely precisely. The user needs to _know the language of the computer_. 
 
-With the advent of Large Language Models (LLMs), particularly those that have been trained on code, it's now possible to interact with a CLI using Natural Language (NL). In effect, these models understand natural language _and_ code well enough that they can translate from one to another. 
-
+With the advent of Large Language Models (LLMs), particularly those that have been trained on code, it's possible to interact with a CLI using Natural Language (NL). In effect, these models understand natural language _and_ code well enough that they can translate from one to another. 
 
 This project aims to offer a cross-shell NL->Code experience to allow users to interact with their favorite CLI using NL. The user enters a command, like "what's my IP address", hits Ctrl + G and gets a suggestion for a command idiomatic to the shell they're using. The project uses the GPT-3 Codex model off-the-shelf, meaning the model has not been explicitly trained for the task. Instead we rely on a discipline called prompt engineering (see [section](#prompt-engineering-and-context-files) below) to coax the right commands from Codex. 
 
@@ -67,7 +66,6 @@ Any time the model seems to output consistently incorrect commands, you can use 
 | `save context <filename>` | Saves the context file to `contexts` folder, if name not specified, uses current date-time |
 | `show config` | Shows the current configuration of your interaction with the model |
 | `set <config-key> <config-value>` | Sets the configuration of your interaction with the model |
-| `unlearn` | Unlearns the last two lines of input-output from the model |
 
 
 Feel free to improve your experience by changing the token limit, engine id and temperature using the set command. For example, `# set engine cushman-codex`, `# set temperature 0.5`, `# set max_tokens 50`.
@@ -138,3 +136,6 @@ You might have access to different [OpenAI engines](https://beta.openai.com/docs
     ```powershell
     (Invoke-WebRequest -Uri https://api.openai.com/v1/engines -Authentication Bearer -Token (ConvertTo-SecureString "YOUR_API_KEY" -AsPlainText -Force) -Headers @{"OpenAI-Organization" = "YOUR_ORG_ID"}).Content
     ```
+
+### Can I run the sample on Azure?
+The sample code can be currently be used with Codex on OpenAI’s API. In the coming months, the sample will be updated so you can also use it with the [Azure OpenAI Service](https://aka.ms/azure-openai). 
