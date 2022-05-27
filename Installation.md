@@ -4,9 +4,12 @@ In order to leverage the Codex CLI tool, you will need to prepare your environme
 
 The following terminal environments are supported:  
 
-* Windows:    [Powershell](#powershell-instructions)
-* Linux/WSL:  [Bash](#bash-instructions) 
-* Mac OS:     [Zsh](#zsh-instructions) (or [Bash 5.1](#bash-instructions))
+* [Powershell](#powershell-instructions)
+* [Bash](#bash-instructions) 
+* [Zsh](#zsh-instructions) (or [Bash 5.1](#bash-instructions))
+
+Learn to install PowerShell on Linux/MacOS
+[here](https://docs.microsoft.com/powershell/scripting/install/installing-powershell).
 
 ## Prerequisites
 
@@ -129,30 +132,33 @@ Once you are done, go to `~/your/custom/path/` (the folder contains Codex CLI co
 
 ## Powershell instructions
 
-1. Download this project to wherever you want `C:\your\custom\path\`.
+1. Download this project to wherever you want. For example, `C:\your\custom\path\` or `~/your/custom/path`.
 
-```
-    $ git clone https://github.com/microsoft/Codex-CLI.git C:\your\custom\path\
+```PowerShell
+git clone https://github.com/microsoft/Codex-CLI.git C:\your\custom\path\
 ```
 
-2. Open PowerShell as Administrator and run the following command.
+2. Open PowerShell and run the following command. If running in Windows, start PowerShell "as an Administrator".
 
-```
+```PowerShell
 Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
 ```
 
+For more information about Execution Policies, see
+[about_Execution_Policies](https://docs.microsoft.com/powershell/module/microsoft.powershell.core/about/about_execution_policies).
 
-3. In the same Powershell window, go to `C:\your\custom\path\Codex-CLI\` (the folder contains Codex CLI code). Copy the following command then replace `YOUR_OPENAI_ORGANIZATION_ID` and `ENGINE_ID` with your OpenAI organization Id and OpenAI engine Id. Run the command to setup your PowerShell environment. It will prompt you for OpenAI access key.
 
-```
-.\scripts\powershell_setup.ps1 -OpenAIOrganizationId "YOUR_OPENAI_ORGANIZATION_ID" -OpenAIEngineId "ENGINE_ID"
+3. In the same Powershell terminal, go to `C:\your\custom\path\Codex-CLI\` (the folder that contains the cloned Codex CLI project). Copy the following command, then replace `YOUR_OPENAI_ORGANIZATION_ID` and `ENGINE_ID` with your OpenAI organization Id and OpenAI engine Id. Run the command to setup your PowerShell environment. It will prompt you for OpenAI access key.
+
+```PowerShell
+.\scripts\powershell_setup.ps1 -OpenAIOrganizationId 'YOUR_OPENAI_ORGANIZATION_ID' -OpenAIEngineId 'ENGINE_ID'
 ```
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;See [About powershell_setup.ps1](#about-powershell_setupps1) section to learn script parameters.
 
 4. Open a new PowerShell session, type in `#` followed by your natural language command and hit Ctrl + G!
 
 ### Clean up
-Once you are done, go to `C:\your\custom\path\` (the folder contains Codex CLI code), then run the following command to clean up.
+Once you are done, go to `C:\your\custom\path\` (the folder that contains the cloned Codex CLI project), then run the following command to clean up.
 ```
 .\scripts\powershell_cleanup.ps1
 ```
