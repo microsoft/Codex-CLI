@@ -12,7 +12,9 @@ function create_completion() {
         return "`nnotepad $profile"
     }
 
+    write-progress -id 1 -activity "Codex query"
     $output = echo -n $buffer | python $nl_cli_script 
+    write-progress -id 1 -activity "Codex query" -completed
     
     return $output
 }
