@@ -19,7 +19,7 @@ This project took technical inspiration from the [zsh_codex](https://github.com/
 This repository aims to grow the understanding of using Codex in applications by providing an example of implementation and references to support the [Microsoft Build conference in 2022](https://mybuild.microsoft.com/). It is not intended to be a released product. Therefore, this repository is not for discussing OpenAI API or requesting new features.
 
 ## Requirements
-* [Python 3](https://www.python.org/downloads/)
+* [Python 3.7.1+](https://www.python.org/downloads/)
     * \[Windows\]: Python is added to PATH.
 * An [OpenAI account](https://openai.com/api/)
     * [OpenAI API Key](https://beta.openai.com/account/api-keys).
