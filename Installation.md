@@ -103,7 +103,7 @@ source bash_setup.sh -h
 1. Download this project to `~/your/custom/path/`.
 
 ```
-    $ git clone https://github.com/microsoft/Codex-CLI.git ~/your/custom/path/
+$ git clone https://github.com/microsoft/Codex-CLI.git ~/your/custom/path/
 ```
 
 2. In zsh, go to `~/your/custom/path/` (the folder contains Codex CLI code), then run the following command to setup your zsh environment. The script will prompt for Organization id, API key and engine id:

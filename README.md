@@ -1,6 +1,6 @@
 # Codex CLI - Natural Language Command Line Interface
 
-This project uses [GPT-3 Codex](https://openai.com/blog/openai-codex/) to convert natural language commands into commands in PowerShell, Zshell and Bash. 
+This project uses [GPT-3 Codex](https://openai.com/blog/openai-codex/) to convert natural language commands into commands in PowerShell, Z shell and Bash.
 
 ![Codex Cli GIF](codex_cli.gif)
 
@@ -97,12 +97,11 @@ This project comes pre-loaded with contexts for each shell, along with some bonu
 ```bash
 # make a K8s cluster IP called my-cs running on 5678:8080
 kubectl create service clusterip my-cs --tcp=5678:8080
-
 ```
 
 Add your context to the `contexts` folder and run `load context <filename>` to load it. You can also change the default context from to your context file inside `src\prompt_file.py`.
 
-Note that Codex will often produce correct scripts without any examples. Having been trained on a large corpus of code, it frequently knows how to produce specific commands. That said, building your own contexts helps coax the specific kind of script you're looking for - whether it's long or short, whether it declares variables or not, whether it refers back to previous commands, etc. You can also provide examples of your own CLI commmands and scripts, to show Codex other tools it should consider using.
+Note that Codex will often produce correct scripts without any examples. Having been trained on a large corpus of code, it frequently knows how to produce specific commands. That said, building your own contexts helps coax the specific kind of script you're looking for - whether it's long or short, whether it declares variables or not, whether it refers back to previous commands, etc. You can also provide examples of your own CLI commands and scripts, to show Codex other tools it should consider using.
 
 One important thing to consider is that if you add a new context, keep the multi-turn mode on to avoid our automatic defaulting (which was added to keep faulty contexts from breaking your experience).
 
