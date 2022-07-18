@@ -1,6 +1,6 @@
 # Codex CLI - Natural Language Command Line Interface
 
-This project uses [GPT-3 Codex](https://openai.com/blog/openai-codex/) to convert natural language commands into commands in PowerShell, Zshell and Bash. 
+This project uses [GPT-3 Codex](https://openai.com/blog/openai-codex/) to convert natural language commands into commands in PowerShell, Z shell and Bash.
 
 ![Codex Cli GIF](codex_cli.gif)
 
@@ -9,9 +9,9 @@ The Command Line Interface (CLI) was the first major User Interface we used to i
 
 With the advent of Large Language Models (LLMs), particularly those that have been trained on code, it's possible to interact with a CLI using Natural Language (NL). In effect, these models understand natural language _and_ code well enough that they can translate from one to another. 
 
-This project aims to offer a cross-shell NL->Code experience to allow users to interact with their favorite CLI using NL. The user enters a command, like "what's my IP address", hits Ctrl + G and gets a suggestion for a command idiomatic to the shell they're using. The project uses the GPT-3 Codex model off-the-shelf, meaning the model has not been explicitly trained for the task. Instead we rely on a discipline called prompt engineering (see [section](#prompt-engineering-and-context-files) below) to coax the right commands from Codex. 
+This project aims to offer a cross-shell NL->Code experience to allow users to interact with their favorite CLI using NL. The user enters a command, like "what's my IP address", hits `Ctrl + G` and gets a suggestion for a command idiomatic to the shell they're using. The project uses the GPT-3 Codex model off-the-shelf, meaning the model has not been explicitly trained for the task. Instead we rely on a discipline called prompt engineering (see [section](#prompt-engineering-and-context-files) below) to coax the right commands from Codex. 
 
-**Note: The model can still make mistakes! Don't run a command if you don't understand it. If you're not sure what a command does, hit 'Ctrl + C' to cancel it**. 
+**Note: The model can still make mistakes! Don't run a command if you don't understand it. If you're not sure what a command does, hit `Ctrl + C` to cancel it**.
 
 This project took technical inspiration from the [zsh_codex](https://github.com/tom-doerr/zsh_codex) project, extending its functionality to span multiple shells and to customize the prompts passed to the model (see prompt engineering section below).
 
@@ -32,9 +32,9 @@ Please follow the installation instructions for PowerShell, bash or zsh from [he
 
 ## Usage
 
-Once configured for your shell of preference, you can use the Codex CLI by writing a comment (starting with `#`) into your shell, and then hitting Ctrl + G. 
+Once configured for your shell of preference, you can use the Codex CLI by writing a comment (starting with `#`) into your shell, and then hitting `Ctrl + G`.
 
-The Codex CLI supports two primary modes: single-turn and multi-turn. 
+The Codex CLI supports two primary modes: single-turn and multi-turn.
 
 By default, multi-turn mode is off. It can be toggled on and off using the `# start multi-turn` and `# stop multi-turn` commands.
 
@@ -97,12 +97,11 @@ This project comes pre-loaded with contexts for each shell, along with some bonu
 ```bash
 # make a K8s cluster IP called my-cs running on 5678:8080
 kubectl create service clusterip my-cs --tcp=5678:8080
-
 ```
 
 Add your context to the `contexts` folder and run `load context <filename>` to load it. You can also change the default context from to your context file inside `src\prompt_file.py`.
 
-Note that Codex will often produce correct scripts without any examples. Having been trained on a large corpus of code, it frequently knows how to produce specific commands. That said, building your own contexts helps coax the specific kind of script you're looking for - whether it's long or short, whether it declares variables or not, whether it refers back to previous commands, etc. You can also provide examples of your own CLI commmands and scripts, to show Codex other tools it should consider using.
+Note that Codex will often produce correct scripts without any examples. Having been trained on a large corpus of code, it frequently knows how to produce specific commands. That said, building your own contexts helps coax the specific kind of script you're looking for - whether it's long or short, whether it declares variables or not, whether it refers back to previous commands, etc. You can also provide examples of your own CLI commands and scripts, to show Codex other tools it should consider using.
 
 One important thing to consider is that if you add a new context, keep the multi-turn mode on to avoid our automatic defaulting (which was added to keep faulty contexts from breaking your experience).
 

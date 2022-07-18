@@ -2,7 +2,7 @@
 
 ## Using Speech Synthesis
 
-This project includes speech synthesized playback for your query outputs using the azure cognitive services speech cli. As noted in the previous section about contexts, this is a certain behaviour of the model that is included in the sample `powershell-voice-cognitive-service.txt` file available in the `contexts` folder. Before running any speech synthesis output from the model, you have to do a couple of steps to set it up: 
+This project includes speech synthesized playback for your query outputs using the azure cognitive services speech cli. As noted in the previous section about contexts, this is a certain behavior of the model that is included in the sample `powershell-voice-cognitive-service.txt` file available in the `contexts` folder. Before running any speech synthesis output from the model, you have to do a couple of steps to set it up: 
 
 ### Set up Azure Speech Service
 
@@ -21,14 +21,14 @@ Follow the instructions in [Azure Speech CLI Quickstart](https://docs.microsoft.
 If you are setting up for the first time, here is what you may have to do: 
 1. Download [.NET Core 3.1 SDK](https://docs.microsoft.com/en-us/dotnet/core/install/windows) and [Microsoft Visual C++ Redistributable for Visual Studio 2019](https://support.microsoft.com/help/2977003/the-latest-supported-visual-c-downloads)
 2. Install speech CLI in PowerShell using this command: `dotnet tool install --global Microsoft.CognitiveServices.Speech.CLI`
-3. Use the subsription key and region that you obtained from the Cognitive Services Speech Service page and input into the following commands
+3. Use the subscription key and region that you obtained from the Cognitive Services Speech Service page and input into the following commands
 
 `spx config @key --set SUBSCRIPTION-KEY`  
 `spx config @region --set REGION`
 
 ### Load the example speech context file
 
-Load the example Cognitive Services speech context file using  ` # load context powershell-voice-cognitive-service.txt ` and then hit Ctrl + G to let the Codex CLI load the file
+Load the example Cognitive Services speech context file using  ` # load context powershell-voice-cognitive-service.txt ` and then hit `Ctrl + G` to let the Codex CLI load the file
 
 And that's it! To get started with an example, go ahead and type `# whats the meaning of life`.
 You can develop your own context with more speech functions as mentioned in the previous section. 
