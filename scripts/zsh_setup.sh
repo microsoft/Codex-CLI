@@ -39,7 +39,7 @@ validateSettings()
     echo "OK ***"
 }
 
-# Append settings and CTRL-g binding in .zshrc
+# Append settings and 'Ctrl + G' binding in .zshrc
 configureZsh()
 {
     # Remove previous settings
@@ -113,7 +113,7 @@ configureApp
 
 echo -e "*** Setup complete! ***\n";
 
-echo "**********************************************"
+echo "***********************************************"
 echo "Open a new zsh terminal, type '#' followed by"
-echo "your natural language command and hit Ctrl+g!"
-echo "**********************************************"
+echo "your natural language command and hit Ctrl + G!"
+echo "***********************************************"

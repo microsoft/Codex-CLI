@@ -93,7 +93,7 @@ configureApp()
     chmod +x "$CODEX_CLI_PATH/src/codex_query.py"
 }
 
-# Create and load ~/.codexclirc to setup bash CTRL-g binding
+# Create and load ~/.codexclirc to setup bash 'Ctrl + G' binding
 configureBash()
 {
     echo "*** Configuring bash [$BASH_RC_FILE] ***"
@@ -181,7 +181,7 @@ cleanupEnv
 
 echo -e "*** Setup complete! ***\n";
 
-echo "**********************************************"
+echo "***********************************************"
 echo "Open a new Bash terminal, type '#' followed by"
-echo "your natural language command and hit Ctrl+g!"
-echo "**********************************************"
+echo "your natural language command and hit Ctrl + G!"
+echo "***********************************************"

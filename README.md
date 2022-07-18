@@ -9,9 +9,9 @@ The Command Line Interface (CLI) was the first major User Interface we used to i
 
 With the advent of Large Language Models (LLMs), particularly those that have been trained on code, it's possible to interact with a CLI using Natural Language (NL). In effect, these models understand natural language _and_ code well enough that they can translate from one to another. 
 
-This project aims to offer a cross-shell NL->Code experience to allow users to interact with their favorite CLI using NL. The user enters a command, like "what's my IP address", hits Ctrl + G and gets a suggestion for a command idiomatic to the shell they're using. The project uses the GPT-3 Codex model off-the-shelf, meaning the model has not been explicitly trained for the task. Instead we rely on a discipline called prompt engineering (see [section](#prompt-engineering-and-context-files) below) to coax the right commands from Codex. 
+This project aims to offer a cross-shell NL->Code experience to allow users to interact with their favorite CLI using NL. The user enters a command, like "what's my IP address", hits `Ctrl + G` and gets a suggestion for a command idiomatic to the shell they're using. The project uses the GPT-3 Codex model off-the-shelf, meaning the model has not been explicitly trained for the task. Instead we rely on a discipline called prompt engineering (see [section](#prompt-engineering-and-context-files) below) to coax the right commands from Codex. 
 
-**Note: The model can still make mistakes! Don't run a command if you don't understand it. If you're not sure what a command does, hit 'Ctrl + C' to cancel it**. 
+**Note: The model can still make mistakes! Don't run a command if you don't understand it. If you're not sure what a command does, hit `Ctrl + C` to cancel it**.
 
 This project took technical inspiration from the [zsh_codex](https://github.com/tom-doerr/zsh_codex) project, extending its functionality to span multiple shells and to customize the prompts passed to the model (see prompt engineering section below).
 
@@ -32,9 +32,9 @@ Please follow the installation instructions for PowerShell, bash or zsh from [he
 
 ## Usage
 
-Once configured for your shell of preference, you can use the Codex CLI by writing a comment (starting with `#`) into your shell, and then hitting Ctrl + G. 
+Once configured for your shell of preference, you can use the Codex CLI by writing a comment (starting with `#`) into your shell, and then hitting `Ctrl + G`.
 
-The Codex CLI supports two primary modes: single-turn and multi-turn. 
+The Codex CLI supports two primary modes: single-turn and multi-turn.
 
 By default, multi-turn mode is off. It can be toggled on and off using the `# start multi-turn` and `# stop multi-turn` commands.
 

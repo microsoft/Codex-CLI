@@ -65,7 +65,7 @@ To leverage the Codex CLI on WSL and Linux environments using Bash please follow
 	
 	The script will create an OpenAI config file and update your bash environment.
 
-4. Open a new Bash terminal. Type in `#` followed by your natural language request. Press Ctrl+g to execute!
+4. Open a new Bash terminal. Type in `#` followed by your natural language request. Press `Ctrl + G` to execute!
 
 ### Clean up
 
@@ -155,7 +155,7 @@ For more information about Execution Policies, see
 ```
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;See [About powershell_setup.ps1](#about-powershell_setupps1) section to learn script parameters.
 
-4. Open a new PowerShell session, type in `#` followed by your natural language command and hit Ctrl + G!
+4. Open a new PowerShell session, type in `#` followed by your natural language command and hit `Ctrl + G`!
 
 ### Clean up
 Once you are done, go to `C:\your\custom\path\` (the folder that contains the cloned Codex CLI project), then run the following command to clean up.
