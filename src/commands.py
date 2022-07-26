@@ -4,7 +4,17 @@ import time
 from pathlib import Path
 from prompt_file import *
 
-def get_command_result(input, prompt_file):
+import re
+
+param_type_mapping = {
+    'engine': str,
+    'temperature': float,
+    'max_tokens': int,
+    'shell': str,
+}
+
+
+def get_command_result(input, prompt_generator):
     """
     Checks if the input is a command and if so, executes it
     Currently supported commands:
@@ -23,131 +33,102 @@ def get_command_result(input, prompt_file):
 
     Returns: command result or "" if no command matched
     """
-    if prompt_file == None:
-        return "", None
     
-    config = prompt_file.config
+    config = prompt_generator.prompt_engine.config.model_config
     # configuration setting commands
     if input.__contains__("set"):
-        # set temperature <temperature>
-        if input.__contains__("temperature"):
-            input = input.split()
-            if len(input) == 4:
-                config['temperature'] = float(input[3])
-                prompt_file.set_config(config)
-                print("# Temperature set to " + str(config['temperature']))
-                return "config set", prompt_file
-            else:
-                return "", prompt_file
-        # set max_tokens <max_tokens>
-        elif input.__contains__("max_tokens"):
-            input = input.split()
-            if len(input) == 4:
-                config['max_tokens'] = int(input[3])
-                prompt_file.set_config(config)
-                print("# Max tokens set to " + str(config['max_tokens']))
-                return "config set", prompt_file
-            else:
-                return "", prompt_file
-        elif input.__contains__("shell"):
-            input = input.split()
-            if len(input) == 4:
-                config['shell'] = input[3]
-                prompt_file.set_config(config)
-                print("# Shell set to " + str(config['shell']))
-                return "config set", prompt_file
-            else:
-                return "", prompt_file
-        elif input.__contains__("engine"):
-            input = input.split()
-            if len(input) == 4:
-                config['engine'] = input[3]
-                prompt_file.set_config(config)
-                print("# Engine set to " + str(config['engine']))
-                return "config set", prompt_file
-            else:
-                return "", prompt_file
+        # match the command using regex to one of the 4 above set commands
+        match = re.match(r"set (engine|temperature|max_tokens|shell) (.*)", input)
+        if match:
+            # get the command and the value
+            command = match.group(1)
+            value = match.group(2)
+            # check if the value is of the correct type
+            if param_type_mapping[command] == float:
+                value = float(value)
+            elif param_type_mapping[command] == int:
+                value = int(value)
+            elif param_type_mapping[command] == str:
+                value = str(value)
+            # set the value
+            setattr(config, command, value)
+            return "Configuration setting updated", prompt_generator
 
-    if input.__contains__("show config"):
-        prompt_file.show_config()
-        return "config shown", prompt_file
+    elif input.__contains__("show config"):
+        prompt_generator.show_config()
+        return "config shown", prompt_generator
 
     # multi turn/single turn commands
-    if input.__contains__("multi-turn"):
+    elif input.__contains__("multi-turn"):
         # start context
         if input.__contains__("start"):
-            if config['multi_turn'] == 'off':
-                prompt_file.start_multi_turn()
-                return "multi turn mode on", prompt_file
-            
-            return "multi turn mode on", prompt_file
-        
+            if getattr(config, 'multi_turn') == 'off':
+                prompt_generator.start_multi_turn()
+                return "multi turn mode on", prompt_generator
+            else:
+                return "multi turn mode already on", prompt_generator
+                    
         # stop context
-        if input.__contains__("stop"):
-            prompt_file.stop_multi_turn()
-            return "multi turn mode off", prompt_file
+        elif input.__contains__("stop"):
+            if getattr(config, 'multi_turn') == 'on':
+                prompt_generator.stop_multi_turn()
+                return "multi turn mode off", prompt_generator
+            else:
+                return "multi turn mode already off", prompt_generator
     
     # context file commands
-    if input.__contains__("context"):
+    elif input.__contains__("context"):
         if input.__contains__("default"):
-            prompt_file.default_context()
-            return "stopped context", prompt_file
+            prompt_generator.default_context()
+            return "stopped context", prompt_generator
         
         # show context <n>
         if input.__contains__("show"):
             print('\n')
-            with open(prompt_file.file_name, 'r') as f:
-                lines = f.readlines()
-                lines = lines[6:] # skip headers
-            
-            line_numbers = 0
-            if len(input.split()) > 3:
-                line_numbers = int(input.split()[3])
-            
-            if line_numbers != 0:
-                for line in lines[-line_numbers:]:
-                    print('\n# '+line, end='')
-            else:
-                print('\n# '.join(lines))
-            return "context shown", prompt_file
+            print (prompt_generator.prompt_engine.build_context())
+            return "context shown", prompt_generator
         
         # edit context
         if input.__contains__("view"):
             # open the prompt file in text editor
-            if config['shell'] != 'powershell':
-                os.system('open {}'.format(prompt_file.file_path))
+            if getattr(config, 'shell') != 'powershell':
+                os.system('open {}'.format(prompt_generator.file_path))
             else:
-                os.system('start {}'.format(prompt_file.file_path))
-            return "context shown", prompt_file
+                os.system('start {}'.format(prompt_generator.file_path))
+            return "context shown", prompt_generator
 
         # save context <filename>
         if input.__contains__("save"):
             # save the current prompt file to a new file
             # if filename not specified use the current time (to avoid name conflicts)
 
-            filename = time.strftime("%Y-%m-%d_%H-%M-%S") + ".txt"
-            if len(input.split()) == 4:
-                filename = input.split()[3]
+            # regex to get the filename
+            match = re.match(r"save context (.*)", input)
+            if match:
+                filename = match.group(1)
+            else:
+                filename = time.strftime("%Y-%m-%d_%H-%M-%S") + ".yaml"
             
-            prompt_file.save_to(filename)
-            return "context saved", prompt_file
+            ##TODO: Make save_to function in prompt_engine
+            prompt_generator.save_to(filename)
+            return "context saved", prompt_generator
         
         # clear context
         if input.__contains__("clear"):
             # temporary saving deleted prompt file
-            prompt_file.default_context()
-            return "unlearned interaction", prompt_file
+            prompt_generator.default_context()
+            return "unlearned interaction", prompt_generator
         
         # load context <filename>
         if input.__contains__("load"):
-            # the input looks like # load context <filename>
-            # write everything from the file to the prompt file
-            input = input.split()
-            if len(input) == 4:
-                filename = input[3]
-                prompt_file.load_context(filename)
-                return "context loaded", prompt_file
+
+            # regex to get the filename
+            match = re.match(r"load context (.*)", input)
+            if match:
+                filename = match.group(1)
+                prompt_generator.load_context(filename)
+                return "context loaded", prompt_generator
             print('\n#\tInvalid command format, did you specify which file to load?')
-            return "context loaded", prompt_file
+            return "context loaded", prompt_generator
     
-    return "", prompt_file
+    return "", prompt_generator

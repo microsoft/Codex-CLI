@@ -9,7 +9,7 @@ import re
 import psutil
 
 from pathlib import Path
-from prompt_file import PromptFile
+from prompt_file import ModelConfig, Prompt
 from commands import get_command_result
 
 MULTI_TURN = "off"
@@ -23,9 +23,6 @@ DEBUG_MODE = False
 
 # api keys located in the same directory as this file
 API_KEYS_LOCATION = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'openaiapirc')
-
-PROMPT_CONTEXT = Path(__file__).with_name('current_context.txt')
-
 
 # Read the secret_key from the ini file ~/.config/openaiapirc
 # The format is:
@@ -46,11 +43,10 @@ def create_template_ini_file():
         print('# engine=<engine-id>')
         sys.exit(1)
 
-def initialize():
+def initialize(shell: str):
     """
     Initialize openAI and shell mode
     """
-    global ENGINE
 
     # Check if file at API_KEYS_LOCATION exists
     create_template_ini_file()
@@ -59,18 +55,9 @@ def initialize():
 
     openai.api_key = config['openai']['secret_key'].strip('"').strip("'")
     openai.organization = config['openai']['organization_id'].strip('"').strip("'")
-    ENGINE = config['openai']['engine'].strip('"').strip("'")
-
-    prompt_config = {
-        'engine': ENGINE,
-        'temperature': TEMPERATURE,
-        'max_tokens': MAX_TOKENS,
-        'shell': SHELL,
-        'multi_turn': MULTI_TURN,
-        'token_count': 0
-    }
+    engine = config['openai']['engine'].strip('"').strip("'")
     
-    return PromptFile(PROMPT_CONTEXT.name, prompt_config)
+    return Prompt(shell, engine)
 
 def is_sensitive_content(content):
     """
@@ -130,7 +117,7 @@ def is_sensitive_content(content):
 
     return (output_label != "0")
 
-def get_query(prompt_file):
+def get_query(prompt_generator):
     """
     uses the stdin to get user input
     input is either treated as a command or as a Codex query
@@ -144,64 +131,58 @@ def get_query(prompt_file):
     else:
         entry = sys.stdin.read()
     # first we check if the input is a command
-    command_result, prompt_file = get_command_result(entry, prompt_file)
+    try:
+        command_result, prompt_generator = get_command_result(entry, prompt_generator)
+    except Exception as e:
+        print (str(e))
 
     # if input is not a command, then query Codex, otherwise exit command has been run successfully
     if command_result == "":
-        return entry, prompt_file
+        return entry, prompt_generator
     else:
         sys.exit(0)
 
-def detect_shell():
-    global SHELL
-    global PROMPT_CONTEXT
 
+def get_shell_prefix(shell: str):
+    # prime codex for the corresponding shell type
+    if shell == "zsh":
+        return '#!/bin/zsh\n\n'
+    elif shell == "bash":
+        return '#!/bin/bash\n\n'
+    elif shell == "powershell":
+        return '<# powershell #>\n\n'
+    elif shell == "unknown":
+        print("\n#\tUnsupported shell type, please use # set shell <shell>")
+        return ""
+    else:
+        return '#' + shell + '\n\n'
+
+def detect_shell():
     parent_process_name = psutil.Process(os.getppid()).name()
     POWERSHELL_MODE = bool(re.fullmatch('pwsh|pwsh.exe|powershell.exe', parent_process_name))
     BASH_MODE = bool(re.fullmatch('bash|bash.exe', parent_process_name))
     ZSH_MODE = bool(re.fullmatch('zsh|zsh.exe', parent_process_name))
 
-    SHELL = "powershell" if POWERSHELL_MODE else "bash" if BASH_MODE else "zsh" if ZSH_MODE else "unknown"
+    shell = "powershell" if POWERSHELL_MODE else "bash" if BASH_MODE else "zsh" if ZSH_MODE else "unknown"
 
-    shell_prompt_file = Path(os.path.join(os.path.dirname(__file__), "..", "contexts", "{}-context.txt".format(SHELL)))
+    prefix = get_shell_prefix(shell)
 
-    if shell_prompt_file.is_file():
-        PROMPT_CONTEXT = shell_prompt_file
+    return shell, prefix
 
 if __name__ == '__main__':
-    detect_shell()
-    prompt_file = initialize()
+    shell, prefix = detect_shell()
+    prompt_generator: Prompt = initialize(shell)
 
     try:
-        user_query, prompt_file = get_query(prompt_file)
-        
-        config = prompt_file.config if prompt_file else {
-            'engine': ENGINE,
-            'temperature': TEMPERATURE,
-            'max_tokens': MAX_TOKENS,
-            'shell': SHELL,
-            'multi_turn': MULTI_TURN,
-            'token_count': 0
-        }
-
-        # use query prefix to prime Codex for correct scripting language
-        prefix = ""
-        # prime codex for the corresponding shell type
-        if config['shell'] == "zsh":
-            prefix = '#!/bin/zsh\n\n'
-        elif config['shell'] == "bash":
-            prefix = '#!/bin/bash\n\n'
-        elif config['shell'] == "powershell":
-            prefix = '<# powershell #>\n\n'
-        elif config['shell'] == "unknown":
-            print("\n#\tUnsupported shell type, please use # set shell <shell>")
-        else:
-            prefix = '#' + config['shell'] + '\n\n'
-
-        codex_query = prefix + prompt_file.read_prompt_file(user_query) + user_query
+        user_query, prompt_generator = get_query(prompt_generator)
+        codex_query = prefix + prompt_generator.prompt_engine.build_prompt(user_query)
 
         # get the response from codex
-        response = openai.Completion.create(engine=config['engine'], prompt=codex_query, temperature=config['temperature'], max_tokens=config['max_tokens'], stop="#")
+        response = openai.Completion.create(engine=prompt_generator.prompt_engine.config.model_config.engine, 
+                                            prompt=codex_query, 
+                                            temperature=prompt_generator.prompt_engine.config.model_config.temperature, 
+                                            max_tokens=prompt_generator.prompt_engine.config.model_config.max_tokens, 
+                                            stop=prompt_generator.prompt_engine.config.input_prefix)
 
         completion_all = response['choices'][0]['text']
 
@@ -211,9 +192,10 @@ if __name__ == '__main__':
             print(completion_all)
 
             # append output to prompt context file
-            if config['multi_turn'] == "on":
+            if prompt_generator.prompt_engine.config.model_config.multi_turn == "on":
                 if completion_all != "" or len(completion_all) > 0:
-                    prompt_file.add_input_output_pair(user_query, completion_all)
+                    prompt_generator.prompt_engine.add_interaction(user_query, completion_all)
+                    prompt_generator.save_prompt_engine()
         
     except FileNotFoundError:
         print('\n\n# Codex CLI error: Prompt file not found, try again')
