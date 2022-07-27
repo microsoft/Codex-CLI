@@ -127,9 +127,10 @@ def get_query(prompt_generator):
 
     # get input from terminal or stdin
     if DEBUG_MODE:
-        entry = input("prompt: ") + '\n'
+        entry = input("prompt: ")
     else:
-        entry = sys.stdin.read()
+        # Remove extreaneous newlines and hashtag from the input string
+        entry = sys.stdin.read().strip("\n").strip("#").strip(" ") 
     # first we check if the input is a command
     try:
         command_result, prompt_generator = get_command_result(entry, prompt_generator)
@@ -175,8 +176,7 @@ if __name__ == '__main__':
 
     try:
         user_query, prompt_generator = get_query(prompt_generator)
-        codex_query = prefix + prompt_generator.prompt_engine.build_prompt(user_query)
-
+        codex_query = prefix + prompt_generator.prompt_engine.build_prompt(user_query, prompt_generator.prompt_engine.config.model_config.multi_turn)
         # get the response from codex
         response = openai.Completion.create(engine=prompt_generator.prompt_engine.config.model_config.engine, 
                                             prompt=codex_query, 

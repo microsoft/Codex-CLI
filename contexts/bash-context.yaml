@@ -3,10 +3,12 @@ config:
   model-config:
     engine: "code-cushman-001"
     temperature: 0
-    max_tokens: 300
+    max_tokens: 1024
     shell: "bash"
     multi_turn: "off"
     token_count: 110
+  comment-operator: "#"
+  description-comment-operator: "##"
 description: "This converts Natural Language Commands to Command Line Commands. Here are some examples"
 examples:
   - input: "what processes are hogging the most cpu?"

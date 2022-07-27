@@ -6,34 +6,34 @@ import pickle
 
 from pathlib import Path
 from openai import Model
-from prompt_engine.code_engine import CodeEngine, PromptEngineConfig, Interaction
+from prompt_engine.code_engine import CodeEngine, ModelConfig
 
 API_KEYS_LOCATION = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'openaiapirc')
 
 
-class ModelConfig:
+class CodexCLIConfig(ModelConfig):
     """
     Interaction class is used to store the model config to be used in the prompt engine
     """
     def __init__(self, **kwargs):
-        self.engine = kwargs['engine'] if kwargs['engine'] else 'code-davinci-002'
-        self.temperature = float(kwargs['temperature']) if kwargs['temperature'] else 0
-        self.max_tokens = int(kwargs['max_tokens']) if kwargs['max_tokens'] else 300
-        self.shell = kwargs['shell'] if kwargs['shell'] else 'powershell'
-        self.multi_turn = kwargs['multi_turn'] if kwargs['multi_turn'] else 'on'
-        self.token_count = int(kwargs['token_count']) if kwargs['token_count'] else 0
+        self.engine = kwargs['engine'] if ('engine' in kwargs and kwargs['engine']) else 'code-davinci-002'
+        self.temperature = float(kwargs['temperature']) if ('temperature' in kwargs and kwargs['temperature']) else 0
+        self.max_tokens = int(kwargs['max_tokens']) if ('max_tokens' in kwargs and kwargs['max_tokens']) else 1024
+        self.shell = kwargs['shell'] if ('shell' in kwargs and kwargs['shell']) else 'powershell'
+        self.multi_turn = kwargs['multi_turn'] if ('multi_turn' in kwargs and kwargs['multi_turn']) else 'on'
+        self.token_count = int(kwargs['token_count']) if ('token_count' in kwargs and kwargs['token_count']) else 0
+CURRENT_CONTEXT_LOCATION = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'current_context.pickle')
 
 class Prompt:
     default_context_filename = "current_context.yaml"
     default_file_path = os.path.join(os.path.dirname(__file__), "..", default_context_filename)
-    default_config_path = os.path.join(os.path.dirname(__file__), "..", "current_context.pickle")
+    default_config_path = os.path.join(os.path.dirname(__file__), "..", 'current_context.pickle')
 
     def __init__(self, shell, engine):
         
         # check if default_config file exists, otherwise create it from the default_context_filename and save it
-        if not os.path.exists(self.default_config_path):
-            self.prompt_engine = self.create_prompt_engine_from_yaml(self.default_config_path)
-            self.save_prompt_engine(self.prompt_engine, self.default_config_path)
+        if os.path.exists(self.default_config_path):
+            self.prompt_engine = self.load_prompt_engine(self.default_config_path)
         else:
             # TODO: Change this to assignment operator (:=), recieving invalid syntax
             if not os.path.exists(self.default_file_path):
@@ -41,16 +41,19 @@ class Prompt:
                 self.prompt_engine = self.create_prompt_engine_from_yaml(shell_context_path)
                 self.save_prompt_engine(self.prompt_engine, self.default_config_path)
             else:
-                temp = self.load_prompt_engine(self.default_config_path)
+                temp = self.create_prompt_engine_from_yaml(self.default_file_path)
                 if temp != None:
                     self.prompt_engine = temp
-                else:
-                    self.prompt_engine = self.create_prompt_engine_from_yaml(self.default_config_path)
                     self.save_prompt_engine(self.prompt_engine, self.default_config_path)
+                else:
+                    raise Exception("Error loading prompt engine")
     
     def create_prompt_engine_from_yaml(self, yaml_path):
-        prompt_engine = CodeEngine()
-        prompt_engine.load_yaml(yaml_path)
+        default_config = CodexCLIConfig()
+        prompt_engine = CodeEngine(default_config)
+        with open(yaml_path, 'r') as f:
+            yaml_config = f.read()
+            prompt_engine.load_yaml(yaml_config=yaml_config)
         return prompt_engine
 
     def show_config(self):
@@ -127,18 +130,18 @@ class Prompt:
 
         
 
-    def save_prompt_engine(self, obj, file_path = os.path.join(os.path.dirname(__file__), "..", "current_context.pickle")):
+    def save_prompt_engine(self, obj, file_path = os.path.join(os.path.dirname(__file__), "..", 'current_context.pickle')):
         try:
             with open(file_path, 'wb') as f:
                 pickle.dump(obj, f)
         except Exception as e:
             raise Exception("Error saving prompt engine: {}".format(e))
             
-    def load_prompt_engine(self, file_path = os.path.join(os.path.dirname(__file__), "..", "current_context.pickle")):
+    def load_prompt_engine(self, file_path = os.path.join(os.path.dirname(__file__), "..", 'current_context.pickle')):
         try:
             with open(file_path, 'rb') as f:
-                self.prompt_engine = pickle.load(f)
-                return self.prompt_engine
+                prompt_engine = pickle.load(f)
+                return prompt_engine
             return None
         except Exception as e:
             print("Error loading prompt engine: {}".format(e))
