@@ -42,6 +42,7 @@ validateSettings()
 # Append settings and CTRL-g binding in .zshrc
 configureZsh()
 {
+    touch $zshrcPath
     # Remove previous settings
     sed -i '' '/### Codex CLI setup - start/,/### Codex CLI setup - end/d' $zshrcPath
     echo "Removed previous settings in $zshrcPath if present"
