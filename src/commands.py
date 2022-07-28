@@ -52,6 +52,7 @@ def get_command_result(input, prompt_generator):
                 value = str(value)
             # set the value
             setattr(config, command, value)
+            print (f"\n#   {command} set to {value}")
             return "Configuration setting updated", prompt_generator
 
     elif input.__contains__("show config"):
@@ -64,37 +65,44 @@ def get_command_result(input, prompt_generator):
         if input.__contains__("start"):
             if getattr(config, 'multi_turn') == 'off':
                 prompt_generator.start_multi_turn()
+                print ("\n#   Multi-turn mode started")
                 return "multi turn mode on", prompt_generator
             else:
+                print ("\n#   Multi-turn mode already started")
                 return "multi turn mode already on", prompt_generator
                     
         # stop context
         elif input.__contains__("stop"):
             if getattr(config, 'multi_turn') == 'on':
                 prompt_generator.stop_multi_turn()
+                print ("\n#   Multi-turn mode stopped")
                 return "multi turn mode off", prompt_generator
             else:
+                print ("\n#   Multi-turn mode already stopped")
                 return "multi turn mode already off", prompt_generator
     
     # context file commands
     elif input.__contains__("context"):
         if input.__contains__("default"):
             prompt_generator.default_context()
+            print ("\n#   Default context loaded")
             return "stopped context", prompt_generator
         
         # show context <n>
         if input.__contains__("show"):
             print('\n')
-            print (prompt_generator.prompt_engine.build_context())
+            print ("\n#   ".join(prompt_generator.prompt_engine.build_context().split("\n")))
             return "context shown", prompt_generator
         
         # edit context
         if input.__contains__("view"):
             # open the prompt file in text editor
+            prompt_generator.save_to("current-context.yaml")
             if getattr(config, 'shell') != 'powershell':
-                os.system('open {}'.format(prompt_generator.file_path))
+                os.system('open {}'.format(Path(os.path.join(os.path.dirname(__file__), "..", "contexts", f"current-context.yaml"))))
             else:
-                os.system('start {}'.format(prompt_generator.file_path))
+                os.system('start {}'.format(Path(os.path.join(os.path.dirname(__file__), "..", "contexts", f"current-context.yaml"))))
+            print ("\n#   Context file opened in text editor")
             return "context shown", prompt_generator
 
         # save context <filename>
@@ -109,14 +117,16 @@ def get_command_result(input, prompt_generator):
             else:
                 filename = time.strftime("%Y-%m-%d_%H-%M-%S") + ".yaml"
             
-            ##TODO: Make save_to function in prompt_engine
             prompt_generator.save_to(filename)
+            print(f'\n#   Saved to {filename}')
+
             return "context saved", prompt_generator
         
         # clear context
         if input.__contains__("clear"):
             # temporary saving deleted prompt file
-            prompt_generator.default_context()
+            prompt_generator.clear_context()
+            print ("\n#   Context cleared")
             return "unlearned interaction", prompt_generator
         
         # load context <filename>
@@ -126,7 +136,11 @@ def get_command_result(input, prompt_generator):
             match = re.match(r"load context (.*)", input)
             if match:
                 filename = match.group(1)
-                prompt_generator.load_context(filename)
+                success = prompt_generator.load_context(filename)
+                if success:
+                    print (f'\n#   Loaded {filename}')
+                else:
+                    print (f'\n#   Failed to load {filename}, please check the file')
                 return "context loaded", prompt_generator
             print('\n#\tInvalid command format, did you specify which file to load?')
             return "context loaded", prompt_generator

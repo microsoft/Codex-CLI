@@ -195,7 +195,7 @@ if __name__ == '__main__':
             if prompt_generator.prompt_engine.config.model_config.multi_turn == "on":
                 if completion_all != "" or len(completion_all) > 0:
                     prompt_generator.prompt_engine.add_interaction(user_query, completion_all)
-                    prompt_generator.save_prompt_engine()
+                    prompt_generator.save_prompt_engine(prompt_generator.prompt_engine)
         
     except FileNotFoundError:
         print('\n\n# Codex CLI error: Prompt file not found, try again')

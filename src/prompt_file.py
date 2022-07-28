@@ -101,9 +101,25 @@ class Prompt:
         """
         Go to default context
         """
-        self.load_context(self.context_source_filename)
+        shell_context_path = Path(os.path.join(os.path.dirname(__file__), "..", "contexts", f"{self.prompt_engine.config.model_config.shell}-context.yaml"))
+        self.prompt_engine = self.create_prompt_engine_from_yaml(shell_context_path)
+        self.save_prompt_engine(self.prompt_engine, self.default_config_path)
+        print (f'\n#   Switched to f"{self.prompt_engine.config.model_config.shell}-context.yaml')
+
+    def clear_context(self):
+        shell_context_path = Path(os.path.join(os.path.dirname(__file__), "..", "contexts", f"{self.prompt_engine.config.model_config.shell}-context.yaml"))
+        self.prompt_engine = self.create_prompt_engine_from_yaml(shell_context_path)
+        self.save_prompt_engine(self.prompt_engine, self.default_config_path)
+        print (f'\n#   Cleared context')
+
+    def save_to(self, filename):
+        if not filename.endswith('.yaml'):
+            filename = filename + '.yaml'
+        filepath = Path(os.path.join(os.path.dirname(__file__), "..", "contexts", filename))
+        with open(filepath, 'w') as f:
+            f.write(self.prompt_engine.save_yaml())
     
-    def load_context(self, filename, initialize=False):
+    def load_context(self, filename):
         """
         Loads a context file into current_context
         """
@@ -123,9 +139,9 @@ class Prompt:
             self.prompt_engine.config.model_config.engine = engine ## Needed?
 
             self.save_prompt_engine(self.prompt_engine, self.default_config_path)
+            return True
 
         else:
-            print("\n#   File not found")
             return False
 
         
