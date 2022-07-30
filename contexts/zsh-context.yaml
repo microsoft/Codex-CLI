@@ -1,0 +1,41 @@
+type: code-engine
+config:
+  model-config:
+    engine: "code-cushman-001"
+    temperature: 0
+    max_tokens: 1024
+    shell: "zsh"
+    multi_turn: "off"
+    token_count: 110
+  comment-operator: "#"
+  description-comment-operator: "##"
+description: "This converts Natural Language Commands to Command Line Commands. Here are some examples"
+examples:
+  - input: "what processes are hogging the most cpu?"
+    response: "ps aux | sort -nrk 3,3 | head -n 10"
+  - input: "stop the chrome processes"
+    response: "kill -9 $(ps aux | grep chrome | awk '{print $2}')"
+  - input: "what's my IP?"
+    response: "curl ifconfig.me"
+  - input: "what's the weather in San Francisco?"
+    response: "curl wttr.in/SanFrancisco"
+  - input: "make a directory called web-app"
+    response: "mkdir web-app"
+  - input: "add an html, css, and js file to it"
+    response: |
+      touch web-app/index.html
+      touch web-app/style.css
+      touch web-app/script.js
+  - input: "add a hello world website to the index"
+    response: "echo '<html><body><h1>Hello World!</h1></body></html>' > web-app/index.html"
+  - input: "open it with vi"
+    response: "vi web-app/index.html"
+  - input: "what's running on port 1018?"
+    response: "lsof -i :1018"
+  - input: "kill process 1584"
+    response: "kill -9 1584"
+  - input: "what other devices are on my network?"
+    response: "arp -a"
+  - input: "how much storage is left?"
+    response: "df -h"
+flow-reset-text: "Ignore the previous examples and start afresh, from here on out, this is an unrelated conversation"

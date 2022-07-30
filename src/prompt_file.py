@@ -1,262 +1,164 @@
 import os
+from pyexpat import model
 import time
 import configparser
+import pickle
 
 from pathlib import Path
-
+from openai import Model
+from prompt_engine.code_engine import CodeEngine, ModelConfig
 
 API_KEYS_LOCATION = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'openaiapirc')
 
-class PromptFile:
-    context_source_filename = ""
-    default_context_filename = "current_context.txt"
+
+class CodexCLIConfig(ModelConfig):
+    """
+    Interaction class is used to store the model config to be used in the prompt engine
+    """
+    def __init__(self, **kwargs):
+        self.engine = kwargs['engine'] if ('engine' in kwargs and kwargs['engine']) else 'code-davinci-002'
+        self.temperature = float(kwargs['temperature']) if ('temperature' in kwargs and kwargs['temperature']) else 0
+        self.max_tokens = int(kwargs['max_tokens']) if ('max_tokens' in kwargs and kwargs['max_tokens']) else 1024
+        self.shell = kwargs['shell'] if ('shell' in kwargs and kwargs['shell']) else 'powershell'
+        self.multi_turn = kwargs['multi_turn'] if ('multi_turn' in kwargs and kwargs['multi_turn']) else 'on'
+        self.token_count = int(kwargs['token_count']) if ('token_count' in kwargs and kwargs['token_count']) else 0
+CURRENT_CONTEXT_LOCATION = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'current_context.pickle')
+
+class Prompt:
+    default_context_filename = "current_context.yaml"
     default_file_path = os.path.join(os.path.dirname(__file__), "..", default_context_filename)
-    default_config_path = os.path.join(os.path.dirname(__file__), "..", "current_context.config")
+    default_config_path = os.path.join(os.path.dirname(__file__), "..", 'current_context.pickle')
 
-    def __init__(self, file_name, config):
-        self.context_source_filename = "{}-context.txt".format(config['shell']) #  feel free to set your own default context path here
+    def __init__(self, shell, engine):
         
-        self.file_path = self.default_file_path
-        self.config_path = self.default_config_path
-
-        # loading in one of the saved contexts
-        if file_name != self.default_context_filename:
-            self.load_context(file_name, True)
-
-    def has_config(self):
-        """
-        Check if the prompt file has a corresponding config file
-        """
-        return os.path.isfile(self.config_path)
+        # check if default_config file exists, otherwise create it from the default_context_filename and save it
+        if os.path.exists(self.default_config_path):
+            self.prompt_engine = self.load_prompt_engine(self.default_config_path)
+        else:
+            # TODO: Change this to assignment operator (:=), recieving invalid syntax
+            if not os.path.exists(self.default_file_path):
+                shell_context_path = Path(os.path.join(os.path.dirname(__file__), "..", "contexts", f"{shell}-context.yaml"))
+                self.prompt_engine = self.create_prompt_engine_from_yaml(shell_context_path)
+                self.save_prompt_engine(self.prompt_engine, self.default_config_path)
+            else:
+                temp = self.create_prompt_engine_from_yaml(self.default_file_path)
+                if temp != None:
+                    self.prompt_engine = temp
+                    self.save_prompt_engine(self.prompt_engine, self.default_config_path)
+                else:
+                    raise Exception("Error loading prompt engine")
     
-    def read_config(self):
-        """
-        Read the prompt config and return a dictionary
-        """
+    def create_prompt_engine_from_yaml(self, yaml_path):
+        default_config = CodexCLIConfig()
+        prompt_engine = CodeEngine(default_config)
+        with open(yaml_path, 'r') as f:
+            yaml_config = f.read()
+            prompt_engine.load_yaml(yaml_config=yaml_config)
+        return prompt_engine
 
-        if self.has_config() == False:
-            self.set_config(self.config)
-            return self.config
-        
-        with open(self.config_path, 'r') as f:
-            lines = f.readlines()
-
-        config = {
-            'engine': lines[0].split(':')[1].strip(),
-            'temperature': float(lines[1].split(':')[1].strip()),
-            'max_tokens': int(lines[2].split(':')[1].strip()),
-            'shell': lines[3].split(':')[1].strip(),
-            'multi_turn': lines[4].split(':')[1].strip(),
-            'token_count': int(lines[5].split(':')[1].strip())
-        }
-
-        self.config = config
-        return self.config 
-    
-    def set_config(self, config):
-        """
-        Set the prompt headers with the new config
-        """
-        self.config = config
-        
-        with open(self.config_path, 'w') as f:
-            f.write('engine: {}\n'.format(self.config['engine']))
-            f.write('temperature: {}\n'.format(self.config['temperature']))
-            f.write('max_tokens: {}\n'.format(self.config['max_tokens']))
-            f.write('shell: {}\n'.format(self.config['shell']))
-            f.write('multi_turn: {}\n'.format(self.config['multi_turn']))
-            f.write('token_count: {}\n'.format(self.config['token_count']))
-    
     def show_config(self):
         print('\n')
         # read the dictionary into a list of # lines
         lines = []
-        for key, value in self.config.items():
+        for key, value in self.prompt_engine.config.model_config.__dict__.items():
             lines.append('# {}: {}\n'.format(key, value))
         print(''.join(lines))
     
     def add_input_output_pair(self, user_query, prompt_response):
         """
-        Add lines to file_name and update the token_count
+        Add an input/output pair to the prompt engine
         """
 
-        with open(self.file_path, 'a') as f:
-            f.write(user_query)
-            f.write(prompt_response)
-        
-        if self.config['multi_turn'] == 'on':
-            self.config['token_count'] += len(user_query.split()) + len(prompt_response.split())
-            self.set_config(self.config)
-    
-    def read_prompt_file(self, input):
-        """
-        Get the updated prompt file
-        Checks for token overflow and appends the current input
-
-        Returns: the prompt file after appending the input
-        """
-
-        input_tokens_count = len(input.split())
-        need_to_refresh = (self.config['token_count'] + input_tokens_count > 2048)
-
-        if need_to_refresh:
-            # delete first 2 lines of prompt context file
-            with open(self.file_path, 'r') as f:
-                lines = f.readlines()
-                prompt = lines[2:] # drop first 2 lines of prompt
-            with open(self.file_path, 'w') as f:
-                f.writelines(prompt)
-
-        # get input from prompt file
-        with open(self.file_path, 'r') as f:
-            lines = f.readlines()
-
-        return ''.join(lines)
-    
-    def get_token_count(self):
-        """
-        Get the actual token count
-        """
-        token_count = 0
-        if self.has_config():
-            with open(self.config_path, 'r') as f:
-                lines = f.readlines()
-                token_count = int(lines[5].split(':')[1].strip())
-        
-        true_token_count = 0
-        with open(self.file_path, 'r') as f:
-            lines = f.readlines()
-            # count the number of words in the prompt file
-            for line in lines:
-                true_token_count += len(line.split())
-        
-        if true_token_count != token_count:
-            self.config['token_count'] = true_token_count
-            self.set_config(self.config)
-        
-        return true_token_count
+        self.prompt_engine.add_interaction(user_query, prompt_response)
     
     def clear(self):
         """
         Clear the prompt file, while keeping the config
         Note: saves a copy to the deleted folder
         """
-        config = self.read_config()
-        filename = time.strftime("%Y-%m-%d_%H-%M-%S") + ".txt"
-        with open(self.file_path, 'r') as f:
-            lines = f.readlines()
-            filename = os.path.join(os.path.dirname(__file__), "..", "deleted", filename)
-            with Path(filename).open('w') as f:
-                f.writelines(lines)
-        
-        # delete the prompt file
-        with open(self.file_path, 'w') as f:
-            f.write('')
-        
-        print("\n#   Context has been cleared, temporarily saved to {}".format(filename))
-        self.set_config(config)
+        self.prompt_engine.reset_context()
     
     def clear_last_interaction(self):
         """
         Clear the last interaction from the prompt file
         """
-        with open(self.file_path, 'r') as f:
-            lines = f.readlines()
-            if len(lines) > 1:
-                lines.pop()
-                lines.pop()
-                with open(self.file_path, 'w') as f:
-                    f.writelines(lines)
-            print("\n#   Unlearned interaction")
-    
-    def save_to(self, save_name):
-        """
-        Save the prompt file to a new location with the config
-        """
-        if not save_name.endswith('.txt'):
-            save_name = save_name + '.txt'
-        save_path = os.path.join(os.path.dirname(__file__), "..", "contexts", save_name)
-
-        # first write the config
-        with open(self.config_path, 'r') as f:
-            lines = f.readlines()
-            lines = ['## ' + line for line in lines]
-            with Path(save_path).open('w') as f:
-                f.writelines(lines)
-        
-        # then write the prompt file
-        with open(self.file_path, 'r') as f:
-            lines = f.readlines()
-            with Path(save_path).open('a') as f:
-                f.writelines(lines)
-        
-        print('\n#   Context saved to {}'.format(save_name))
+        self.prompt_engine.remove_last_interaction()
     
     def start_multi_turn(self):
         """
         Turn on context mode
         """
-        self.config['multi_turn'] = 'on'
-        self.set_config(self.config)
-        print("\n#   Multi turn mode is on")
+        self.prompt_engine.config.model_config.multi_turn = "on"
 
     
     def stop_multi_turn(self):
         """
         Turn off context mode
         """
-        self.config['multi_turn'] = 'off'
-        self.set_config(self.config)
-        print("\n#   Multi turn mode is off")
+        self.prompt_engine.config.model_config.multi_turn = "off"
     
     def default_context(self):
         """
         Go to default context
         """
-        self.load_context(self.context_source_filename)
+        shell_context_path = Path(os.path.join(os.path.dirname(__file__), "..", "contexts", f"{self.prompt_engine.config.model_config.shell}-context.yaml"))
+        self.prompt_engine = self.create_prompt_engine_from_yaml(shell_context_path)
+        self.save_prompt_engine(self.prompt_engine, self.default_config_path)
+        print (f'\n#   Switched to f"{self.prompt_engine.config.model_config.shell}-context.yaml')
+
+    def clear_context(self):
+        shell_context_path = Path(os.path.join(os.path.dirname(__file__), "..", "contexts", f"{self.prompt_engine.config.model_config.shell}-context.yaml"))
+        self.prompt_engine = self.create_prompt_engine_from_yaml(shell_context_path)
+        self.save_prompt_engine(self.prompt_engine, self.default_config_path)
+        print (f'\n#   Cleared context')
+
+    def save_to(self, filename):
+        if not filename.endswith('.yaml'):
+            filename = filename + '.yaml'
+        filepath = Path(os.path.join(os.path.dirname(__file__), "..", "contexts", filename))
+        with open(filepath, 'w') as f:
+            f.write(self.prompt_engine.save_yaml())
     
-    def load_context(self, filename, initialize=False):
+    def load_context(self, filename):
         """
         Loads a context file into current_context
         """
-        if not filename.endswith('.txt'):
-            filename = filename + '.txt'
+        if not filename.endswith('.yaml'):
+            filename = filename + '.yaml'
         filepath = Path(os.path.join(os.path.dirname(__file__), "..", "contexts", filename))
 
         # check if the file exists
         if filepath.exists():
-            with filepath.open('r') as f:
-                lines = f.readlines()
             
             # read in the engine name from openaiapirc
             config = configparser.ConfigParser()
             config.read(API_KEYS_LOCATION)
-            ENGINE = config['openai']['engine'].strip('"').strip("'")
+            engine = config['openai']['engine'].strip('"').strip("'")
+            
+            self.prompt_engine = self.create_prompt_engine_from_yaml(filepath)
+            self.prompt_engine.config.model_config.engine = engine ## Needed?
 
-            config = {
-                'engine': ENGINE,
-                'temperature': float(lines[1].split(':')[1].strip()),
-                'max_tokens': int(lines[2].split(':')[1].strip()),
-                'shell': lines[3].split(':')[1].strip(),
-                'multi_turn': lines[4].split(':')[1].strip(),
-                'token_count': int(lines[5].split(':')[1].strip())
-            }
+            self.save_prompt_engine(self.prompt_engine, self.default_config_path)
+            return True
 
-            # use new config if old config doesn't exist
-            if initialize == False or self.has_config() == False:
-                self.set_config(config)
-            else:
-                self.config = self.read_config()
-
-            lines = lines[6:]
-
-            # write to the current prompt file if we are in multi-turn mode
-            if initialize == False or self.config['multi_turn'] == "off":
-                with open(self.file_path, 'w') as f:
-                    f.writelines(lines)
-                
-                if initialize == False:
-                    print('\n#   Context loaded from {}'.format(filename))
         else:
-            print("\n#   File not found")
             return False
+
+        
+
+    def save_prompt_engine(self, obj, file_path = os.path.join(os.path.dirname(__file__), "..", 'current_context.pickle')):
+        try:
+            with open(file_path, 'wb') as f:
+                pickle.dump(obj, f)
+        except Exception as e:
+            raise Exception("Error saving prompt engine: {}".format(e))
+            
+    def load_prompt_engine(self, file_path = os.path.join(os.path.dirname(__file__), "..", 'current_context.pickle')):
+        try:
+            with open(file_path, 'rb') as f:
+                prompt_engine = pickle.load(f)
+                return prompt_engine
+            return None
+        except Exception as e:
+            print("Error loading prompt engine: {}".format(e))
+            return None

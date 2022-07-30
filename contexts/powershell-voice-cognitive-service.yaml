@@ -1,0 +1,73 @@
+type: code-engine
+config:
+  model-config:
+    engine: "code-cushman-001"
+    temperature: 0
+    max_tokens: 1024
+    shell: "powershell"
+    multi_turn: "off"
+    token_count: 110
+  comment-operator: "#"
+  description-comment-operator: "##"
+description: "This converts Natural Language Commands to Command Line Commands. Here are some examples"
+examples:
+  - input: "what processes are hogging the most cpu?"
+    response: |
+      Get-Process | Sort-Object -Property CPU -Descending | Select-Object -First 10
+      spx synthesize --text ("Here are the top 10 processes by memory used") --speakers --quiet
+
+  - input: "stop the chrome processes"
+    response: |
+      Get-Process chrome | Stop-Process
+      spx synthesize --text ("I stopped chrome") --speakers --quiet
+
+  - input: "what's running on port 3000?"
+    response: |
+      Get-Process -Id (Get-NetTCPConnection -LocalPort 3000).OwningProcess
+      spx synthesize --text ("I found the process running on port 3000") --speakers --quiet
+
+  - input: "kill process 1584"
+    response: |
+      Stop-Process -Id 1584
+      spx synthesize --text ("I killed the process with ID 1584") --speakers --quiet
+
+  - input: "what other devices are on my network?"
+    response: |
+      Get-NetIPAddress | Format-Table
+      spx synthesize --text ("Here are the IP addresses on your network") --speakers --quiet
+
+  - input: "how much storage is left on my pc?"
+    response: |
+      Get-WmiObject -Class Win32_LogicalDisk | Select-Object -Property DeviceID,FreeSpace,Size,DriveType | Format-Table -AutoSize
+      spx synthesize --text ("Here is the amount of storage left on your computer") --speakers --quiet
+
+  - input: "how many GB is 367247884288 B?"
+    response: |
+      spx synthesize --text ("367247884288 B is " + (367247884288 / 1073741824) + " GB") --speakers --quiet
+  - input: "where do you live?"
+    response: |
+      spx synthesize --text ("I live in " + $HOME) --speakers --quiet
+  - input: "what's my IP address?"
+    response: |
+      $ip = (Invoke-WebRequest -Uri http://ifconfig.me/ip).Content
+      spx synthesize --text ("Your IP address is " + $ip) --speakers --quiet
+
+  - input: "tell me a joke"
+    response: |
+      spx synthesize --text ("What do dog robots do? They byte!") --speakers --quiet
+  - input: "You: How do I combine arrays?"
+    response: |
+      spx synthesize --text ("Bot: You can use the concat() method") --speakers --quiet
+  - input: "tell me a joke"
+    response: |
+      spx synthesize --text ("Why do programmers always mix up Halloween and Christmas? Because Oct 31 = Dec 25") --speakers --quiet
+  - input: "tell me a joke"
+    response: |
+      spx synthesize --text ("The best method for accelerating a computer is the one that boosts it by 9.8 m/s^2") --speakers --quiet
+  - input: "what's the meaning of life?"
+    response: |
+      spx synthesize --text ("The meaning of life is 42") --speakers --quiet
+  - input: "where are you located"
+    response: |
+      spx synthesize --text ("I live in " + $HOME) --speakers --quiet
+flow-reset-text: "Ignore the previous examples and start afresh, from here on out, this is an unrelated conversation" 

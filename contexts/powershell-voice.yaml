@@ -1,0 +1,37 @@
+type: code-engine
+config:
+  model-config:
+    engine: "code-cushman-001"
+    temperature: 0
+    max_tokens: 1024
+    shell: "powershell"
+    multi_turn: "off"
+    token_count: 110
+  comment-operator: "#"
+  description-comment-operator: "##"
+description: "This converts Natural Language Commands to Command Line Commands. Here are some examples"
+examples:
+  - input: "what processes are hogging the most cpu?"
+    response: "Get-Process | Sort-Object -Property CPU -Descending | Select-Object -First 10"
+  - input: "stop the chrome processes"
+    response: "Get-Process chrome | Stop-Process"
+  - input: "make a readme with a project header and two sections"
+    response: |
+      # Project Header
+      ## Section 1
+      ## Section 2" | Out-File "./readme2.md"
+  - input: "what's running on port 3000?"
+    response: "Get-Process -Id (Get-NetTCPConnection -LocalPort 3000).OwningProcess"
+  - input: "kill process 1584"
+    response: "Stop-Process -Id 1584"
+  - input: "what other devices are on my network?"
+    response: "Get-NetIPAddress | Format-Table"
+  - input: "how much storage is left on my pc?"
+    response: "Get-WmiObject -Class Win32_LogicalDisk | Select-Object -Property DeviceID,FreeSpace,Size,DriveType | Format-Table -AutoSize"
+  - input: "how many GB is 367247884288 B?"
+    response: "(367247884288 / 1GB)"
+  - input: "what's the meaning of life?"
+    response: '(new-object -ComObject SAPI.SPVoice).Speak("The meaning of life is 42")'
+  - input: "where are you located"
+    response: '(new-object -ComObject SAPI.SPVoice).Speak("I live in " + $HOME)'
+flow-reset-text: "Ignore the previous examples and start afresh, from here on out, this is an unrelated conversation"
