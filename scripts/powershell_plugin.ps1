@@ -30,6 +30,15 @@ Set-PSReadLineKeyHandler -Key Ctrl+g `
 
     # get response from create_completion function
     $output = create_completion($line)
+
+    # get first char of the response
+    # if its not #, add # to the beginning of the response
+    if ($output[0] -ne "#") {
+        $output = "# $output"
+    }
+    # note: add multiline fix
+    
+
     
     # check if output is not null
     if ($output -ne $null) {
