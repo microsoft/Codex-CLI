@@ -43,7 +43,7 @@ validateSettings()
 configureZsh()
 {
     # Remove previous settings
-    sed -i '' '/### Codex CLI setup - start/,/### Codex CLI setup - end/d' $zshrcPath
+    sed -i'' '/### Codex CLI setup - start/,/### Codex CLI setup - end/d' "$(readlink -f $zshrcPath)"
     echo "Removed previous settings in $zshrcPath if present"
 
     # Update the latest settings
