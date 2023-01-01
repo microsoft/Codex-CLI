@@ -9,7 +9,7 @@
 #
 # For example:
 # ./zsh_setup.sh -o <YOUR_ORG_ID> -k <YOUR_API_KEY> -e <ENGINE_ID>
-# 
+#
 set -e
 
 # Call OpenAI API with the given settings to verify everythin is in order
@@ -52,7 +52,7 @@ configureZsh()
     echo "source \"\$CODEX_CLI_PATH/scripts/zsh_plugin.zsh\"" >> $zshrcPath
     echo "bindkey '^G' create_completion" >> $zshrcPath
     echo "### Codex CLI setup - end" >> $zshrcPath
-    
+
     echo "Added settings in $zshrcPath"
 }
 
@@ -63,7 +63,7 @@ configureApp()
     echo "organization_id=$orgId" >> $openAIConfigPath
     echo "secret_key=$secret" >> $openAIConfigPath
     echo "engine=$engineId" >> $openAIConfigPath
-    
+
     echo "Updated OpenAI configuration file ($openAIConfigPath) with secrets"
 
     # Change file mode of codex_query.py to allow execution
@@ -108,8 +108,20 @@ validateSettings
 openAIConfigPath="$CODEX_CLI_PATH/src/openaiapirc"
 zshrcPath="$HOME/.zshrc"
 
-configureZsh
-configureApp
+if [ -z "$1" ]; then
+   configureZsh
+   configureApp
+else
+    while [[ "$#" -gt 0 ]]
+    do case $1 in
+        -a|--app-only) configureApp
+        shift;;
+        *) echo "Unknown parameter passed: $1"
+        exit 1;;
+    esac
+    shift
+    done
+fi
 
 echo -e "*** Setup complete! ***\n";
 
