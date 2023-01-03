@@ -1,7 +1,11 @@
 #!/bin/zsh
 
-# This ZSH plugin reads the text from the current buffer 
+# This ZSH plugin reads the text from the current buffer
 # and uses a Python script to complete the text.
+
+if [[ -z "$CODEX_CLI_PATH" ]];then
+export CODEX_CLI_PATH="$( cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )/../"
+fi
 
 create_completion() {
     # Get the text typed until now.

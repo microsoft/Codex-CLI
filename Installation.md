@@ -115,6 +115,15 @@ $ git clone https://github.com/microsoft/Codex-CLI.git ~/your/custom/path/
 
 3. Run `zsh`, start typing and complete it using `^G`!
 
+### Using [zinit](https://github.com/zdharma-continuum/zinit) to install
+
+1. Add below settings to your zshrc
+
+```
+zinit ice lucid wait atclone"./scripts/zsh_setup.sh -a" src"scripts/zsh_plugin.zsh" atload"bindkey '^G' create_completion"
+zinit light microsoft/Codex-CLI.git
+```
+
 ### Clean up
 Once you are done, go to `~/your/custom/path/` (the folder contains Codex CLI code), then run the following command to clean up.
 ```
