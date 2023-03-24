@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -e
+set -m
 trap 'exitScript' ERR
 
 help()
@@ -12,7 +12,7 @@ Usage: source bash_setup.sh [optional parameters]
 
     -o orgId     Set the OpenAI organization id.
     -k apiKey    Set the OpenAI API key.
-    -e engineId  Set the OpenAI engine id.
+    -m modelId  Set the OpenAI model id.
     -d           Print some system information for debugging.
     -h           Print this help content.
 
@@ -28,7 +28,7 @@ readParameters()
         case $1 in
             -o ) shift; ORG_ID=$1 ;;
             -k ) shift; SECRET_KEY=$1 ;;
-            -e ) shift; ENGINE_ID=$1 ;;
+            -e ) shift; MODEL_ID=$1 ;;
             -d ) systemInfo
                  exitScript
                 ;;
@@ -50,12 +50,13 @@ askSettings()
     if [ -z "$SECRET_KEY" ]; then
         echo -n 'OpenAI API key: '; read -s SECRET_KEY; echo
     fi
-    if [ -z "$ENGINE_ID" ]; then
-        echo -n 'OpenAI Engine Id: '; read ENGINE_ID
+    if [ -z "$MODEL_ID" ]; then
+        echo -n 'OpenAI Model Id: '; read MODEL_ID
     fi
 }
 
-# Call OpenAI API with the given settings to verify everythin is in order
+# Call OpenAI API with the given settings to verify everything is in order
+# API call to https://api.openai.com/v1/engines is a potential risk in the future because the route is deprecated
 validateSettings()
 {
     echo -n "*** Testing Open AI access... "
@@ -70,11 +71,11 @@ validateSettings()
         exitScript
         return
     fi
-    local ENGINE_FOUND=$(echo "$TEST"|grep '"id"'|grep "\"$ENGINE_ID\"")
-    if [ -z "$ENGINE_FOUND" ]; then
+    local MODEL_FOUND=$(echo "$TEST"|grep '"id"'|grep "\"$MODEL_ID\"")
+    if [ -z "$MODEL_FOUND" ]; then
         echo "ERROR"
-        echo "Cannot find OpenAI engine: $ENGINE_ID" 
-        echo "Please check the OpenAI engine id (https://beta.openai.com/docs/engines/codex-series-private-beta)."
+        echo "Cannot find OpenAI model: $MODEL_ID"
+        echo "Please check the OpenAI model id (https://platform.openai.com/docs/models/gpt-4)."
         echo "*************"
         exitScript
         return
@@ -89,7 +90,7 @@ configureApp()
     echo '[openai]' > $OPENAI_RC_FILE
     echo "organization_id=$ORG_ID" >> $OPENAI_RC_FILE
     echo "secret_key=$SECRET_KEY" >> $OPENAI_RC_FILE
-    echo "engine=$ENGINE_ID" >> $OPENAI_RC_FILE
+    echo "model=$MODEL_ID" >> $OPENAI_RC_FILE
     chmod +x "$CODEX_CLI_PATH/src/codex_query.py"
 }
 
@@ -149,7 +150,7 @@ systemInfo()
 # Remove variables and functions from the environment, in case the script was sourced
 cleanupEnv()
 {
-    unset ORG_ID SECRET_KEY ENGINE_ID SOURCED OPENAI_RC_FILE BASH_RC_FILE
+    unset ORG_ID SECRET_KEY MODEL_ID SOURCED OPENAI_RC_FILE BASH_RC_FILE
     unset -f askSettings validateSettings configureApp configureBash enableApp readParameters
 }
 
