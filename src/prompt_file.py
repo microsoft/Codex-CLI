@@ -1,11 +1,10 @@
+import configparser
 import os
 import time
-import configparser
-
 from pathlib import Path
 
-
 API_KEYS_LOCATION = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'openaiapirc')
+
 
 class PromptFile:
     context_source_filename = ""
@@ -14,8 +13,9 @@ class PromptFile:
     default_config_path = os.path.join(os.path.dirname(__file__), "..", "current_context.config")
 
     def __init__(self, file_name, config):
-        self.context_source_filename = "{}-context.txt".format(config['shell']) #  feel free to set your own default context path here
-        
+        self.context_source_filename = "{}-context.txt".format(
+            config['shell'])  # feel free to set your own default context path here
+
         self.file_path = self.default_file_path
         self.config_path = self.default_config_path
 
@@ -28,16 +28,16 @@ class PromptFile:
         Check if the prompt file has a corresponding config file
         """
         return os.path.isfile(self.config_path)
-    
+
     def read_config(self):
         """
         Read the prompt config and return a dictionary
         """
 
-        if self.has_config() == False:
+        if not self.has_config():
             self.set_config(self.config)
             return self.config
-        
+
         with open(self.config_path, 'r') as f:
             lines = f.readlines()
 
@@ -51,14 +51,14 @@ class PromptFile:
         }
 
         self.config = config
-        return self.config 
-    
+        return self.config
+
     def set_config(self, config):
         """
         Set the prompt headers with the new config
         """
         self.config = config
-        
+
         with open(self.config_path, 'w') as f:
             f.write('engine: {}\n'.format(self.config['engine']))
             f.write('temperature: {}\n'.format(self.config['temperature']))
@@ -66,7 +66,7 @@ class PromptFile:
             f.write('shell: {}\n'.format(self.config['shell']))
             f.write('multi_turn: {}\n'.format(self.config['multi_turn']))
             f.write('token_count: {}\n'.format(self.config['token_count']))
-    
+
     def show_config(self):
         print('\n')
         # read the dictionary into a list of # lines
@@ -74,7 +74,7 @@ class PromptFile:
         for key, value in self.config.items():
             lines.append('# {}: {}\n'.format(key, value))
         print(''.join(lines))
-    
+
     def add_input_output_pair(self, user_query, prompt_response):
         """
         Add lines to file_name and update the token_count
@@ -83,11 +83,11 @@ class PromptFile:
         with open(self.file_path, 'a') as f:
             f.write(user_query)
             f.write(prompt_response)
-        
+
         if self.config['multi_turn'] == 'on':
             self.config['token_count'] += len(user_query.split()) + len(prompt_response.split())
             self.set_config(self.config)
-    
+
     def read_prompt_file(self, input):
         """
         Get the updated prompt file
@@ -103,7 +103,7 @@ class PromptFile:
             # delete first 2 lines of prompt context file
             with open(self.file_path, 'r') as f:
                 lines = f.readlines()
-                prompt = lines[2:] # drop first 2 lines of prompt
+                prompt = lines[2:]  # drop first 2 lines of prompt
             with open(self.file_path, 'w') as f:
                 f.writelines(prompt)
 
@@ -112,7 +112,7 @@ class PromptFile:
             lines = f.readlines()
 
         return ''.join(lines)
-    
+
     def get_token_count(self):
         """
         Get the actual token count
@@ -122,20 +122,20 @@ class PromptFile:
             with open(self.config_path, 'r') as f:
                 lines = f.readlines()
                 token_count = int(lines[5].split(':')[1].strip())
-        
+
         true_token_count = 0
         with open(self.file_path, 'r') as f:
             lines = f.readlines()
             # count the number of words in the prompt file
             for line in lines:
                 true_token_count += len(line.split())
-        
+
         if true_token_count != token_count:
             self.config['token_count'] = true_token_count
             self.set_config(self.config)
-        
+
         return true_token_count
-    
+
     def clear(self):
         """
         Clear the prompt file, while keeping the config
@@ -148,14 +148,14 @@ class PromptFile:
             filename = os.path.join(os.path.dirname(__file__), "..", "deleted", filename)
             with Path(filename).open('w') as f:
                 f.writelines(lines)
-        
+
         # delete the prompt file
         with open(self.file_path, 'w') as f:
             f.write('')
-        
+
         print("\n#   Context has been cleared, temporarily saved to {}".format(filename))
         self.set_config(config)
-    
+
     def clear_last_interaction(self):
         """
         Clear the last interaction from the prompt file
@@ -168,7 +168,7 @@ class PromptFile:
                 with open(self.file_path, 'w') as f:
                     f.writelines(lines)
             print("\n#   Unlearned interaction")
-    
+
     def save_to(self, save_name):
         """
         Save the prompt file to a new location with the config
@@ -183,15 +183,15 @@ class PromptFile:
             lines = ['## ' + line for line in lines]
             with Path(save_path).open('w') as f:
                 f.writelines(lines)
-        
+
         # then write the prompt file
         with open(self.file_path, 'r') as f:
             lines = f.readlines()
             with Path(save_path).open('a') as f:
                 f.writelines(lines)
-        
+
         print('\n#   Context saved to {}'.format(save_name))
-    
+
     def start_multi_turn(self):
         """
         Turn on context mode
@@ -200,7 +200,6 @@ class PromptFile:
         self.set_config(self.config)
         print("\n#   Multi turn mode is on")
 
-    
     def stop_multi_turn(self):
         """
         Turn off context mode
@@ -208,13 +207,13 @@ class PromptFile:
         self.config['multi_turn'] = 'off'
         self.set_config(self.config)
         print("\n#   Multi turn mode is off")
-    
+
     def default_context(self):
         """
         Go to default context
         """
         self.load_context(self.context_source_filename)
-    
+
     def load_context(self, filename, initialize=False):
         """
         Loads a context file into current_context
@@ -227,7 +226,7 @@ class PromptFile:
         if filepath.exists():
             with filepath.open('r') as f:
                 lines = f.readlines()
-            
+
             # read in the engine name from openaiapirc
             config = configparser.ConfigParser()
             config.read(API_KEYS_LOCATION)
@@ -251,11 +250,11 @@ class PromptFile:
             lines = lines[6:]
 
             # write to the current prompt file if we are in multi-turn mode
-            if initialize == False or self.config['multi_turn'] == "off":
+            if (not initialize) or self.config['multi_turn'] == "off":
                 with open(self.file_path, 'w') as f:
                     f.writelines(lines)
-                
-                if initialize == False:
+
+                if not initialize:
                     print('\n#   Context loaded from {}'.format(filename))
         else:
             print("\n#   File not found")
