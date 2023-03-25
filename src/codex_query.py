@@ -58,7 +58,10 @@ def initialize():
     config.read(API_KEYS_LOCATION)
 
     openai.api_key = config['openai']['secret_key'].strip('"').strip("'")
-    openai.organization = config['openai']['organization_id'].strip('"').strip("'")
+    openai.api_version = "2022-12-01"
+    #openai.organization = config['openai']['organization_id'].strip('"').strip("'")
+    openai.api_type = "azure"
+    openai.api_base = "https://jarvis-openai.openai.azure.com/"
     ENGINE = config['openai']['engine'].strip('"').strip("'")
 
     prompt_config = {
