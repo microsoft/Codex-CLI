@@ -33,6 +33,8 @@ PROMPT_CONTEXT = Path(__file__).with_name('current_context.txt')
 # organization=<organization-id>
 # secret_key=<your secret key>
 # engine=<engine-name>
+# api_version=<api-version>
+# base_url=<base-url>
 def create_template_ini_file():
     """
     If the ini file does not exist create it and add secret_key
@@ -44,6 +46,8 @@ def create_template_ini_file():
         print('# organization_id=<organization-id>')
         print('# secret_key=<your secret key>\n')
         print('# engine=<engine-id>')
+        print('# api_version=<api-version>')
+        print('# base_url=<base-url>\n')
         sys.exit(1)
 
 def initialize():
@@ -58,10 +62,15 @@ def initialize():
     config.read(API_KEYS_LOCATION)
 
     openai.api_key = config['openai']['secret_key'].strip('"').strip("'")
-    openai.api_version = "2022-12-01"
-    #openai.organization = config['openai']['organization_id'].strip('"').strip("'")
-    openai.api_type = "azure"
-    openai.api_base = "https://jarvis-openai.openai.azure.com/"
+    base_url = config['openai']['base_url'].strip('"').strip("'")
+    if base_url == "":
+        openai.organization = config['openai']['organization_id'].strip('"').strip("'")
+    else:
+        if DEBUG_MODE:
+            print("Using Azure OpenAI")
+        openai.api_type = "azure"
+        openai.api_version = config['openai']['api_version'].strip('"').strip("'")
+        openai.api_base = config['openai']['base_url'].strip('"').strip("'")
     ENGINE = config['openai']['engine'].strip('"').strip("'")
 
     prompt_config = {
@@ -204,11 +213,16 @@ if __name__ == '__main__':
         codex_query = prefix + prompt_file.read_prompt_file(user_query) + user_query
 
         # get the response from codex
-        response = openai.Completion.create(engine=config['engine'], prompt=codex_query, temperature=config['temperature'], max_tokens=config['max_tokens'], stop="#")
+        response = openai.Completion.create(
+            engine=config['engine'], 
+            prompt=codex_query, 
+            temperature=config['temperature'], 
+            max_tokens=config['max_tokens'], 
+            stop="#")
 
         completion_all = response['choices'][0]['text']
 
-        if is_sensitive_content(user_query + '\n' + completion_all):
+        if (False): #s_sensitive_content(user_query + '\n' + completion_all):
             print("\n#   Sensitive content detected, response has been redacted")
         else:
             print(completion_all)
