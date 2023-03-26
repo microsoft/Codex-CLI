@@ -131,21 +131,7 @@ if __name__ == '__main__':
             'token_count': 0
         }
 
-        # use query prefix to prime Codex for correct scripting language
-        prefix = ""
-        # prime codex for the corresponding shell type
-        if config['shell'] == "zsh":
-            prefix = '#!/bin/zsh\n\n'
-        elif config['shell'] == "bash":
-            prefix = '#!/bin/bash\n\n'
-        elif config['shell'] == "powershell":
-            prefix = '<# powershell #>\n\n'
-        elif config['shell'] == "unknown":
-            print("\n#\tUnsupported shell type, please use # set shell <shell>")
-        else:
-            prefix = '#' + config['shell'] + '\n\n'
-
-        codex_query = prefix + prompt_file.read_prompt_file(user_query) + user_query
+        codex_query = prompt_file.read_prompt_file(user_query) + user_query
 
         # get the response from openAI
         response = openai.ChatCompletion.create(model=config['model'],
