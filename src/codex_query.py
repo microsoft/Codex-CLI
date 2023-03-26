@@ -147,14 +147,14 @@ if __name__ == '__main__':
 
         codex_query = prefix + prompt_file.read_prompt_file(user_query) + user_query
 
-        # get the response from codex
+        # get the response from openAI
         response = openai.ChatCompletion.create(model=config['model'],
                                                 messages=[
                                                     {'role': 'system', 'content': 'You are an shell code assistant, '
                                                                                   'complete the textual query of the '
                                                                                   'user with a valid shell command. '
                                                                                   'The specific shell type is ' +
-                                                                                  prefix + '.'},
+                                                                                  config['shell'] + '.'},
                                                     {'role': 'user', 'content': codex_query}],
                                                 temperature=config['temperature'], max_tokens=config['max_tokens'],
                                                 stop="#")
