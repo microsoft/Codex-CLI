@@ -141,9 +141,9 @@ if __name__ == '__main__':
                                                                                   'user with a valid shell command. '
                                                                                   'The specific shell type is ' +
                                                                                   config['shell'] + '. '
-                                                                                                    'If you the user wants a textual'
-                                                                                                    'reply, your reply should be a '
-                                                                                                    'comment based on the shell type.'},
+                                                                                  'If you the user wants a textual'
+                                                                                  'reply, your reply should be a '
+                                                                                  'comment based on the shell type.'},
                                                     {'role': 'user', 'content': codex_query}],
                                                 temperature=config['temperature'], max_tokens=config['max_tokens'],
                                                 stop="#")
