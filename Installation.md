@@ -19,23 +19,28 @@ In order to run the Codex CLI, ensure that you have python installed. To install
 python -m pip install -r requirements.txt
 ```
 
-Additionally, the OpenAI API key, organization id, and engine id are required to execute the Codex CLI tool. 
+Additionally, the OpenAI API key, organization id, and engine id are required to execute the Codex CLI tool.
 
-To obtain the OpenAI API key information, go to (https://beta.openai.com/account/api-keys) and login into your account. 
+To obtain the OpenAI API key information, go to (https://platform.openai.com/account/api-keys) and login into your
+account.
 
-Once logged in you will see: 
+Once logged in you will see:
 ![](images/OpenAI-apikey.png)
 
 Copy the API key by clicking the _Copy_ button and save the copied key where you can retrieve it.
 
-To obtain the OpenAI organization id, go to OpenAI Settings page (https://beta.openai.com/account/org-settings) and copy the id shown underneath the _Organization ID_ heading. Save the copied id with the API key that was stored in previous step. 
+To obtain the OpenAI organization id, go to OpenAI Settings page (https://platform.openai.com/account/org-settings) and
+copy the id shown underneath the _Organization ID_ heading. Save the copied id with the API key that was stored in
+previous step.
 
-See image below for reference: 
+See image below for reference:
 ![](images/OpenAI-orgid.png)
 
-To obtain the OpenAI engine id, go to OpenAI Engines page (https://beta.openai.com/docs/engines/codex-series-private-beta) for the engines available for Codex models. Select the desired engine and save the engine id with the API key and organization id stored in previous steps. 
+To obtain the OpenAI model id, go to OpenAI Models page (https://platform.openai.com/docs/models) for the models
+available for Chat models. Select the desired model and save the model id with the API key and organization id stored in
+previous steps.
 
-See image below for reference: 
+See image below for reference:
 ![](images/OpenAI-engineid.png)
 
 ## Bash instructions
@@ -54,10 +59,11 @@ To leverage the Codex CLI on WSL and Linux environments using Bash please follow
 
 3. Setup your Bash Codex CLI environment.
 
-	In the Codex CLI folder, there is a folder named `scripts` where you will find a `bash_setup.sh` script which is used to setup the Bash environment.
+   In the Codex CLI folder, there is a folder named `scripts` where you will find a `bash_setup.sh` script which is used
+   to setup the Bash environment.
 
-	Run the following commands to setup your environment, the script will prompt
-	for Organization id, API key and engine id:
+   Run the following commands to set up your environment, the script will prompt
+   for Organization id, API key and engine id:
 	```
 	cd scripts
 	source bash_setup.sh
@@ -79,10 +85,10 @@ Once done, close the terminal session.
 
 By default `bash_setup.sh` will prompt for the required settings. It's also possible to pass these values from the command line, using the following parameters:
 
-| Parameter    | Description |
-|--------------|-------------|
-| `-o <value>` | To pass your [OpenAI Organization Id](https://beta.openai.com/account/org-settings) |
-| `-k <value>` | To pass your [OpenAI API key](https://beta.openai.com/account/api-keys) |
+| Parameter    | Description                                                                                       |
+|--------------|---------------------------------------------------------------------------------------------------|
+| `-o <value>` | To pass your [OpenAI Organization Id](https://beta.openai.com/account/org-settings)               |
+| `-k <value>` | To pass your [OpenAI API key](https://beta.openai.com/account/api-keys)                           |
 | `-e <value>` | To specify the [OpenAI Engine Id](https://beta.openai.com/docs/engines/codex-series-private-beta) |
 
 Example: 
