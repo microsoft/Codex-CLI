@@ -33,7 +33,7 @@ This repository aims to grow the understanding of using Codex in applications by
   * [OpenAI API Key](https://platform.openai.com/account/api-keys).
   * [OpenAI Organization Id](https://platform.openai.com/account/org-settings). If you have multiple organizations,
     please update your [default organization](https://beta.openai.com/account/api-keys) to the one that has access to
-    codex engines before getting the organization Id.
+    codex models before getting the organization Id.
   * [OpenAI Model Id](https://platform.openai.com/docs/models). It provides access to a model. For
     example, `gpt-3.5-turbo` or `gpt-4`.
 
@@ -74,12 +74,13 @@ Any time the model seems to output consistently incorrect commands, you can use 
 | `load context <filename>` | Loads the context file from `contexts` folder |
 | `default context` | Loads default shell context |
 | `view context` | Opens the context file in a text editor |
-| `save context <filename>` | Saves the context file to `contexts` folder, if name not specified, uses current date-time |
+| `save context <filename>` | Saves the context file to `contexts` folder, if name not specified, uses current
+date-time |
 | `show config` | Shows the current configuration of your interaction with the model |
 | `set <config-key> <config-value>` | Sets the configuration of your interaction with the model |
 
-
-Feel free to improve your experience by changing the token limit, engine id and temperature using the set command. For example, `# set engine cushman-codex`, `# set temperature 0.5`, `# set max_tokens 50`.
+Feel free to improve your experience by changing the token limit, model id and temperature using the set command. For
+example, `# set model gpt-4`, `# set temperature 0.5`, `# set max_tokens 50`.
 
 ## Prompt Engineering and Context Files
 
@@ -141,7 +142,7 @@ of `codex_query.py` for that exception and print a custom error message.
 
 You might have access to different [OpenAI models](https://platform.openai.com/docs/models/overview) per OpenAI
 organization. To check what models are available to you, one can query
-the [List models API](https://platform.openai.com/docs/api-reference/models/list) for available engines. See the
+the [List models API](https://platform.openai.com/docs/api-reference/models/list) for available models. See the
 following commands:
 
 * Shell
