@@ -1,6 +1,7 @@
 # Codex CLI - Natural Language Command Line Interface
 
-This project uses [GPT-3 Codex](https://openai.com/blog/openai-codex/) to convert natural language commands into commands in PowerShell, Z shell and Bash.
+This project uses [ChatGPT like Models](https://platform.openai.com/docs/models/gpt-4) to convert natural language
+commands into commands in PowerShell, Z shell and Bash.
 
 ![Codex Cli GIF](codex_cli.gif)
 
