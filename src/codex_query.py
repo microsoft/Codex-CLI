@@ -136,14 +136,14 @@ if __name__ == '__main__':
         # get the response from openAI
         response = openai.ChatCompletion.create(model=config['model'],
                                                 messages=[
-                                                    {'role': 'system', 'content': 'You are an shell code assistant, '
+                                                    {'role': 'system', 'content': 'You are a shell code assistant, '
                                                                                   'complete the textual query of the '
                                                                                   'user with a valid shell command. '
                                                                                   'The specific shell type is ' +
-                                                                                  config['shell'] + '. '
-                                                                                  'If you the user wants a textual'
-                                                                                  'reply, your reply should be a '
-                                                                                  'comment based on the shell type.'},
+                                                                                  config['shell'] + '. If the user '
+                                                                                                    'wants a textual reply, your reply '
+                                                                                                    'should be prefixed with a comment '
+                                                                                                    'symbol based on the shell type.'},
                                                     {'role': 'user', 'content': codex_query}],
                                                 temperature=config['temperature'], max_tokens=config['max_tokens'],
                                                 stop="#")
