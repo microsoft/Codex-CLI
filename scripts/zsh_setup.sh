@@ -28,10 +28,10 @@ validateSettings()
 
         exit 1
     fi
-    local MODEL_FOUND=$(echo "$TEST"|grep '"id"'|grep "\"$modelID\"")
+    local MODEL_FOUND=$(echo "$TEST"|grep '"id"'|grep "\"$modelId\"")
     if [ -z "$MODEL_FOUND" ]; then
         echo "ERROR"
-        echo "Cannot find OpenAI model: $modelID" 
+        echo "Cannot find OpenAI model: $modelId"
         echo "Please check the OpenAI model id (https://platform.openai.com/docs/models/gpt-4)."
         echo "*************"
 
@@ -53,7 +53,7 @@ configureZsh()
     echo "source \"\$CODEX_CLI_PATH/scripts/zsh_plugin.zsh\"" >> $zshrcPath
     echo "bindkey '^G' create_completion" >> $zshrcPath
     echo "### Codex CLI setup - end" >> $zshrcPath
-    
+
     echo "Added settings in $zshrcPath"
 }
 
@@ -63,8 +63,8 @@ configureApp()
     echo "[openai]" > $openAIConfigPath
     echo "organization_id=$orgId" >> $openAIConfigPath
     echo "secret_key=$secret" >> $openAIConfigPath
-    echo "model=$modelID" >> $openAIConfigPath
-    
+    echo "model=$modelId" >> $openAIConfigPath
+
     echo "Updated OpenAI configuration file ($openAIConfigPath) with secrets"
 
     # Change file mode of codex_query.py to allow execution
@@ -86,7 +86,7 @@ else
     echo -n 'OpenAI Organization Id: '; read orgId
 fi
 
-if (( ${+m_modelId[2]} )); then
+if (( ${+o_modelId[2]} )); then
     modelId=${o_modelId[2]}
 else
     echo -n 'OpenAI Model Id: '; read modelId
