@@ -28,7 +28,7 @@ readParameters()
         case $1 in
             -o ) shift; ORG_ID=$1 ;;
             -k ) shift; SECRET_KEY=$1 ;;
-            -e ) shift; MODEL_ID=$1 ;;
+            -m ) shift; MODEL_ID=$1 ;;
             -d ) systemInfo
                  exitScript
                 ;;
