@@ -43,7 +43,15 @@ validateSettings()
 configureZsh()
 {
     # Remove previous settings
-    sed -i '' '/### Codex CLI setup - start/,/### Codex CLI setup - end/d' $zshrcPath
+    
+    # Check if the current system is Darwin (i.e. MacOS)
+    if [[ "$OSTYPE" == "Darwin" ]]; then
+        # Command to execute on MacOS
+        sed -i '' '/### Codex CLI setup - start/,/### Codex CLI setup - end/d' $zshrcPath
+    else
+        # Command to execute on Linux
+        sed -i '/### Codex CLI setup - start/,/### Codex CLI setup - end/d' $zshrcPath
+    fi
     echo "Removed previous settings in $zshrcPath if present"
 
     # Update the latest settings
