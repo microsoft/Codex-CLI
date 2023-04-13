@@ -44,11 +44,8 @@ configureZsh()
 {
     # Remove previous settings
     
-    # Get the name of the current operating system
-    system_name="$(uname -s)"
-
     # Check if the current system is Darwin (i.e. MacOS)
-    if [ "$system_name" == "Darwin" ]; then
+    if [[ "$OSTYPE" == "Darwin" ]]; then
         # Command to execute on MacOS
         sed -i '' '/### Codex CLI setup - start/,/### Codex CLI setup - end/d' $zshrcPath
     else
