@@ -86,18 +86,18 @@ else
     echo -n 'OpenAI Organization Id: '; read orgId
 fi
 
-if (( ${+o_modelId[2]} )); then
-    modelId=${o_modelId[2]}
-else
-    echo -n 'OpenAI Model Id: '; read modelId
-fi
-
 if (( ${+o_key[2]} )); then
     secret=${o_key[2]}
 else
    # Prompt user for OpenAI access key
    read -rs 'secret?OpenAI access key:'
    echo -e "\n"
+fi
+
+if (( ${+o_modelId[2]} )); then
+    modelId=${o_modelId[2]}
+else
+    echo -n 'OpenAI Model Id: '; read modelId
 fi
 
 # Detect Codex CLI folder path
