@@ -21,7 +21,7 @@ create_completion()
     text=${READLINE_LINE}
     completion=$(echo -n "$text" | $CODEX_CLI_PATH/src/codex_query.py)
     # Add completion to the current buffer
-    READLINE_LINE="${text}${completion}"
+    READLINE_LINE="${text}"$'\n'"${completion}"
     # Put the cursor at the end of the line
     READLINE_POINT=${#READLINE_LINE}
 }
