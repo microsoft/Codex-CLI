@@ -6,9 +6,13 @@
 #   -o: Your OpenAI organization id.
 #   -k: Your OpenAI API key.
 #   -e: The OpenAI engine id that provides access to a model.
+#   -a: The API type (openapi/azure).
+#   -m: The Azure model deployment.
+#   -p: The Azure API endpoint.
+#   -v: The Azure API version.
 #
 # For example:
-# ./zsh_setup.sh -o <YOUR_ORG_ID> -k <YOUR_API_KEY> -e <ENGINE_ID>
+# ./zsh_setup.sh -o <YOUR_ORG_ID> -k <YOUR_API_KEY> -e <ENGINE_ID> -a <API_TYPE> -m <MODEL_DEPLOYMENT> -p <API_ENDPOINT> -v <API_VERSION>
 # 
 set -e
 
@@ -39,11 +43,45 @@ validateSettings()
     echo "OK ***"
 }
 
+# Call Azure OpenAI API with the given settings to verify everythin is in order
+validateAzureSettings()
+{
+    echo -n "*** Testing Open AI access... "
+    local TEST=$(curl -s $apiBase"openai/deployments/$engineId/completions?api-version=$apiVersion" \
+        -H "Content-Type: application/json" \
+        -H "api-key: $secret" \
+        -d '{
+        "prompt": "This is a test",
+        "max_tokens": 250,
+        "temperature": 0.7,
+        "frequency_penalty": 0,
+        "presence_penalty": 0,
+        "top_p": 1,
+        "best_of": 1,
+        "stop": null
+        }' -w '%{http_code}')
+    local STATUS_CODE=$(echo "$TEST"|tail -n 1)
+    if [ $STATUS_CODE -ne 200 ]; then
+        echo "ERROR [$STATUS_CODE]"
+        echo "Failed to access OpenAI API, result: $STATUS_CODE"
+        echo "Please check your Azure OpenAI API key" 
+        echo "and Endpoint URL."
+        echo "*************"
+
+        exit 1
+    fi
+    echo "OK ***"
+}
+
 # Append settings and 'Ctrl + G' binding in .zshrc
 configureZsh()
 {
     # Remove previous settings
-    sed -i '' '/### Codex CLI setup - start/,/### Codex CLI setup - end/d' $zshrcPath
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        sed -i '' '/### Codex CLI setup - start/,/### Codex CLI setup - end/d' $zshrcPath
+    else
+        sed -i -e '/### Codex CLI setup - start/,/### Codex CLI setup - end/d' $zshrcPath
+    fi
     echo "Removed previous settings in $zshrcPath if present"
 
     # Update the latest settings
@@ -60,10 +98,15 @@ configureZsh()
 configureApp()
 {
     echo "[openai]" > $openAIConfigPath
-    echo "organization_id=$orgId" >> $openAIConfigPath
     echo "secret_key=$secret" >> $openAIConfigPath
     echo "engine=$engineId" >> $openAIConfigPath
-    
+    # Azure specific settings
+    if [[ "$apiType" == "azure" ]]; then
+        echo "api_base=$apiBase" >> $openAIConfigPath
+        echo "api_version=$apiVersion" >> $openAIConfigPath
+        echo "api_type=$apiType" >> $openAIConfigPath
+    else
+         echo "organization_id=$orgId" >> $openAIConfigPath
     echo "Updated OpenAI configuration file ($openAIConfigPath) with secrets"
 
     # Change file mode of codex_query.py to allow execution
@@ -77,20 +120,41 @@ zmodload zsh/zutil
 zparseopts -E -D -- \
           o:=o_orgId \
           e:=o_engineId \
-          k:=o_key
+          k:=o_key \
+          a:=o_apiType \
+          p:=o_apiBase \
+          v:=o_apiVersion
 
-if (( ${+o_orgId[2]} )); then
-    orgId=${o_orgId[2]}
+if (( ${+o_apiType[2]} )); then
+    apiType=${o_apiType[2]}
 else
-    echo -n 'OpenAI Organization Id: '; read orgId
+    echo -n 'API type (openapi/azure):'; read apiType
 fi
 
+# Check for Azure API settings if apiType is azure
+if [[ "$apiType" == "azure" ]]; then
+    if (( ${+o_apiBase[2]} )); then
+        apiBase=${o_apiBase[2]}
+    else
+        echo -n 'Azure API Endpoint: '; read apiBase
+    fi
+    if (( ${+o_apiVersion[2]} )); then
+        apiVersion=${o_apiVersion[2]}
+    else
+        echo -n 'Azure API Version: '; read apiVersion
+    fi
+else
+    if (( ${+o_orgId[2]} )); then
+        orgId=${o_orgId[2]}
+    else
+        echo -n 'OpenAI Organization Id: '; read orgId
+    fi
+fi
 if (( ${+o_engineId[2]} )); then
-    engineId=${o_engineId[2]}
-else
-    echo -n 'OpenAI Engine Id: '; read engineId
-fi
-
+        engineId=${o_engineId[2]}
+    else
+        echo -n 'OpenAI Engine Id or Azure model deployment: '; read engineId
+    fi
 if (( ${+o_key[2]} )); then
     secret=${o_key[2]}
 else
@@ -103,7 +167,11 @@ fi
 CODEX_CLI_PATH="$( cd "$( dirname "$0" )" && cd .. && pwd )"
 echo "CODEX_CLI_PATH is $CODEX_CLI_PATH"
 
-validateSettings
+if [[ "$apiType" == "azure" ]]; then
+    validateAzureSettings
+else
+    validateSettings
+fi
 
 openAIConfigPath="$CODEX_CLI_PATH/src/openaiapirc"
 zshrcPath="$HOME/.zshrc"

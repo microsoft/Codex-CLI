@@ -1,6 +1,6 @@
 # Codex CLI - Natural Language Command Line Interface
 
-This project uses [GPT-3 Codex](https://openai.com/blog/openai-codex/) to convert natural language commands into commands in PowerShell, Z shell and Bash.
+This project uses [GPT-3 Codex](https://openai.com/blog/openai-codex/) or custom Azure deployed models to convert natural language commands into commands in PowerShell, Z shell and Bash.
 
 ![Codex Cli GIF](codex_cli.gif)
 
@@ -121,7 +121,7 @@ You might have access to different [OpenAI engines](https://beta.openai.com/docs
     ```
     curl https://api.openai.com/v1/engines \
       -H 'Authorization: Bearer YOUR_API_KEY' \
-      -H 'OpenAI-Organization: YOUR_ORG_ID'
+      -H 'OpenAI-Organization: YOUR_ORG_ID' 
     ```
 
 * PowerShell
@@ -137,4 +137,4 @@ You might have access to different [OpenAI engines](https://beta.openai.com/docs
     ```
 
 ### Can I run the sample on Azure?
-The sample code can be currently be used with Codex on OpenAI’s API. In the coming months, the sample will be updated so you can also use it with the [Azure OpenAI Service](https://aka.ms/azure-openai). 
+In order to use this with [Azure OpenAI Service](https://aka.ms/azure-openai), you can run zsh_setup_azure.sh. Bash and powershell will be included in future.

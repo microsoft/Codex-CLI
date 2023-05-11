@@ -10,9 +10,12 @@ Help for Codex CLI Bash setup script
 
 Usage: source bash_setup.sh [optional parameters]
 
-    -o orgId     Set the OpenAI organization id.
-    -k apiKey    Set the OpenAI API key.
-    -e engineId  Set the OpenAI engine id.
+    -o orgId      Set the OpenAI organization id.
+    -k apiKey     Set the OpenAI API key.
+    -e engineId   Set the OpenAI engine id or Azure model deployment.
+    -a apiType    Set the API type (openapi/azure).
+    -p apiBase    Set the Azure API endpoint.
+    -v apiVersion Set the Azure API version.
     -d           Print some system information for debugging.
     -h           Print this help content.
 
@@ -29,6 +32,10 @@ readParameters()
             -o ) shift; ORG_ID=$1 ;;
             -k ) shift; SECRET_KEY=$1 ;;
             -e ) shift; ENGINE_ID=$1 ;;
+            -a ) shift; API_TYPE=$1 ;;
+            -m ) shift; MODEL_DEPLOYMENT=$1 ;;
+            -p ) shift; API_BASE=$1 ;;
+            -v ) shift; API_VERSION=$1 ;;
             -d ) systemInfo
                  exitScript
                 ;;
@@ -44,14 +51,26 @@ readParameters()
 askSettings()
 {
     echo "*** Starting Codex CLI bash setup ***"
-    if [ -z "$ORG_ID" ]; then
-        echo -n 'OpenAI Organization Id: '; read ORG_ID
+    if [ -z "$API_TYPE" ]; then
+        echo -n 'OpenAI API type (openapi/azure): '; read API_TYPE
+    fi
+    if [ "$API_TYPE" == "azure" ]; then
+        if [ -z "$API_BASE" ]; then
+            echo -n 'Azure API endpoint: '; read API_BASE
+        fi
+        if [ -z "$API_VERSION" ]; then
+            echo -n 'Azure API version: '; read API_VERSION
+        fi
+    else
+        if [ -z "$ORG_ID" ]; then
+            echo -n 'OpenAI Organization Id: '; read ORG_ID
+        fi
+    fi  
+    if [ -z "$ENGINE_ID" ]; then
+        echo -n 'OpenAI Engine Id or Azure model deployment: '; read ENGINE_ID
     fi
     if [ -z "$SECRET_KEY" ]; then
         echo -n 'OpenAI API key: '; read -s SECRET_KEY; echo
-    fi
-    if [ -z "$ENGINE_ID" ]; then
-        echo -n 'OpenAI Engine Id: '; read ENGINE_ID
     fi
 }
 
@@ -82,14 +101,50 @@ validateSettings()
     echo "OK ***"
 }
 
+# Call Azure OpenAI API with the given settings to verify everythin is in order
+validateAzureSettings()
+{
+    echo -n "*** Testing Open AI access... "
+    local TEST=$(curl -s $API_BASE "openai/deployments/$ENGINE_ID /completions?api-version=$API_VERSION" \
+        -H "Content-Type: application/json" \
+        -H "api-key: $SECRET_KEY" \
+        -d '{
+        "prompt": "This is a test",
+        "max_tokens": 250,
+        "temperature": 0.7,
+        "frequency_penalty": 0,
+        "presence_penalty": 0,
+        "top_p": 1,
+        "best_of": 1,
+        "stop": null
+        }' -w '%{http_code}')
+    local STATUS_CODE=$(echo "$TEST"|tail -n 1)
+    if [ $STATUS_CODE -ne 200 ]; then
+        echo "ERROR [$STATUS_CODE]"
+        echo "Failed to access OpenAI API, result: $STATUS_CODE"
+        echo "Please check your Azure OpenAI API key" 
+        echo "and Endpoint URL."
+        echo "*************"
+
+        exit 1
+    fi
+    echo "OK ***"
+}
+
 # Store API key and other settings in `openaiapirc`
 configureApp()
 { 
     echo "*** Configuring application [$OPENAI_RC_FILE] ***"
     echo '[openai]' > $OPENAI_RC_FILE
-    echo "organization_id=$ORG_ID" >> $OPENAI_RC_FILE
     echo "secret_key=$SECRET_KEY" >> $OPENAI_RC_FILE
     echo "engine=$ENGINE_ID" >> $OPENAI_RC_FILE
+    if [ "$API_TYPE" == "azure" ]; then
+        echo "api_type=$API_TYPE" >> $OPENAI_RC_FILE
+        echo "api_base=$API_BASE" >> $OPENAI_RC_FILE
+        echo "api_version=$API_VERSION" >> $OPENAI_RC_FILE
+    else
+        echo "organization_id=$ORG_ID" >> $OPENAI_RC_FILE
+    fi
     chmod +x "$CODEX_CLI_PATH/src/codex_query.py"
 }
 
@@ -173,7 +228,11 @@ BASH_RC_FILE="$HOME/.codexclirc"
 # Start installation
 readParameters $*
 askSettings
-validateSettings
+if [ "$API_TYPE" == "azure" ]; then
+    validateAzureSettings
+else
+    validateSettings
+fi
 configureApp
 configureBash
 enableApp
