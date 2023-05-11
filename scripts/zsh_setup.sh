@@ -6,9 +6,13 @@
 #   -o: Your OpenAI organization id.
 #   -k: Your OpenAI API key.
 #   -e: The OpenAI engine id that provides access to a model.
+#   -a: The API type (openapi/azure).
+#   -m: The Azure model deployment.
+#   -p: The Azure API endpoint.
+#   -v: The Azure API version.
 #
 # For example:
-# ./zsh_setup.sh -o <YOUR_ORG_ID> -k <YOUR_API_KEY> -e <ENGINE_ID>
+# ./zsh_setup.sh -o <YOUR_ORG_ID> -k <YOUR_API_KEY> -e <ENGINE_ID> -a <API_TYPE> -m <MODEL_DEPLOYMENT> -p <API_ENDPOINT> -v <API_VERSION>
 # 
 set -e
 
