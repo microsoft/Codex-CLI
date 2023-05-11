@@ -34,7 +34,6 @@ PROMPT_CONTEXT = Path(__file__).with_name('current_context.txt')
 # secret_key=<your secret key>
 # engine=<engine-name>
 # use_azure=<y/n>
-# model_deployment=<model-deployment>
 # api_version=<api-version>
 # api_base=<api-endpoint>
 
@@ -50,7 +49,6 @@ def create_template_ini_file():
         print('# secret_key=<your secret key>\n')
         print('# engine=<engine-id>\n')
         print('# use_azure=<y/n>\n')
-        print('# model_deployment=<model-deployment>\n')
         print('# api_version=<api-version>\n')
         print('# api_base=<api-base>\n')
         sys.exit(1)
@@ -71,10 +69,9 @@ def initialize():
     if openai.api_type == "azure":
         openai.api_base = config['openai']['api_base'].strip('"').strip("'")
         openai.api_version = config['openai']['api_version'].strip('"').strip("'")
-        ENGINE = config['openai']['model_deployment'].strip('"').strip("'")
     else:
         openai.organization = config['openai']['organization_id'].strip('"').strip("'")
-        ENGINE = config['openai']['engine'].strip('"').strip("'")
+    ENGINE = config['openai']['engine'].strip('"').strip("'")
 
     prompt_config = {
         'engine': ENGINE,

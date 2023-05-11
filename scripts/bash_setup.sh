@@ -12,9 +12,8 @@ Usage: source bash_setup.sh [optional parameters]
 
     -o orgId      Set the OpenAI organization id.
     -k apiKey     Set the OpenAI API key.
-    -e engineId   Set the OpenAI engine id.
+    -e engineId   Set the OpenAI engine id or Azure model deployment.
     -a apiType    Set the API type (openapi/azure).
-    -m modelDeployment Set the Azure model deployment.
     -p apiBase    Set the Azure API endpoint.
     -v apiVersion Set the Azure API version.
     -d           Print some system information for debugging.
@@ -56,9 +55,6 @@ askSettings()
         echo -n 'OpenAI API type (openapi/azure): '; read API_TYPE
     fi
     if [ "$API_TYPE" == "azure" ]; then
-        if [ -z "$MODEL_DEPLOYMENT" ]; then
-            echo -n 'Azure model deployment: '; read MODEL_DEPLOYMENT
-        fi
         if [ -z "$API_BASE" ]; then
             echo -n 'Azure API endpoint: '; read API_BASE
         fi
@@ -69,9 +65,9 @@ askSettings()
         if [ -z "$ORG_ID" ]; then
             echo -n 'OpenAI Organization Id: '; read ORG_ID
         fi
-        if [ -z "$ENGINE_ID" ]; then
-            echo -n 'OpenAI Engine Id: '; read ENGINE_ID
-        fi
+    fi  
+    if [ -z "$ENGINE_ID" ]; then
+        echo -n 'OpenAI Engine Id or Azure model deployment: '; read ENGINE_ID
     fi
     if [ -z "$SECRET_KEY" ]; then
         echo -n 'OpenAI API key: '; read -s SECRET_KEY; echo
@@ -109,7 +105,7 @@ validateSettings()
 validateAzureSettings()
 {
     echo -n "*** Testing Open AI access... "
-    local TEST=$(curl -s $API_BASE "openai/deployments/$MODEL_DEPLOYMENT /completions?api-version=$API_VERSION" \
+    local TEST=$(curl -s $API_BASE "openai/deployments/$ENGINE_ID /completions?api-version=$API_VERSION" \
         -H "Content-Type: application/json" \
         -H "api-key: $SECRET_KEY" \
         -d '{
@@ -140,13 +136,15 @@ configureApp()
 { 
     echo "*** Configuring application [$OPENAI_RC_FILE] ***"
     echo '[openai]' > $OPENAI_RC_FILE
-    echo "organization_id=$ORG_ID" >> $OPENAI_RC_FILE
     echo "secret_key=$SECRET_KEY" >> $OPENAI_RC_FILE
     echo "engine=$ENGINE_ID" >> $OPENAI_RC_FILE
-    echo "api_type=$API_TYPE" >> $OPENAI_RC_FILE
-    echo "model_deployment=$MODEL_DEPLOYMENT" >> $OPENAI_RC_FILE
-    echo "api_base=$API_BASE" >> $OPENAI_RC_FILE
-    echo "api_version=$API_VERSION" >> $OPENAI_RC_FILE
+    if [ "$API_TYPE" == "azure" ]; then
+        echo "api_type=$API_TYPE" >> $OPENAI_RC_FILE
+        echo "api_base=$API_BASE" >> $OPENAI_RC_FILE
+        echo "api_version=$API_VERSION" >> $OPENAI_RC_FILE
+    else
+        echo "organization_id=$ORG_ID" >> $OPENAI_RC_FILE
+    fi
     chmod +x "$CODEX_CLI_PATH/src/codex_query.py"
 }
 
