@@ -72,10 +72,6 @@ def initialize():
         openai.api_base = config['openai']['api_base'].strip('"').strip("'")
         openai.api_version = config['openai']['api_version'].strip('"').strip("'")
         ENGINE = config['openai']['model_deployment'].strip('"').strip("'")
-        print("Using Azure API")
-        print("API Base: " + openai.api_base)
-        print("API Version: " + openai.api_version)
-        print("Model Deployment: " + ENGINE)
     else:
         openai.organization = config['openai']['organization_id'].strip('"').strip("'")
         ENGINE = config['openai']['engine'].strip('"').strip("'")
