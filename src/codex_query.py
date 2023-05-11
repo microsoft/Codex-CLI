@@ -33,8 +33,11 @@ PROMPT_CONTEXT = Path(__file__).with_name('current_context.txt')
 # organization=<organization-id>
 # secret_key=<your secret key>
 # engine=<engine-name>
+# use_azure=<y/n>
+# model_deployment=<model-deployment>
 # api_version=<api-version>
-# base_url=<base-url>
+# api_base=<api-endpoint>
+
 def create_template_ini_file():
     """
     If the ini file does not exist create it and add secret_key
@@ -43,11 +46,13 @@ def create_template_ini_file():
         print('# Please create a file at {} and add your secret key'.format(API_KEYS_LOCATION))
         print('# The format is:\n')
         print('# [openai]')
-        print('# organization_id=<organization-id>')
+        print('# organization_id=<organization-id>\n')
         print('# secret_key=<your secret key>\n')
-        print('# engine=<engine-id>')
-        print('# api_version=<api-version>')
-        print('# base_url=<base-url>\n')
+        print('# engine=<engine-id>\n')
+        print('# use_azure=<y/n>\n')
+        print('# model_deployment=<model-deployment>\n')
+        print('# api_version=<api-version>\n')
+        print('# api_base=<api-base>\n')
         sys.exit(1)
 
 def initialize():
@@ -62,16 +67,18 @@ def initialize():
     config.read(API_KEYS_LOCATION)
 
     openai.api_key = config['openai']['secret_key'].strip('"').strip("'")
-    base_url = config['openai']['base_url'].strip('"').strip("'")
-    if base_url == "":
-        openai.organization = config['openai']['organization_id'].strip('"').strip("'")
-    else:
-        if DEBUG_MODE:
-            print("Using Azure OpenAI")
-        openai.api_type = "azure"
+    openai.api_type = config['openai']['api_type'].strip('"').strip("'")
+    if openai.api_type == "azure":
+        openai.api_base = config['openai']['api_base'].strip('"').strip("'")
         openai.api_version = config['openai']['api_version'].strip('"').strip("'")
-        openai.api_base = config['openai']['base_url'].strip('"').strip("'")
-    ENGINE = config['openai']['engine'].strip('"').strip("'")
+        ENGINE = config['openai']['model_deployment'].strip('"').strip("'")
+        print("Using Azure API")
+        print("API Base: " + openai.api_base)
+        print("API Version: " + openai.api_version)
+        print("Model Deployment: " + ENGINE)
+    else:
+        openai.organization = config['openai']['organization_id'].strip('"').strip("'")
+        ENGINE = config['openai']['engine'].strip('"').strip("'")
 
     prompt_config = {
         'engine': ENGINE,
