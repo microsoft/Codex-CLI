@@ -15,6 +15,7 @@ Usage: source bash_setup.sh [optional parameters]
     -e engineId  Set the OpenAI engine id.
     -d           Print some system information for debugging.
     -h           Print this help content.
+    -a           Use Azure Open AI
 
 To uninstall Codex CLI use bash_cleanup.sh.
 For more information visit https://github.com/microsoft/Codex-CLI
@@ -29,6 +30,7 @@ readParameters()
             -o ) shift; ORG_ID=$1 ;;
             -k ) shift; SECRET_KEY=$1 ;;
             -e ) shift; ENGINE_ID=$1 ;;
+            -a ) shift; USE_AZURE=$1 ;;
             -d ) systemInfo
                  exitScript
                 ;;
@@ -90,6 +92,9 @@ configureApp()
     echo "organization_id=$ORG_ID" >> $OPENAI_RC_FILE
     echo "secret_key=$SECRET_KEY" >> $OPENAI_RC_FILE
     echo "engine=$ENGINE_ID" >> $OPENAI_RC_FILE
+    if [ -n "$USE_AZURE" ]; then
+        echo "use_azure=$USE_AZURE" >> $OPENAI_RC_FILE
+    fi
     chmod +x "$CODEX_CLI_PATH/src/codex_query.py"
 }
 
@@ -173,7 +178,9 @@ BASH_RC_FILE="$HOME/.codexclirc"
 # Start installation
 readParameters $*
 askSettings
-validateSettings
+if ![ -z $USE_AZURE ]; then
+    validateSettings
+fi
 configureApp
 configureBash
 enableApp
