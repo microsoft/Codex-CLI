@@ -213,7 +213,7 @@ if __name__ == '__main__':
         codex_query = prefix + prompt_file.read_prompt_file(user_query) + user_query
 
         # get the response from codex
-        print('engine = ', config['engine'])
+        print('engine :', config['engine'], openai.api_type, openai.api_key, openai.api_base, openai.api_version)
         # response = openai.Completion.create(engine=config['engine'], prompt=codex_query, temperature=config['temperature'], max_tokens=config['max_tokens'], stop="#")
         response = openai.Completion.create(engine=config['engine'], prompt=codex_query, stop="#")
 
