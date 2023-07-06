@@ -178,7 +178,7 @@ BASH_RC_FILE="$HOME/.codexclirc"
 # Start installation
 readParameters $*
 askSettings
-if ![ -z $USE_AZURE ]; then
+if [ -z $USE_AZURE ]; then
     validateSettings
 fi
 configureApp
