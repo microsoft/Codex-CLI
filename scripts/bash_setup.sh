@@ -60,15 +60,24 @@ askSettings()
 # Call (Azure) OpenAI API with the given settings to verify everythin is in order
 validateSettings()
 {
-    if [ -n "USE_AZURE" ]; then
+       if [ -n "USE_AZURE" ]; then
         echo -n "*** Testing Azure Open AI access... "
-        URL="${ORG_ID}openai/models?api-version=${USE_AZURE}"
+        URL="${ORG_ID}openai/deployments?api-version=${USE_AZURE}"
         local TEST=$(curl -s $URL -H "api-key: $SECRET_KEY" -w '%{http_code}')
         local STATUS_CODE=$(echo "$TEST"|tail -n 1 | sed s'/}//g')
         if [ $STATUS_CODE -ne 200 ]; then
             echo "ERROR [$STATUS_CODE]"
             echo "Failed to access Azure OpenAI API, result: $STATUS_CODE"
             echo "Please check your Azure OpenAI Endpoint and API key (https://portal.azure.com)" 
+            echo "*************"
+            exitScript
+            return
+        fi
+        local DEPLOYMENT_FOUND=$(echo "$TEST"|grep '"id"'|grep "\"$ENGINE_ID\"")
+        if [ -z "$DEPLOYMENT_FOUND" ]; then
+            echo "ERROR"
+            echo "Cannot find Azure OpenAI deployment engine: $ENGINE_ID" 
+            echo "Please check the Azure OpenAI deployment engine id (hhttps://portal.azure.com)."
             echo "*************"
             exitScript
             return
