@@ -77,7 +77,7 @@ validateSettings()
         if [ -z "$DEPLOYMENT_FOUND" ]; then
             echo "ERROR"
             echo "Cannot find Azure OpenAI deployment engine: $ENGINE_ID" 
-            echo "Please check the Azure OpenAI deployment engine id (hhttps://portal.azure.com)."
+            echo "Please check the Azure OpenAI deployment engine id (https://portal.azure.com)."
             echo "*************"
             exitScript
             return
