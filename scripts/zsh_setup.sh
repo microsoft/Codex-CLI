@@ -6,6 +6,7 @@
 #   -o: Your OpenAI organization id.
 #   -k: Your OpenAI API key.
 #   -e: The OpenAI engine id that provides access to a model.
+#   -a: Use Azure Open AI.
 #
 # For example:
 # ./zsh_setup.sh -o <YOUR_ORG_ID> -k <YOUR_API_KEY> -e <ENGINE_ID>
@@ -15,26 +16,50 @@ set -e
 # Call OpenAI API with the given settings to verify everythin is in order
 validateSettings()
 {
-    echo -n "*** Testing Open AI access... "
-    local TEST=$(curl -s 'https://api.openai.com/v1/engines' -H "Authorization: Bearer $secret" -H "OpenAI-Organization: $orgId" -w '%{http_code}')
-    local STATUS_CODE=$(echo "$TEST"|tail -n 1)
-    if [ $STATUS_CODE -ne 200 ]; then
-        echo "ERROR [$STATUS_CODE]"
-        echo "Failed to access OpenAI API, result: $STATUS_CODE"
-        echo "Please check your OpenAI API key (https://beta.openai.com/account/api-keys)" 
-        echo "and Organization ID (https://beta.openai.com/account/org-settings)."
-        echo "*************"
+    if (( ${use_azure} )); then
+        echo -n "*** Testing Azure Open AI access... "
+        URL="$orgId/openai/deployments?api-version=$use_azure"
+        local TEST=$(curl -s $URL -H "api-key: $secret" -w '%{http_code}')
+        local STATUS_CODE=$(echo "$TEST"|tail -n 1 | sed s'/}//g')
+        if [ $STATUS_CODE -ne 200 ]; then
+            echo "ERROR [$STATUS_CODE]"
+            echo "Failed to access Azure OpenAI API, result: $STATUS_CODE"
+            echo "Please check your Azure OpenAI Endpoint and API key (https://portal.azure.com)" 
+            echo "*************"
 
-        exit 1
-    fi
-    local ENGINE_FOUND=$(echo "$TEST"|grep '"id"'|grep "\"$engineId\"")
-    if [ -z "$ENGINE_FOUND" ]; then
-        echo "ERROR"
-        echo "Cannot find OpenAI engine: $engineId" 
-        echo "Please check the OpenAI engine id (https://beta.openai.com/docs/engines/codex-series-private-beta)."
-        echo "*************"
+            exit 1
+        fi
+        local DEPLOYMENT_FOUND=$(echo "$TEST"|grep '"id"'|grep "\"$engineId\"")
+        if [ -z "$DEPLOYMENT_FOUND" ]; then
+            echo "ERROR"
+            echo "Cannot find Azure OpenAI deployment engine: $engineId" 
+            echo "Please check the Azure OpenAI deployment engine id (https://portal.azure.com)."
+            echo "*************"
 
-        exit 1
+            exit 1
+        fi
+    else 
+        echo -n "*** Testing Open AI access... "
+        local TEST=$(curl -s 'https://api.openai.com/v1/engines' -H "Authorization: Bearer $secret" -H "OpenAI-Organization: $orgId" -w '%{http_code}')
+        local STATUS_CODE=$(echo "$TEST"|tail -n 1)
+        if [ $STATUS_CODE -ne 200 ]; then
+            echo "ERROR [$STATUS_CODE]"
+            echo "Failed to access OpenAI API, result: $STATUS_CODE"
+            echo "Please check your OpenAI API key (https://beta.openai.com/account/api-keys)" 
+            echo "and Organization ID (https://beta.openai.com/account/org-settings)."
+            echo "*************"
+
+            exit 1
+        fi
+        local ENGINE_FOUND=$(echo "$TEST"|grep '"id"'|grep "\"$engineId\"")
+        if [ -z "$ENGINE_FOUND" ]; then
+            echo "ERROR"
+            echo "Cannot find OpenAI engine: $engineId" 
+            echo "Please check the OpenAI engine id (https://beta.openai.com/docs/engines/codex-series-private-beta)."
+            echo "*************"
+
+            exit 1
+        fi
     fi
     echo "OK ***"
 }
@@ -63,6 +88,9 @@ configureApp()
     echo "organization_id=$orgId" >> $openAIConfigPath
     echo "secret_key=$secret" >> $openAIConfigPath
     echo "engine=$engineId" >> $openAIConfigPath
+    if (( ${use_azure} )); then
+        echo "use_azure=$use_azure" >> $openAIConfigPath
+    fi
     
     echo "Updated OpenAI configuration file ($openAIConfigPath) with secrets"
 
@@ -77,7 +105,8 @@ zmodload zsh/zutil
 zparseopts -E -D -- \
           o:=o_orgId \
           e:=o_engineId \
-          k:=o_key
+          k:=o_key \
+          a:=o_azure
 
 if (( ${+o_orgId[2]} )); then
     orgId=${o_orgId[2]}
@@ -97,6 +126,10 @@ else
    # Prompt user for OpenAI access key
    read -rs 'secret?OpenAI access key:'
    echo -e "\n"
+fi
+
+if (( ${+o_azure[2]} )); then
+    use_azure=${o_azure[2]}
 fi
 
 # Detect Codex CLI folder path
