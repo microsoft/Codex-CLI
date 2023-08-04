@@ -15,6 +15,7 @@ Usage: source bash_setup.sh [optional parameters]
     -e engineId  Set the OpenAI engine id.
     -d           Print some system information for debugging.
     -h           Print this help content.
+    -a           Use Azure Open AI
 
 To uninstall Codex CLI use bash_cleanup.sh.
 For more information visit https://github.com/microsoft/Codex-CLI
@@ -29,6 +30,7 @@ readParameters()
             -o ) shift; ORG_ID=$1 ;;
             -k ) shift; SECRET_KEY=$1 ;;
             -e ) shift; ENGINE_ID=$1 ;;
+            -a ) shift; USE_AZURE=$1 ;;
             -d ) systemInfo
                  exitScript
                 ;;
@@ -55,29 +57,53 @@ askSettings()
     fi
 }
 
-# Call OpenAI API with the given settings to verify everythin is in order
+# Call (Azure) OpenAI API with the given settings to verify everythin is in order
 validateSettings()
 {
-    echo -n "*** Testing Open AI access... "
-    local TEST=$(curl -s 'https://api.openai.com/v1/engines' -H "Authorization: Bearer $SECRET_KEY" -H "OpenAI-Organization: $ORG_ID" -w '%{http_code}')
-    local STATUS_CODE=$(echo "$TEST"|tail -n 1)
-    if [ $STATUS_CODE -ne 200 ]; then
-        echo "ERROR [$STATUS_CODE]"
-        echo "Failed to access OpenAI API, result: $STATUS_CODE"
-        echo "Please check your OpenAI API key (https://beta.openai.com/account/api-keys)" 
-        echo "and Organization ID (https://beta.openai.com/account/org-settings)."
-        echo "*************"
-        exitScript
-        return
-    fi
-    local ENGINE_FOUND=$(echo "$TEST"|grep '"id"'|grep "\"$ENGINE_ID\"")
-    if [ -z "$ENGINE_FOUND" ]; then
-        echo "ERROR"
-        echo "Cannot find OpenAI engine: $ENGINE_ID" 
-        echo "Please check the OpenAI engine id (https://beta.openai.com/docs/engines/codex-series-private-beta)."
-        echo "*************"
-        exitScript
-        return
+       if [ -n "USE_AZURE" ]; then
+        echo -n "*** Testing Azure Open AI access... "
+        URL="${ORG_ID}openai/deployments?api-version=${USE_AZURE}"
+        local TEST=$(curl -s $URL -H "api-key: $SECRET_KEY" -w '%{http_code}')
+        local STATUS_CODE=$(echo "$TEST"|tail -n 1 | sed s'/}//g')
+        if [ $STATUS_CODE -ne 200 ]; then
+            echo "ERROR [$STATUS_CODE]"
+            echo "Failed to access Azure OpenAI API, result: $STATUS_CODE"
+            echo "Please check your Azure OpenAI Endpoint and API key (https://portal.azure.com)" 
+            echo "*************"
+            exitScript
+            return
+        fi
+        local DEPLOYMENT_FOUND=$(echo "$TEST"|grep '"id"'|grep "\"$ENGINE_ID\"")
+        if [ -z "$DEPLOYMENT_FOUND" ]; then
+            echo "ERROR"
+            echo "Cannot find Azure OpenAI deployment engine: $ENGINE_ID" 
+            echo "Please check the Azure OpenAI deployment engine id (https://portal.azure.com)."
+            echo "*************"
+            exitScript
+            return
+        fi
+    else
+        echo -n "*** Testing Open AI access... "
+        local TEST=$(curl -s 'https://api.openai.com/v1/engines' -H "Authorization: Bearer $SECRET_KEY" -H "OpenAI-Organization: $ORG_ID" -w '%{http_code}')
+        local STATUS_CODE=$(echo "$TEST"|tail -n 1)
+        if [ $STATUS_CODE -ne 200 ]; then
+            echo "ERROR [$STATUS_CODE]"
+            echo "Failed to access OpenAI API, result: $STATUS_CODE"
+            echo "Please check your OpenAI API key (https://beta.openai.com/account/api-keys)" 
+            echo "and Organization ID (https://beta.openai.com/account/org-settings)."
+            echo "*************"
+            exitScript
+            return
+        fi
+        local ENGINE_FOUND=$(echo "$TEST"|grep '"id"'|grep "\"$ENGINE_ID\"")
+        if [ -z "$ENGINE_FOUND" ]; then
+            echo "ERROR"
+            echo "Cannot find OpenAI engine: $ENGINE_ID" 
+            echo "Please check the OpenAI engine id (https://beta.openai.com/docs/engines/codex-series-private-beta)."
+            echo "*************"
+            exitScript
+            return
+        fi
     fi
     echo "OK ***"
 }
@@ -90,6 +116,9 @@ configureApp()
     echo "organization_id=$ORG_ID" >> $OPENAI_RC_FILE
     echo "secret_key=$SECRET_KEY" >> $OPENAI_RC_FILE
     echo "engine=$ENGINE_ID" >> $OPENAI_RC_FILE
+    if [ -n "$USE_AZURE" ]; then
+        echo "use_azure=$USE_AZURE" >> $OPENAI_RC_FILE
+    fi
     chmod +x "$CODEX_CLI_PATH/src/codex_query.py"
 }
 
@@ -149,7 +178,7 @@ systemInfo()
 # Remove variables and functions from the environment, in case the script was sourced
 cleanupEnv()
 {
-    unset ORG_ID SECRET_KEY ENGINE_ID SOURCED OPENAI_RC_FILE BASH_RC_FILE
+    unset ORG_ID SECRET_KEY ENGINE_ID USE_AZURE SOURCED OPENAI_RC_FILE BASH_RC_FILE
     unset -f askSettings validateSettings configureApp configureBash enableApp readParameters
 }
 

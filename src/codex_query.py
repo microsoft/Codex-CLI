@@ -57,10 +57,18 @@ def initialize():
     config = configparser.ConfigParser()
     config.read(API_KEYS_LOCATION)
 
+    """
+    Check if Azure Open AI is to be used
+    If so get the version and set base URL based on the organization
+    """
+    if 'use_azure' in config['openai']:
+        openai.api_type = "azure"
+        openai.api_base = config['openai']['organization_id'].strip('"').strip("'")
+        openai.api_version = config['openai']['use_azure'].strip('"').strip("'")
+    else:
+        openai.organization = config['openai']['organization_id'].strip('"').strip("'")
     openai.api_key = config['openai']['secret_key'].strip('"').strip("'")
-    openai.organization = config['openai']['organization_id'].strip('"').strip("'")
     ENGINE = config['openai']['engine'].strip('"').strip("'")
-
     prompt_config = {
         'engine': ENGINE,
         'temperature': TEMPERATURE,
@@ -143,6 +151,7 @@ def get_query(prompt_file):
         entry = input("prompt: ") + '\n'
     else:
         entry = sys.stdin.read()
+
     # first we check if the input is a command
     command_result, prompt_file = get_command_result(entry, prompt_file)
 
@@ -171,10 +180,8 @@ def detect_shell():
 if __name__ == '__main__':
     detect_shell()
     prompt_file = initialize()
-
     try:
         user_query, prompt_file = get_query(prompt_file)
-        
         config = prompt_file.config if prompt_file else {
             'engine': ENGINE,
             'temperature': TEMPERATURE,
@@ -199,13 +206,13 @@ if __name__ == '__main__':
             prefix = '#' + config['shell'] + '\n\n'
 
         codex_query = prefix + prompt_file.read_prompt_file(user_query) + user_query
-
+        
         # get the response from codex
         response = openai.Completion.create(engine=config['engine'], prompt=codex_query, temperature=config['temperature'], max_tokens=config['max_tokens'], stop="#")
-
+       
         completion_all = response['choices'][0]['text']
 
-        if is_sensitive_content(user_query + '\n' + completion_all):
+        if openai.api_type == "" and is_sensitive_content(user_query + '\n' + completion_all):
             print("\n#   Sensitive content detected, response has been redacted")
         else:
             print(completion_all)
