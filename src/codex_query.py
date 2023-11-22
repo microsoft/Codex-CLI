@@ -36,7 +36,7 @@ PROMPT_CONTEXT = Path(__file__).with_name('current_context.txt')
 # model=<model-name>
 def create_template_ini_file():
     """
-    If the ini file does not exist create it and add secret_key
+    If the ini file does not exist, create it and add secret_key
     """
     if not os.path.isfile(API_KEYS_LOCATION):
         print('# Please create a file at {} and add your secret key'.format(API_KEYS_LOCATION))
@@ -54,7 +54,7 @@ def initialize():
     """
     global MODEL
 
-    # Check if file at API_KEYS_LOCATION exists
+    # Check if the file at API_KEYS_LOCATION exists
     create_template_ini_file()
     config = configparser.ConfigParser()
     config.read(API_KEYS_LOCATION)
@@ -77,7 +77,7 @@ def initialize():
 
 def get_query(prompt_file):
     """
-    uses the stdin to get user input
+    Uses the stdin to get user input
     the input is either treated as a command or as a Codex query
 
     Returns: command result or context + input from stdin
@@ -88,10 +88,10 @@ def get_query(prompt_file):
         entry = input("prompt: ") + '\n'
     else:
         entry = sys.stdin.read()
-    # first we check if the input is a command
+    # first, we check if the input is a command
     command_result, prompt_file = get_command_result(entry, prompt_file)
 
-    # if input is not a command, then query Codex, otherwise exit command has been run successfully
+    # if input is not a command, then query Codex; otherwise exit command has been run successfully
     if command_result == "":
         return entry, prompt_file
     else:
@@ -141,9 +141,13 @@ if __name__ == '__main__':
                                                                                   'user with a valid shell command. '
                                                                                   'The specific shell type is ' +
                                                                                   config['shell'] + '. If the user '
-                                                                                                    'wants a textual reply, your reply '
-                                                                                                    'should be prefixed with a comment '
-                                                                                                    'symbol based on the shell type.'},
+                                                                                                    'wants a textual '
+                                                                                                    'reply, your reply'
+                                                                                                    'should be '
+                                                                                                    'prefixed with a '
+                                                                                                    'comment'
+                                                                                                    'symbol based on '
+                                                                                                    'the shell type.'},
                                                     {'role': 'user', 'content': codex_query}],
                                                 temperature=config['temperature'], max_tokens=config['max_tokens'],
                                                 stop="#")
