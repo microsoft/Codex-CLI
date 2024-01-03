@@ -1,8 +1,5 @@
-import os
-import time
-
-from pathlib import Path
 from prompt_file import *
+
 
 def get_command_result(input, prompt_file):
     """
@@ -16,16 +13,16 @@ def get_command_result(input, prompt_file):
     - save context
     - clear context
     - load context <filename>
-    - set engine <engine>
+    - set model <model>
     - set temperature <temperature>
     - set max_tokens <max_tokens>
     - set shell <shell>
 
     Returns: command result or "" if no command matched
     """
-    if prompt_file == None:
+    if prompt_file is None:
         return "", None
-    
+
     config = prompt_file.config
     # configuration setting commands
     if input.__contains__("set"):
@@ -58,12 +55,12 @@ def get_command_result(input, prompt_file):
                 return "config set", prompt_file
             else:
                 return "", prompt_file
-        elif input.__contains__("engine"):
+        elif input.__contains__("model"):
             input = input.split()
             if len(input) == 4:
-                config['engine'] = input[3]
+                config['model'] = input[3]
                 prompt_file.set_config(config)
-                print("# Engine set to " + str(config['engine']))
+                print("# model set to " + str(config['model']))
                 return "config set", prompt_file
             else:
                 return "", prompt_file
@@ -79,38 +76,38 @@ def get_command_result(input, prompt_file):
             if config['multi_turn'] == 'off':
                 prompt_file.start_multi_turn()
                 return "multi turn mode on", prompt_file
-            
+
             return "multi turn mode on", prompt_file
-        
+
         # stop context
         if input.__contains__("stop"):
             prompt_file.stop_multi_turn()
             return "multi turn mode off", prompt_file
-    
+
     # context file commands
     if input.__contains__("context"):
         if input.__contains__("default"):
             prompt_file.default_context()
             return "stopped context", prompt_file
-        
+
         # show context <n>
         if input.__contains__("show"):
             print('\n')
             with open(prompt_file.file_name, 'r') as f:
                 lines = f.readlines()
-                lines = lines[6:] # skip headers
-            
+                lines = lines[6:]  # skip headers
+
             line_numbers = 0
             if len(input.split()) > 3:
                 line_numbers = int(input.split()[3])
-            
+
             if line_numbers != 0:
                 for line in lines[-line_numbers:]:
-                    print('\n# '+line, end='')
+                    print('\n# ' + line, end='')
             else:
                 print('\n# '.join(lines))
             return "context shown", prompt_file
-        
+
         # edit context
         if input.__contains__("view"):
             # open the prompt file in text editor
@@ -128,16 +125,16 @@ def get_command_result(input, prompt_file):
             filename = time.strftime("%Y-%m-%d_%H-%M-%S") + ".txt"
             if len(input.split()) == 4:
                 filename = input.split()[3]
-            
+
             prompt_file.save_to(filename)
             return "context saved", prompt_file
-        
+
         # clear context
         if input.__contains__("clear"):
             # temporary saving deleted prompt file
             prompt_file.default_context()
             return "unlearned interaction", prompt_file
-        
+
         # load context <filename>
         if input.__contains__("load"):
             # the input looks like # load context <filename>
@@ -149,5 +146,5 @@ def get_command_result(input, prompt_file):
                 return "context loaded", prompt_file
             print('\n#\tInvalid command format, did you specify which file to load?')
             return "context loaded", prompt_file
-    
+
     return "", prompt_file

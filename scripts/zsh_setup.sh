@@ -5,14 +5,15 @@
 # You can pass the following arguments to the script:
 #   -o: Your OpenAI organization id.
 #   -k: Your OpenAI API key.
-#   -e: The OpenAI engine id that provides access to a model.
+#   -e: The OpenAI model id that provides access to a model.
 #
 # For example:
-# ./zsh_setup.sh -o <YOUR_ORG_ID> -k <YOUR_API_KEY> -e <ENGINE_ID>
+# ./zsh_setup.sh -o <YOUR_ORG_ID> -k <YOUR_API_KEY> -e <MODEL_ID>
 # 
 set -e
 
-# Call OpenAI API with the given settings to verify everythin is in order
+# Call OpenAI API with the given settings to verify everything is in order
+# API call to https://api.openai.com/v1/engines is a potential risk in the future because the route is deprecated
 validateSettings()
 {
     echo -n "*** Testing Open AI access... "
@@ -27,11 +28,11 @@ validateSettings()
 
         exit 1
     fi
-    local ENGINE_FOUND=$(echo "$TEST"|grep '"id"'|grep "\"$engineId\"")
-    if [ -z "$ENGINE_FOUND" ]; then
+    local MODEL_FOUND=$(echo "$TEST"|grep '"id"'|grep "\"$modelId\"")
+    if [ -z "$MODEL_FOUND" ]; then
         echo "ERROR"
-        echo "Cannot find OpenAI engine: $engineId" 
-        echo "Please check the OpenAI engine id (https://beta.openai.com/docs/engines/codex-series-private-beta)."
+        echo "Cannot find OpenAI model: $modelId"
+        echo "Please check the OpenAI model id (https://platform.openai.com/docs/models/gpt-4)."
         echo "*************"
 
         exit 1
@@ -52,7 +53,7 @@ configureZsh()
     echo "source \"\$CODEX_CLI_PATH/scripts/zsh_plugin.zsh\"" >> $zshrcPath
     echo "bindkey '^G' create_completion" >> $zshrcPath
     echo "### Codex CLI setup - end" >> $zshrcPath
-    
+
     echo "Added settings in $zshrcPath"
 }
 
@@ -62,8 +63,8 @@ configureApp()
     echo "[openai]" > $openAIConfigPath
     echo "organization_id=$orgId" >> $openAIConfigPath
     echo "secret_key=$secret" >> $openAIConfigPath
-    echo "engine=$engineId" >> $openAIConfigPath
-    
+    echo "model=$modelId" >> $openAIConfigPath
+
     echo "Updated OpenAI configuration file ($openAIConfigPath) with secrets"
 
     # Change file mode of codex_query.py to allow execution
@@ -76,7 +77,7 @@ configureApp()
 zmodload zsh/zutil
 zparseopts -E -D -- \
           o:=o_orgId \
-          e:=o_engineId \
+          m:=o_modelId \
           k:=o_key
 
 if (( ${+o_orgId[2]} )); then
@@ -85,18 +86,18 @@ else
     echo -n 'OpenAI Organization Id: '; read orgId
 fi
 
-if (( ${+o_engineId[2]} )); then
-    engineId=${o_engineId[2]}
-else
-    echo -n 'OpenAI Engine Id: '; read engineId
-fi
-
 if (( ${+o_key[2]} )); then
     secret=${o_key[2]}
 else
    # Prompt user for OpenAI access key
    read -rs 'secret?OpenAI access key:'
    echo -e "\n"
+fi
+
+if (( ${+o_modelId[2]} )); then
+    modelId=${o_modelId[2]}
+else
+    echo -n 'OpenAI Model Id: '; read modelId
 fi
 
 # Detect Codex CLI folder path

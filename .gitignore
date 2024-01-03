@@ -3,3 +3,4 @@ current_context.config
 contexts/test.txt
 src/__pycache__/
 src/openaiapirc
+.idea/

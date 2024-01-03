@@ -1,4 +1,4 @@
-### 
+###
 # PowerShell script to setup Codex CLI for PowerShell
 ###
 param
@@ -24,7 +24,7 @@ param
 
     [Parameter(Mandatory = $true)]
     [ValidateNotNullOrEmpty()]
-    $OpenAIEngineId
+    $OpenAIModelID
 )
 
 $plugInScriptPath = Join-Path $RepoRoot -ChildPath "scripts\powershell_plugin.ps1"
@@ -43,14 +43,15 @@ if ($PSMajorVersion -lt 7) {
 }
 
 # Check the access with OpenAI API
+# API call to https://api.openai.com/v1/engines is a potential risk in the future because the route is deprecated
 Write-Host "Checking OpenAI access..."
-$enginesApiUri = "https://api.openai.com/v1/engines"
+$testApiUri = "https://api.openai.com/v1/engines"
 $response = $null
 try {
     if ($PSMajorVersion -lt 7) {
-        $response = (Invoke-WebRequest -Uri $enginesApiUri -Headers @{"Authorization" = "Bearer $openAIApiKeyPlainText"; "OpenAI-Organization" = "$OpenAIOrganizationId"})
+        $response = (Invoke-WebRequest -Uri $testApiUri -Headers @{"Authorization" = "Bearer $openAIApiKeyPlainText"; "OpenAI-Organization" = "$OpenAIOrganizationId"})
     } else {
-        $response = (Invoke-WebRequest -Uri $enginesApiUri -Authentication Bearer -Token $OpenAIApiKey -Headers @{"OpenAI-Organization" = "$OpenAIOrganizationId"})
+        $response = (Invoke-WebRequest -Uri $testApiUri -Authentication Bearer -Token $OpenAIApiKey -Headers @{"OpenAI-Organization" = "$OpenAIOrganizationId"})
     }
 } catch {
     $statusCode = $_.Exception.Response.StatusCode.value__
@@ -58,9 +59,9 @@ try {
     exit 1
 }
 
-# Check if target engine is available to the user
-if ($null -eq (($response.Content | ConvertFrom-Json).data | Where-Object {$_.id -eq $OpenAIEngineId})) {
-    Write-Error "Cannot find OpenAI engine: $OpenAIEngineId. Please check the OpenAI engine id (https://beta.openai.com/docs/engines/codex-series-private-beta) and your Organization ID (https://beta.openai.com/account/org-settings)."
+# Check if target model is available to the user
+if ($null -eq (($response.Content | ConvertFrom-Json).data | Where-Object {$_.id -eq $OpenAIModelID})) {
+    Write-Error "Cannot find OpenAI model: $OpenAIModelID. Please check the OpenAI model id (https://platform.openai.com/docs/models/gpt-4) and your Organization ID (https://beta.openai.com/account/org-settings)."
     exit 1
 }
 
@@ -90,7 +91,7 @@ if (!(Test-Path -Path $openAIConfigPath)) {
 Set-Content -Path $openAIConfigPath "[openai]
 organization_id=$OpenAIOrganizationId
 secret_key=$openAIApiKeyPlainText
-engine=$OpenAIEngineId"
+model=$OpenAIModelID"
 Write-Host "Updated OpenAI configuration file with secrets."
 
 Write-Host -ForegroundColor Blue "Codex CLI PowerShell (v$PSMajorVersion) setup completed. Please open a new PowerShell session, type in # followed by your natural language command and hit Ctrl+G!"

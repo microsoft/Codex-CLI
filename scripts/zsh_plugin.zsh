@@ -8,7 +8,7 @@ create_completion() {
     text=${BUFFER}
     completion=$(echo -n "$text" | $CODEX_CLI_PATH/src/codex_query.py)
     # Add completion to the current buffer.
-    BUFFER="${text}${completion}"
+    BUFFER="${text}"$'\n'"${completion}"
     # Put the cursor at the end of the line.
     CURSOR=${#BUFFER}
 }
