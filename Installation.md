@@ -19,24 +19,22 @@ In order to run the Codex CLI, ensure that you have python installed. To install
 python -m pip install -r requirements.txt
 ```
 
-Additionally, the OpenAI API key, organization id, and engine id are required to execute the Codex CLI tool. 
+Additionally, a MiniMax API key, API base URL, and model id are required to execute the Codex CLI tool. An organization id is optional.
 
-To obtain the OpenAI API key information, go to (https://beta.openai.com/account/api-keys) and login into your account. 
+## MiniMax configuration
 
-Once logged in you will see: 
-![](images/OpenAI-apikey.png)
+The setup scripts accept an API base URL and model id. Use one of these regional base URLs:
 
-Copy the API key by clicking the _Copy_ button and save the copied key where you can retrieve it.
+* Global: `https://api.minimax.io/v1`
+* China: `https://api.minimaxi.com/v1`
 
-To obtain the OpenAI organization id, go to OpenAI Settings page (https://beta.openai.com/account/org-settings) and copy the id shown underneath the _Organization ID_ heading. Save the copied id with the API key that was stored in previous step. 
+The current model ids are `MiniMax-M3` and `MiniMax-M2.7`. For example:
 
-See image below for reference: 
-![](images/OpenAI-orgid.png)
+```bash
+source bash_setup.sh -k YOUR_API_KEY -b https://api.minimax.io/v1 -m MiniMax-M3
+```
 
-To obtain the OpenAI engine id, go to OpenAI Engines page (https://beta.openai.com/docs/engines/codex-series-private-beta) for the engines available for Codex models. Select the desired engine and save the engine id with the API key and organization id stored in previous steps. 
-
-See image below for reference: 
-![](images/OpenAI-engineid.png)
+The generated `src/openaiapirc` stores `base_url` and `model`; `organization_id` is optional.
 
 ## Bash instructions
 
@@ -57,7 +55,7 @@ To leverage the Codex CLI on WSL and Linux environments using Bash please follow
 	In the Codex CLI folder, there is a folder named `scripts` where you will find a `bash_setup.sh` script which is used to setup the Bash environment.
 
 	Run the following commands to setup your environment, the script will prompt
-	for Organization id, API key and engine id:
+	for an optional organization id, API key, API base URL, and model id:
 	```
 	cd scripts
 	source bash_setup.sh
@@ -82,13 +80,15 @@ By default `bash_setup.sh` will prompt for the required settings. It's also poss
 | Parameter    | Description |
 |--------------|-------------|
 | `-o <value>` | To pass your [OpenAI Organization Id](https://beta.openai.com/account/org-settings) |
-| `-k <value>` | To pass your [OpenAI API key](https://beta.openai.com/account/api-keys) |
-| `-e <value>` | To specify the [OpenAI Engine Id](https://beta.openai.com/docs/engines/codex-series-private-beta) |
+| `-k <value>` | To pass your API key |
+| `-b <value>` | To specify the API base URL |
+| `-m <value>` | To specify the model id |
+| `-e <value>` | Legacy alias for `-m` |
 
 Example: 
 
 ```
-source bash_setup.sh -o myorgid -k myapikey -e someengineid
+source bash_setup.sh -k YOUR_API_KEY -b https://api.minimax.io/v1 -m MiniMax-M3
 ```
 
 For help running the Codex CLI Bash setup, please run the following command:   
@@ -106,7 +106,7 @@ source bash_setup.sh -h
 $ git clone https://github.com/microsoft/Codex-CLI.git ~/your/custom/path/
 ```
 
-2. In zsh, go to `~/your/custom/path/` (the folder contains Codex CLI code), then run the following command to setup your zsh environment. The script will prompt for Organization id, API key and engine id:
+2. In zsh, go to `~/your/custom/path/` (the folder contains Codex CLI code), then run the following command to setup your zsh environment. The script will prompt for an optional organization id, API key, API base URL, and model id:
 
 ```
 ./scripts/zsh_setup.sh
@@ -126,8 +126,10 @@ Once you are done, go to `~/your/custom/path/` (the folder contains Codex CLI co
 | Parameter    | Description |
 |--------------|-------------|
 | `-o <value>` | To pass your [OpenAI Organization Id](https://beta.openai.com/account/org-settings) |
-| `-k <value>` | To pass your [OpenAI API key](https://beta.openai.com/account/api-keys) |
-| `-e <value>` | To specify the [OpenAI Engine Id](https://beta.openai.com/docs/engines/codex-series-private-beta) |
+| `-k <value>` | To pass your API key |
+| `-b <value>` | To specify the API base URL |
+| `-m <value>` | To specify the model id |
+| `-e <value>` | Legacy alias for `-m` |
 
 
 ## Powershell instructions
@@ -148,10 +150,10 @@ For more information about Execution Policies, see
 [about_Execution_Policies](https://docs.microsoft.com/powershell/module/microsoft.powershell.core/about/about_execution_policies).
 
 
-3. In the same Powershell terminal, go to `C:\your\custom\path\Codex-CLI\` (the folder that contains the cloned Codex CLI project). Copy the following command, then replace `YOUR_OPENAI_ORGANIZATION_ID` and `ENGINE_ID` with your OpenAI organization Id and OpenAI engine Id. Run the command to setup your PowerShell environment. It will prompt you for OpenAI access key.
+3. In the same Powershell terminal, go to `C:\your\custom\path\Codex-CLI\` (the folder that contains the cloned Codex CLI project). Run the command below with your API base URL and model id. It will prompt you for an API key.
 
 ```PowerShell
-.\scripts\powershell_setup.ps1 -OpenAIOrganizationId 'YOUR_OPENAI_ORGANIZATION_ID' -OpenAIEngineId 'ENGINE_ID'
+.\scripts\powershell_setup.ps1 -OpenAIApiBaseUrl 'https://api.minimax.io/v1' -OpenAIModelId 'MiniMax-M3'
 ```
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;See [About powershell_setup.ps1](#about-powershell_setupps1) section to learn script parameters.
 
@@ -173,6 +175,7 @@ Set-ExecutionPolicy Undefined -Scope CurrentUser
 | Parameter | Type | Description |
 |--|--|--|
 | `-OpenAIApiKey` | [SecureString](https://docs.microsoft.com/en-us/dotnet/api/system.security.securestring) | Required. If is not supplied, the script will prompt you to input the value. You can find this value at [https://beta.openai.com/account/api-keys](https://beta.openai.com/account/api-keys). To provide the value via PowerShell parameter, this is an example for PowerShell 7: <br/> `.\scripts\powershell_setup.ps1 -OpenAIApiKey (ConvertTo-SecureString "YOUR_OPENAI_API_KEY" -AsPlainText -Force)` | 
-| `-OpenAIOrganizationId` | String | Required. Your [OpenAI organization Id](https://beta.openai.com/account/org-settings). |
-| `-OpenAIEngineId` | String | Required. The [OpenAI engine Id](https://beta.openai.com/docs/engines/codex-series-private-beta) that provides access to a model.|
+| `-OpenAIOrganizationId` | String | Optional organization id. |
+| `-OpenAIApiBaseUrl` | String | Required API base URL. |
+| `-OpenAIModelId` | String | Required model id. `-OpenAIEngineId` remains available as an alias. |
 | `-RepoRoot` | [FileInfo](https://docs.microsoft.com/en-us/dotnet/api/system.io.fileinfo) | Optional. Default to the current folder.<br>The value should be the path of Codex CLI folder. Example:<br/>`.\scripts\powershell_setup.ps1 -RepoRoot 'C:\your\custom\path'`|

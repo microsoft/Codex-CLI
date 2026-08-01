@@ -18,13 +18,17 @@ param
     [SecureString]
     $OpenAIApiKey,
 
-    [Parameter(Mandatory = $true)]
-    [ValidateNotNullOrEmpty()]
+    [Parameter()]
     $OpenAIOrganizationId,
 
     [Parameter(Mandatory = $true)]
     [ValidateNotNullOrEmpty()]
-    $OpenAIEngineId
+    $OpenAIApiBaseUrl,
+
+    [Parameter(Mandatory = $true)]
+    [ValidateNotNullOrEmpty()]
+    [Alias("OpenAIEngineId")]
+    $OpenAIModelId
 )
 
 $plugInScriptPath = Join-Path $RepoRoot -ChildPath "scripts\powershell_plugin.ps1"
@@ -42,25 +46,11 @@ if ($PSMajorVersion -lt 7) {
     $openAIApiKeyPlainText = ConvertFrom-SecureString -SecureString $OpenAIApiKey -AsPlainText
 }
 
-# Check the access with OpenAI API
-Write-Host "Checking OpenAI access..."
-$enginesApiUri = "https://api.openai.com/v1/engines"
-$response = $null
-try {
-    if ($PSMajorVersion -lt 7) {
-        $response = (Invoke-WebRequest -Uri $enginesApiUri -Headers @{"Authorization" = "Bearer $openAIApiKeyPlainText"; "OpenAI-Organization" = "$OpenAIOrganizationId"})
-    } else {
-        $response = (Invoke-WebRequest -Uri $enginesApiUri -Authentication Bearer -Token $OpenAIApiKey -Headers @{"OpenAI-Organization" = "$OpenAIOrganizationId"})
-    }
-} catch {
-    $statusCode = $_.Exception.Response.StatusCode.value__
-    Write-Error "Failed to access OpenAI api [$statusCode]. Please check your OpenAI API key (https://beta.openai.com/account/api-keys) and Organization ID (https://beta.openai.com/account/org-settings)."
-    exit 1
-}
-
-# Check if target engine is available to the user
-if ($null -eq (($response.Content | ConvertFrom-Json).data | Where-Object {$_.id -eq $OpenAIEngineId})) {
-    Write-Error "Cannot find OpenAI engine: $OpenAIEngineId. Please check the OpenAI engine id (https://beta.openai.com/docs/engines/codex-series-private-beta) and your Organization ID (https://beta.openai.com/account/org-settings)."
+# Validate the API base URL before writing the configuration file
+$apiBaseUri = $null
+if (-not [Uri]::TryCreate($OpenAIApiBaseUrl, [UriKind]::Absolute, [ref]$apiBaseUri) -or
+    $apiBaseUri.Scheme -notin @("http", "https")) {
+    Write-Error "API base URL must be an absolute HTTP or HTTPS URL."
     exit 1
 }
 
@@ -90,7 +80,8 @@ if (!(Test-Path -Path $openAIConfigPath)) {
 Set-Content -Path $openAIConfigPath "[openai]
 organization_id=$OpenAIOrganizationId
 secret_key=$openAIApiKeyPlainText
-engine=$OpenAIEngineId"
+base_url=$OpenAIApiBaseUrl
+model=$OpenAIModelId"
 Write-Host "Updated OpenAI configuration file with secrets."
 
 Write-Host -ForegroundColor Blue "Codex CLI PowerShell (v$PSMajorVersion) setup completed. Please open a new PowerShell session, type in # followed by your natural language command and hit Ctrl+G!"

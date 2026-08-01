@@ -1,5 +1,5 @@
 current_context.txt
 current_context.config
 contexts/test.txt
-src/__pycache__/
+__pycache__/
 src/openaiapirc

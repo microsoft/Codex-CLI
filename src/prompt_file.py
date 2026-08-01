@@ -42,7 +42,7 @@ class PromptFile:
             lines = f.readlines()
 
         config = {
-            'engine': lines[0].split(':')[1].strip(),
+            'model': lines[0].split(':')[1].strip(),
             'temperature': float(lines[1].split(':')[1].strip()),
             'max_tokens': int(lines[2].split(':')[1].strip()),
             'shell': lines[3].split(':')[1].strip(),
@@ -60,7 +60,7 @@ class PromptFile:
         self.config = config
         
         with open(self.config_path, 'w') as f:
-            f.write('engine: {}\n'.format(self.config['engine']))
+            f.write('model: {}\n'.format(self.config['model']))
             f.write('temperature: {}\n'.format(self.config['temperature']))
             f.write('max_tokens: {}\n'.format(self.config['max_tokens']))
             f.write('shell: {}\n'.format(self.config['shell']))
@@ -228,13 +228,15 @@ class PromptFile:
             with filepath.open('r') as f:
                 lines = f.readlines()
             
-            # read in the engine name from openaiapirc
+            # read in the model name from openaiapirc
             config = configparser.ConfigParser()
             config.read(API_KEYS_LOCATION)
-            ENGINE = config['openai']['engine'].strip('"').strip("'")
+            MODEL = config['openai'].get(
+                'model', config['openai'].get('engine', '')
+            ).strip('"').strip("'")
 
             config = {
-                'engine': ENGINE,
+                'model': MODEL,
                 'temperature': float(lines[1].split(':')[1].strip()),
                 'max_tokens': int(lines[2].split(':')[1].strip()),
                 'shell': lines[3].split(':')[1].strip(),
