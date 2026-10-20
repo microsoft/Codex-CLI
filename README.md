@@ -21,10 +21,10 @@ This repository aims to grow the understanding of using Codex in applications by
 ## Requirements
 * [Python 3.7.1+](https://www.python.org/downloads/)
     * \[Windows\]: Python is added to PATH.
-* An [OpenAI account](https://openai.com/api/)
-    * [OpenAI API Key](https://beta.openai.com/account/api-keys).
-    * [OpenAI Organization Id](https://beta.openai.com/account/org-settings). If you have multiple organizations, please update your [default organization](https://beta.openai.com/account/api-keys) to the one that has access to codex engines before getting the organization Id.
-    * [OpenAI Engine Id](https://beta.openai.com/docs/engines/codex-series-private-beta). It provides access to a model. For example, `code-davinci-002` or `code-cushman-001`. See [here](#what-openai-engines-are-available-to-me) for checking available engines.
+* MiniMax API credentials
+    * API key.
+    * API base URL: `https://api.minimax.io/v1` globally or `https://api.minimaxi.com/v1` in China.
+    * Model id: `MiniMax-M3.1-Flash` (default) or `MiniMax-M3`.
 
 ## Installation
 
@@ -68,7 +68,7 @@ Any time the model seems to output consistently incorrect commands, you can use 
 | `set <config-key> <config-value>` | Sets the configuration of your interaction with the model |
 
 
-Feel free to improve your experience by changing the token limit, engine id and temperature using the set command. For example, `# set engine cushman-codex`, `# set temperature 0.5`, `# set max_tokens 50`.
+Feel free to improve your experience by changing the token limit, model id and temperature using the set command. For example, `# set model MiniMax-M3.1-Flash`, `# set temperature 0.5`, `# set max_tokens 32768`.
 
 ## Prompt Engineering and Context Files
 
@@ -114,27 +114,9 @@ Use `DEBUG_MODE` to use a terminal input instead of the stdin and debug the code
 Sometimes the `openai` package will throws errors that aren't caught by the tool, you can add a catch block at the end of `codex_query.py` for that exception and print a custom error message.
 
 ## FAQ
-### What OpenAI engines are available to me?
-You might have access to different [OpenAI engines](https://beta.openai.com/docs/api-reference/engines) per OpenAI organization. To check what engines are available to you, one can query the [List engines API](https://beta.openai.com/docs/api-reference/engines/list) for available engines. See the following commands:
+### Which MiniMax models are supported?
 
-* Shell
-    ```
-    curl https://api.openai.com/v1/engines \
-      -H 'Authorization: Bearer YOUR_API_KEY' \
-      -H 'OpenAI-Organization: YOUR_ORG_ID'
-    ```
-
-* PowerShell
-
-    PowerShell v5 (The default one comes with Windows)
-    ```powershell
-    (Invoke-WebRequest -Uri https://api.openai.com/v1/engines -Headers @{"Authorization" = "Bearer YOUR_API_KEY"; "OpenAI-Organization" = "YOUR_ORG_ID"}).Content
-    ```
-
-    PowerShell v7
-    ```powershell
-    (Invoke-WebRequest -Uri https://api.openai.com/v1/engines -Authentication Bearer -Token (ConvertTo-SecureString "YOUR_API_KEY" -AsPlainText -Force) -Headers @{"OpenAI-Organization" = "YOUR_ORG_ID"}).Content
-    ```
+Set `model` to `MiniMax-M3.1-Flash` or `MiniMax-M3` in `src/openaiapirc`. For either direct MiniMax base URL above, an omitted or blank model defaults to `MiniMax-M3.1-Flash`. Explicit `model` values, the legacy `engine` alias, and models in saved contexts are preserved. Custom endpoints still require an explicit model. The client sends requests to the configured `base_url` using the chat completions API, leaving thinking and reasoning effort at the model's API defaults. New contexts for these two models use a 32,768-token generation budget, including thinking; saved budgets are unchanged. Adjust it with `# set max_tokens <limit>` if needed.
 
 ### Can I run the sample on Azure?
 The sample code can be currently be used with Codex on OpenAI’s API. In the coming months, the sample will be updated so you can also use it with the [Azure OpenAI Service](https://aka.ms/azure-openai). 

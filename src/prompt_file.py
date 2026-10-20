@@ -4,6 +4,8 @@ import configparser
 
 from pathlib import Path
 
+from api_config import get_default_max_tokens, get_model
+
 
 API_KEYS_LOCATION = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'openaiapirc')
 
@@ -42,7 +44,7 @@ class PromptFile:
             lines = f.readlines()
 
         config = {
-            'engine': lines[0].split(':')[1].strip(),
+            'model': lines[0].split(':', 1)[1].strip(),
             'temperature': float(lines[1].split(':')[1].strip()),
             'max_tokens': int(lines[2].split(':')[1].strip()),
             'shell': lines[3].split(':')[1].strip(),
@@ -60,7 +62,7 @@ class PromptFile:
         self.config = config
         
         with open(self.config_path, 'w') as f:
-            f.write('engine: {}\n'.format(self.config['engine']))
+            f.write('model: {}\n'.format(self.config['model']))
             f.write('temperature: {}\n'.format(self.config['temperature']))
             f.write('max_tokens: {}\n'.format(self.config['max_tokens']))
             f.write('shell: {}\n'.format(self.config['shell']))
@@ -228,15 +230,29 @@ class PromptFile:
             with filepath.open('r') as f:
                 lines = f.readlines()
             
-            # read in the engine name from openaiapirc
+            # read in the model name from openaiapirc
             config = configparser.ConfigParser()
             config.read(API_KEYS_LOCATION)
-            ENGINE = config['openai']['engine'].strip('"').strip("'")
+            MODEL = get_model(config['openai'])
+            # Bundled examples use historical engine placeholders. Saved contexts
+            # carry the user's explicit model, including legacy engine headers.
+            bundled_contexts = (
+                'bash-context.txt', 'zsh-context.txt', 'powershell-context.txt',
+                'powershell-voice.txt', 'powershell-voice-cognitive-service.txt',
+            )
+            max_tokens = int(lines[2].split(':')[1].strip())
+            model_key, _, saved_model = lines[0].partition(':')
+            if filename in bundled_contexts and model_key.strip('# ') == 'engine':
+                max_tokens = get_default_max_tokens(config['openai'], max_tokens)
+            if (model_key.strip('# ') == 'model' or
+                    (filename not in bundled_contexts and
+                     model_key.strip('# ') == 'engine')):
+                MODEL = saved_model.strip() or MODEL
 
             config = {
-                'engine': ENGINE,
+                'model': MODEL,
                 'temperature': float(lines[1].split(':')[1].strip()),
-                'max_tokens': int(lines[2].split(':')[1].strip()),
+                'max_tokens': max_tokens,
                 'shell': lines[3].split(':')[1].strip(),
                 'multi_turn': lines[4].split(':')[1].strip(),
                 'token_count': int(lines[5].split(':')[1].strip())

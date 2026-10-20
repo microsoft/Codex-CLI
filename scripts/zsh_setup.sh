@@ -5,37 +5,34 @@
 # You can pass the following arguments to the script:
 #   -o: Your OpenAI organization id.
 #   -k: Your OpenAI API key.
-#   -e: The OpenAI engine id that provides access to a model.
+#   -b: The API base URL.
+#   -m: The model id.
+#   -e: Legacy alias for -m.
 #
 # For example:
-# ./zsh_setup.sh -o <YOUR_ORG_ID> -k <YOUR_API_KEY> -e <ENGINE_ID>
+# ./zsh_setup.sh -o <YOUR_ORG_ID> -k <YOUR_API_KEY> -b <BASE_URL> -m <MODEL_ID>
 # 
 set -e
 
-# Call OpenAI API with the given settings to verify everythin is in order
+# Validate the settings before writing the configuration file
 validateSettings()
 {
-    echo -n "*** Testing Open AI access... "
-    local TEST=$(curl -s 'https://api.openai.com/v1/engines' -H "Authorization: Bearer $secret" -H "OpenAI-Organization: $orgId" -w '%{http_code}')
-    local STATUS_CODE=$(echo "$TEST"|tail -n 1)
-    if [ $STATUS_CODE -ne 200 ]; then
-        echo "ERROR [$STATUS_CODE]"
-        echo "Failed to access OpenAI API, result: $STATUS_CODE"
-        echo "Please check your OpenAI API key (https://beta.openai.com/account/api-keys)" 
-        echo "and Organization ID (https://beta.openai.com/account/org-settings)."
-        echo "*************"
-
-        exit 1
-    fi
-    local ENGINE_FOUND=$(echo "$TEST"|grep '"id"'|grep "\"$engineId\"")
-    if [ -z "$ENGINE_FOUND" ]; then
+    echo -n "*** Validating API settings... "
+    if [ -z "$secret" ] || [ -z "$baseUrl" ] || [ -z "$modelId" ]; then
         echo "ERROR"
-        echo "Cannot find OpenAI engine: $engineId" 
-        echo "Please check the OpenAI engine id (https://beta.openai.com/docs/engines/codex-series-private-beta)."
+        echo "API key, base URL, and model id are required."
         echo "*************"
-
         exit 1
     fi
+    case "$baseUrl" in
+        http://* | https://* ) ;;
+        * )
+            echo "ERROR"
+            echo "API base URL must start with http:// or https://."
+            echo "*************"
+            exit 1
+            ;;
+    esac
     echo "OK ***"
 }
 
@@ -62,7 +59,8 @@ configureApp()
     echo "[openai]" > $openAIConfigPath
     echo "organization_id=$orgId" >> $openAIConfigPath
     echo "secret_key=$secret" >> $openAIConfigPath
-    echo "engine=$engineId" >> $openAIConfigPath
+    echo "base_url=$baseUrl" >> $openAIConfigPath
+    echo "model=$modelId" >> $openAIConfigPath
     
     echo "Updated OpenAI configuration file ($openAIConfigPath) with secrets"
 
@@ -76,6 +74,8 @@ configureApp()
 zmodload zsh/zutil
 zparseopts -E -D -- \
           o:=o_orgId \
+          b:=o_baseUrl \
+          m:=o_modelId \
           e:=o_engineId \
           k:=o_key
 
@@ -85,10 +85,18 @@ else
     echo -n 'OpenAI Organization Id: '; read orgId
 fi
 
-if (( ${+o_engineId[2]} )); then
-    engineId=${o_engineId[2]}
+if (( ${+o_baseUrl[2]} )); then
+    baseUrl=${o_baseUrl[2]}
 else
-    echo -n 'OpenAI Engine Id: '; read engineId
+    echo -n 'API base URL: '; read baseUrl
+fi
+
+if (( ${+o_modelId[2]} )); then
+    modelId=${o_modelId[2]}
+elif (( ${+o_engineId[2]} )); then
+    modelId=${o_engineId[2]}
+else
+    echo -n 'Model Id: '; read modelId
 fi
 
 if (( ${+o_key[2]} )); then

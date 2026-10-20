@@ -12,7 +12,9 @@ Usage: source bash_setup.sh [optional parameters]
 
     -o orgId     Set the OpenAI organization id.
     -k apiKey    Set the OpenAI API key.
-    -e engineId  Set the OpenAI engine id.
+    -b baseUrl   Set the API base URL.
+    -m modelId   Set the model id.
+    -e modelId   Legacy alias for -m.
     -d           Print some system information for debugging.
     -h           Print this help content.
 
@@ -28,7 +30,8 @@ readParameters()
         case $1 in
             -o ) shift; ORG_ID=$1 ;;
             -k ) shift; SECRET_KEY=$1 ;;
-            -e ) shift; ENGINE_ID=$1 ;;
+            -b ) shift; BASE_URL=$1 ;;
+            -m | -e ) shift; MODEL_ID=$1 ;;
             -d ) systemInfo
                  exitScript
                 ;;
@@ -50,35 +53,35 @@ askSettings()
     if [ -z "$SECRET_KEY" ]; then
         echo -n 'OpenAI API key: '; read -s SECRET_KEY; echo
     fi
-    if [ -z "$ENGINE_ID" ]; then
-        echo -n 'OpenAI Engine Id: '; read ENGINE_ID
+    if [ -z "$BASE_URL" ]; then
+        echo -n 'API base URL: '; read BASE_URL
+    fi
+    if [ -z "$MODEL_ID" ]; then
+        echo -n 'Model Id: '; read MODEL_ID
     fi
 }
 
-# Call OpenAI API with the given settings to verify everythin is in order
+# Validate the settings before writing the configuration file
 validateSettings()
 {
-    echo -n "*** Testing Open AI access... "
-    local TEST=$(curl -s 'https://api.openai.com/v1/engines' -H "Authorization: Bearer $SECRET_KEY" -H "OpenAI-Organization: $ORG_ID" -w '%{http_code}')
-    local STATUS_CODE=$(echo "$TEST"|tail -n 1)
-    if [ $STATUS_CODE -ne 200 ]; then
-        echo "ERROR [$STATUS_CODE]"
-        echo "Failed to access OpenAI API, result: $STATUS_CODE"
-        echo "Please check your OpenAI API key (https://beta.openai.com/account/api-keys)" 
-        echo "and Organization ID (https://beta.openai.com/account/org-settings)."
-        echo "*************"
-        exitScript
-        return
-    fi
-    local ENGINE_FOUND=$(echo "$TEST"|grep '"id"'|grep "\"$ENGINE_ID\"")
-    if [ -z "$ENGINE_FOUND" ]; then
+    echo -n "*** Validating API settings... "
+    if [ -z "$SECRET_KEY" ] || [ -z "$BASE_URL" ] || [ -z "$MODEL_ID" ]; then
         echo "ERROR"
-        echo "Cannot find OpenAI engine: $ENGINE_ID" 
-        echo "Please check the OpenAI engine id (https://beta.openai.com/docs/engines/codex-series-private-beta)."
+        echo "API key, base URL, and model id are required."
         echo "*************"
         exitScript
         return
     fi
+    case "$BASE_URL" in
+        http://* | https://* ) ;;
+        * )
+            echo "ERROR"
+            echo "API base URL must start with http:// or https://."
+            echo "*************"
+            exitScript
+            return
+            ;;
+    esac
     echo "OK ***"
 }
 
@@ -89,7 +92,8 @@ configureApp()
     echo '[openai]' > $OPENAI_RC_FILE
     echo "organization_id=$ORG_ID" >> $OPENAI_RC_FILE
     echo "secret_key=$SECRET_KEY" >> $OPENAI_RC_FILE
-    echo "engine=$ENGINE_ID" >> $OPENAI_RC_FILE
+    echo "base_url=$BASE_URL" >> $OPENAI_RC_FILE
+    echo "model=$MODEL_ID" >> $OPENAI_RC_FILE
     chmod +x "$CODEX_CLI_PATH/src/codex_query.py"
 }
 
@@ -149,7 +153,7 @@ systemInfo()
 # Remove variables and functions from the environment, in case the script was sourced
 cleanupEnv()
 {
-    unset ORG_ID SECRET_KEY ENGINE_ID SOURCED OPENAI_RC_FILE BASH_RC_FILE
+    unset ORG_ID SECRET_KEY BASE_URL MODEL_ID SOURCED OPENAI_RC_FILE BASH_RC_FILE
     unset -f askSettings validateSettings configureApp configureBash enableApp readParameters
 }
 

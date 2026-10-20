@@ -16,7 +16,7 @@ def get_command_result(input, prompt_file):
     - save context
     - clear context
     - load context <filename>
-    - set engine <engine>
+    - set model <model>
     - set temperature <temperature>
     - set max_tokens <max_tokens>
     - set shell <shell>
@@ -58,12 +58,12 @@ def get_command_result(input, prompt_file):
                 return "config set", prompt_file
             else:
                 return "", prompt_file
-        elif input.__contains__("engine"):
+        elif input.__contains__("model") or input.__contains__("engine"):
             input = input.split()
             if len(input) == 4:
-                config['engine'] = input[3]
+                config['model'] = input[3]
                 prompt_file.set_config(config)
-                print("# Engine set to " + str(config['engine']))
+                print("# Model set to " + str(config['model']))
                 return "config set", prompt_file
             else:
                 return "", prompt_file
