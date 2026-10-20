@@ -4,6 +4,8 @@ import configparser
 
 from pathlib import Path
 
+from api_config import get_default_max_tokens, get_model
+
 
 API_KEYS_LOCATION = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'openaiapirc')
 
@@ -42,7 +44,7 @@ class PromptFile:
             lines = f.readlines()
 
         config = {
-            'model': lines[0].split(':')[1].strip(),
+            'model': lines[0].split(':', 1)[1].strip(),
             'temperature': float(lines[1].split(':')[1].strip()),
             'max_tokens': int(lines[2].split(':')[1].strip()),
             'shell': lines[3].split(':')[1].strip(),
@@ -231,14 +233,26 @@ class PromptFile:
             # read in the model name from openaiapirc
             config = configparser.ConfigParser()
             config.read(API_KEYS_LOCATION)
-            MODEL = config['openai'].get(
-                'model', config['openai'].get('engine', '')
-            ).strip('"').strip("'")
+            MODEL = get_model(config['openai'])
+            # Bundled examples use historical engine placeholders. Saved contexts
+            # carry the user's explicit model, including legacy engine headers.
+            bundled_contexts = (
+                'bash-context.txt', 'zsh-context.txt', 'powershell-context.txt',
+                'powershell-voice.txt', 'powershell-voice-cognitive-service.txt',
+            )
+            max_tokens = int(lines[2].split(':')[1].strip())
+            model_key, _, saved_model = lines[0].partition(':')
+            if filename in bundled_contexts and model_key.strip('# ') == 'engine':
+                max_tokens = get_default_max_tokens(config['openai'], max_tokens)
+            if (model_key.strip('# ') == 'model' or
+                    (filename not in bundled_contexts and
+                     model_key.strip('# ') == 'engine')):
+                MODEL = saved_model.strip() or MODEL
 
             config = {
                 'model': MODEL,
                 'temperature': float(lines[1].split(':')[1].strip()),
-                'max_tokens': int(lines[2].split(':')[1].strip()),
+                'max_tokens': max_tokens,
                 'shell': lines[3].split(':')[1].strip(),
                 'multi_turn': lines[4].split(':')[1].strip(),
                 'token_count': int(lines[5].split(':')[1].strip())

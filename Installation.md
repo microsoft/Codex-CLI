@@ -28,13 +28,13 @@ The setup scripts accept an API base URL and model id. Use one of these regional
 * Global: `https://api.minimax.io/v1`
 * China: `https://api.minimaxi.com/v1`
 
-The current model ids are `MiniMax-M3` and `MiniMax-M2.7`. For example:
+The current model ids are `MiniMax-M3.1-Flash` (recommended) and `MiniMax-M3`. For example:
 
 ```bash
-source bash_setup.sh -k YOUR_API_KEY -b https://api.minimax.io/v1 -m MiniMax-M3
+source bash_setup.sh -k YOUR_API_KEY -b https://api.minimax.io/v1 -m MiniMax-M3.1-Flash
 ```
 
-The generated `src/openaiapirc` stores `base_url` and `model`; `organization_id` is optional.
+The generated `src/openaiapirc` stores `base_url` and `model`; `organization_id` is optional. When editing this file manually, omitting or leaving `model` blank selects `MiniMax-M3.1-Flash` for either direct MiniMax base URL. Explicit model ids and the legacy `engine` alias take precedence; custom endpoints require an explicit model.
 
 ## Bash instructions
 
@@ -88,7 +88,7 @@ By default `bash_setup.sh` will prompt for the required settings. It's also poss
 Example: 
 
 ```
-source bash_setup.sh -k YOUR_API_KEY -b https://api.minimax.io/v1 -m MiniMax-M3
+source bash_setup.sh -k YOUR_API_KEY -b https://api.minimax.io/v1 -m MiniMax-M3.1-Flash
 ```
 
 For help running the Codex CLI Bash setup, please run the following command:   
@@ -153,7 +153,7 @@ For more information about Execution Policies, see
 3. In the same Powershell terminal, go to `C:\your\custom\path\Codex-CLI\` (the folder that contains the cloned Codex CLI project). Run the command below with your API base URL and model id. It will prompt you for an API key.
 
 ```PowerShell
-.\scripts\powershell_setup.ps1 -OpenAIApiBaseUrl 'https://api.minimax.io/v1' -OpenAIModelId 'MiniMax-M3'
+.\scripts\powershell_setup.ps1 -OpenAIApiBaseUrl 'https://api.minimax.io/v1' -OpenAIModelId 'MiniMax-M3.1-Flash'
 ```
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;See [About powershell_setup.ps1](#about-powershell_setupps1) section to learn script parameters.
 

@@ -10,6 +10,7 @@ from pathlib import Path
 import openai
 import psutil
 
+from api_config import get_default_max_tokens, get_model, get_setting
 from prompt_file import PromptFile
 from commands import get_command_result
 
@@ -51,11 +52,6 @@ def create_template_ini_file():
         sys.exit(1)
 
 
-def get_setting(settings, key, fallback=''):
-    value = settings.get(key, fallback)
-    return value.strip().strip('"').strip("'")
-
-
 def initialize():
     """
     Initialize openAI and shell mode
@@ -72,7 +68,7 @@ def initialize():
     api_key = get_setting(settings, 'secret_key')
     base_url = get_setting(settings, 'base_url')
     organization_id = get_setting(settings, 'organization_id')
-    MODEL = get_setting(settings, 'model') or get_setting(settings, 'engine')
+    MODEL = get_model(settings)
 
     if not api_key or not MODEL:
         raise ValueError('secret_key and model are required in openaiapirc')
@@ -87,7 +83,7 @@ def initialize():
     prompt_config = {
         'model': MODEL,
         'temperature': TEMPERATURE,
-        'max_tokens': MAX_TOKENS,
+        'max_tokens': get_default_max_tokens(settings, MAX_TOKENS),
         'shell': SHELL,
         'multi_turn': MULTI_TURN,
         'token_count': 0

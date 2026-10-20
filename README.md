@@ -24,7 +24,7 @@ This repository aims to grow the understanding of using Codex in applications by
 * MiniMax API credentials
     * API key.
     * API base URL: `https://api.minimax.io/v1` globally or `https://api.minimaxi.com/v1` in China.
-    * Model id: `MiniMax-M3` or `MiniMax-M2.7`.
+    * Model id: `MiniMax-M3.1-Flash` (default) or `MiniMax-M3`.
 
 ## Installation
 
@@ -68,7 +68,7 @@ Any time the model seems to output consistently incorrect commands, you can use 
 | `set <config-key> <config-value>` | Sets the configuration of your interaction with the model |
 
 
-Feel free to improve your experience by changing the token limit, model id and temperature using the set command. For example, `# set model MiniMax-M3`, `# set temperature 0.5`, `# set max_tokens 50`.
+Feel free to improve your experience by changing the token limit, model id and temperature using the set command. For example, `# set model MiniMax-M3.1-Flash`, `# set temperature 0.5`, `# set max_tokens 32768`.
 
 ## Prompt Engineering and Context Files
 
@@ -116,7 +116,7 @@ Sometimes the `openai` package will throws errors that aren't caught by the tool
 ## FAQ
 ### Which MiniMax models are supported?
 
-Set `model` to `MiniMax-M3` or `MiniMax-M2.7` in `src/openaiapirc`. The client sends requests to the configured `base_url` using the chat completions API.
+Set `model` to `MiniMax-M3.1-Flash` or `MiniMax-M3` in `src/openaiapirc`. For either direct MiniMax base URL above, an omitted or blank model defaults to `MiniMax-M3.1-Flash`. Explicit `model` values, the legacy `engine` alias, and models in saved contexts are preserved. Custom endpoints still require an explicit model. The client sends requests to the configured `base_url` using the chat completions API, leaving thinking and reasoning effort at the model's API defaults. New contexts for these two models use a 32,768-token generation budget, including thinking; saved budgets are unchanged. Adjust it with `# set max_tokens <limit>` if needed.
 
 ### Can I run the sample on Azure?
 The sample code can be currently be used with Codex on OpenAI’s API. In the coming months, the sample will be updated so you can also use it with the [Azure OpenAI Service](https://aka.ms/azure-openai). 
